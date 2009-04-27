@@ -37,8 +37,7 @@ module Recliner::Document::Properties
   
   def attributes=(attrs)
     attrs.each do |key, value|
-      as = self.class.properties[key.to_sym]
-      attributes[as] = value if as
+      self.send("#{key}=", value) unless key == 'class'
     end
   end
   

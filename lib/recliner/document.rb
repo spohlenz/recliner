@@ -20,8 +20,15 @@ class Recliner::Document
   property :id,  String, :as => '_id'
   property :rev, String, :as => '_rev'
   
+  # Special case as old document needs to be deleted if the id is changed
+  def id=(new_id)
+    @old_id = id
+    attributes['_id'] = new_id
+  end
+  
   def save
     result = self.class.database.put(id, attributes_with_class)
+    self.class.database.delete("#{@old_id}?rev=#{rev}") if @old_id
     
     self.id = result['id']
     self.rev = result['rev']

@@ -45,12 +45,46 @@ describe "Save a Recliner::Document" do
     end
   end
   
-  describe "an existing document" do
+  describe "an existing document (changing id)" do
+    subject { BasicDocument.load('abc') }
     
+    before(:each) do
+      CouchDB.no_document_at('http://localhost:5984/recliner-test/1234')
+      CouchDB.document_at('http://localhost:5984/recliner-test/abc',
+                          { :class => 'BasicDocument', :_id => 'abc' })
+      
+      subject.id = '1234'
+    end
+    
+    it "should save the document" do
+      subject.save.should be_true
+    end
+    
+    it "should remove the document at the old id" do
+      subject.save
+      CouchDB.should_not have_document.at('http://localhost:5984/recliner-test/abc')
+    end
+    
+    it "should create the document at the new id" do
+      subject.save
+      CouchDB.should have_document({ :class => 'BasicDocument', :_id => '1234' }).
+                     at('http://localhost:5984/recliner-test/1234')
+    end
   end
   
   describe "an existing document with an out-of-date revision" do
+    subject { BasicDocument.load('abc') }
     
+    before(:each) do
+      CouchDB.document_at('http://localhost:5984/recliner-test/abc',
+                          { :class => 'BasicDocument', :_id => 'abc' })
+      
+      subject.rev = 'WRONG'
+    end
+    
+    it "should not save the document" do
+      subject.save.should be_false
+    end
   end
 end
 
