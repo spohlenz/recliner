@@ -137,3 +137,22 @@ describe "Load a Recliner::Document" do
     end
   end
 end
+
+
+module ReclinerTest
+  class TestClass < Recliner::Document; end
+end  
+
+describe "Save a scoped Recliner::Document" do
+  subject { ReclinerTest::TestClass.new(:id => '1234') }
+  
+  before(:each) do
+    CouchDB.no_document_at('http://localhost:5984/recliner-test/1234')
+    subject.save
+  end
+  
+  it "should set the class attribute correctly" do
+    CouchDB.should have_document({ :class => 'ReclinerTest::TestClass' }).
+                   at('http://localhost:5984/recliner-test/1234')
+  end
+end
