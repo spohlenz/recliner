@@ -1,6 +1,6 @@
 module CouchDB
   module Matchers
-    class HaveDocument
+    class HaveDocumentMatcher
       def initialize(expected)
         @expected = expected
       end
@@ -48,7 +48,7 @@ module CouchDB
     end
     
     def have_document(doc=nil)
-      HaveDocument.new(doc)
+      HaveDocumentMatcher.new(doc)
     end
   end
 end

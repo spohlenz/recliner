@@ -20,6 +20,12 @@ describe "An instance of a Recliner::Document class" do
   it "should be a new record" do
     subject.new_record?.should be_true
   end
+  
+  it "should allow attributes to be assigned with a hash" do
+    subject.attributes = { :id => '123', :rev => '456' }
+    subject.id.should == '123'
+    subject.rev.should == '456'
+  end
 end
 
 describe "Save a Recliner::Document" do
@@ -78,12 +84,35 @@ describe "Save a Recliner::Document" do
     before(:each) do
       CouchDB.document_at('http://localhost:5984/recliner-test/abc',
                           { :class => 'BasicDocument', :_id => 'abc' })
-      
       subject.rev = 'WRONG'
     end
     
     it "should not save the document" do
       subject.save.should be_false
+    end
+    
+    it "should raise a Recliner::StaleRevisionError error when using save!" do
+      lambda {
+        subject.save!
+      }.should raise_error(Recliner::StaleRevisionError)
+    end
+  end
+  
+  describe "an invalid document" do
+    subject { BasicDocument.new }
+    
+    before(:each) do
+      subject.stub!(:valid?).and_return(false)
+    end
+    
+    it "should not save" do
+      subject.save.should be_false
+    end
+    
+    it "should raise a Recliner::DocumentNotSaved error when using save!" do
+      lambda {
+        subject.save!
+      }.should raise_error(Recliner::DocumentNotSaved)
     end
   end
 end

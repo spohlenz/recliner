@@ -1,9 +1,12 @@
+require 'active_support'
 require 'json'
 require 'rest_client'
 
 $:.unshift File.dirname(__FILE__) unless
   $:.include?(File.dirname(__FILE__)) ||
   $:.include?(File.expand_path(File.dirname(__FILE__)))
+
+require 'json_ext'
 
 module Recliner
   VERSION = '0.0.1'
@@ -12,6 +15,7 @@ module Recliner
   autoload :Document,   'recliner/document'
   
   class DocumentNotFound < StandardError; end
+  class DocumentNotSaved < StandardError; end
   class StaleRevisionError < StandardError; end
   
   class << self

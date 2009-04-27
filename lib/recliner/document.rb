@@ -1,4 +1,3 @@
-require 'active_support'
 require 'uuid'
 
 class Recliner::Document
@@ -26,9 +25,28 @@ class Recliner::Document
     attributes['_id'] = new_id
   end
   
+  # If the doc id has changed, we need to delete the old document when saving
+  def id_changed?
+    @old_id && @old_id != id
+  end
+  
+  #
+  #
+  #
   def save
+    save!
+  rescue
+    false
+  end
+  
+  #
+  #
+  #
+  def save!
+    raise Recliner::DocumentNotSaved unless valid?
+    
     result = self.class.database.put(id, attributes_with_class)
-    self.class.database.delete("#{@old_id}?rev=#{rev}") if @old_id
+    self.class.database.delete("#{@old_id}?rev=#{rev}") if id_changed?
     
     self.id = result['id']
     self.rev = result['rev']
@@ -36,15 +54,23 @@ class Recliner::Document
     @new_record = false
     
     true
-  rescue
-    false
   end
   
+  #
+  #
+  #
   def new_record?
     @new_record
   end
   
+  def valid?
+    true
+  end
+  
   class << self
+    #
+    #
+    #
     def load(id)
       attrs = database.get(id)
       raise Recliner::DocumentNotFound unless attrs['class'] == name
