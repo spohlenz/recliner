@@ -1,27 +1,24 @@
-require 'uuid'
-
 class Recliner::Document
   class_inheritable_accessor :database_uri
   
   def initialize(attributes={})
-    self.attributes = attributes
-    self.id ||= generate_guid
-    
+    self.attributes = self.class.default_attributes(self).merge(attributes)
     @new_record = true
   end
   
+  autoload :Properties,    'recliner/properties'
+  autoload :PrettyInspect, 'recliner/pretty_inspect'
+  
+  include Properties, PrettyInspect
+  
   # Define core properties
   
-  autoload :Properties, 'recliner/properties'
-  
-  include Properties
-  
-  property :id,  String, :as => '_id'
+  property :id,  String, :as => '_id', :default => lambda { generate_guid }
   property :rev, String, :as => '_rev'
   
   # Special case as old document needs to be deleted if the id is changed
   def id=(new_id)
-    @old_id = id
+    @old_id = id unless new_record?
     attributes['_id'] = new_id
   end
   
@@ -63,6 +60,7 @@ class Recliner::Document
     @new_record
   end
   
+  # TODO: Extract out into Validation module
   def valid?
     true
   end
@@ -75,26 +73,33 @@ class Recliner::Document
       attrs = database.get(id)
       raise Recliner::DocumentNotFound unless attrs['class'] == name
       
-      attrs['id'] = attrs.delete('_id')
-      attrs['rev'] = attrs.delete('_rev')
-      
-      returning new(attrs) do |record|
-        record.instance_variable_set("@new_record", false)
-      end
+      instantiate_from_database(attrs)
     end
     
+    #
+    #
+    #
     def use_database!(uri)
-      @database = nil unless uri == database_uri
+      @database = nil
       self.database_uri = uri
     end
     
+    #
+    #
+    #
     def database
       @database ||= Recliner::Database.new(database_uri)
     end
-  end
-
-protected
-  def generate_guid
-    UUID.generate
+  
+  private
+    def instantiate_from_database(attrs)
+      returning(new) do |record|
+        properties.each do |name, property|
+          record.attributes[property.as] = property.type.from_couch(attrs[property.as])
+        end
+        
+        record.instance_variable_set("@new_record", false)
+      end
+    end
   end
 end

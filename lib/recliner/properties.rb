@@ -1,5 +1,11 @@
+require 'uuid'
+
 class Recliner::Document
-  Property = Struct.new(:name, :type, :as, :default)
+  class Property < Struct.new(:name, :type, :as, :default)
+    def default_value(instance)
+      default.respond_to?(:call) ? default.call(instance) : default
+    end
+  end
   
   module Properties
     def self.included(base)
@@ -8,7 +14,7 @@ class Recliner::Document
       base.class_inheritable_accessor :properties
       base.properties = {}
     end
-  
+    
     module ClassMethods
       #
       #
@@ -28,40 +34,79 @@ class Recliner::Document
           raise 'Either a type or block must be provided'
         end
       end
-    
+      
       #
       #
       #
-      def default_attributes
+      def model_properties
+        properties.reject { |name, property| [:id, :rev].include?(name) }
+      end
+      
+      #
+      #
+      #
+      def default_attributes(instance)
         properties.inject({}) do |result, pair|
           name, property = pair
-          result[property.as] = property.default unless [:id, :rev].include?(name)
+          result[name] = property.default_value(instance) unless name == :rev
           result
-        end
+        end.with_indifferent_access
       end
     
     private
       def create_property_accessors!(property)
         class_eval <<-END_RUBY
           def #{property.name}
-            attributes['#{property.as}']
+            read_attribute(:#{property.name})
           end
   
           def #{property.name}=(value)
-            attributes['#{property.as}'] = #{property.type}.from_json(value)
+            write_attribute(:#{property.name}, value)
           end
         END_RUBY
       end
+      
+    protected
+      # Unique ID generation for new documents
+      def generate_guid
+        UUID.generate
+      end
     end
-  
+    
+    #
+    #
+    #
+    def read_attribute(name)
+      attributes[property(name).as]
+    end
+    
+    #
+    #
+    #
+    def write_attribute(name, value)
+      attributes[property(name).as] = value
+      value
+    end
+    
+    #
+    #
+    #
     def attributes
-      @attributes ||= self.class.default_attributes
+      @attributes ||= {}.with_indifferent_access
     end
   
+    #
+    #
+    #
     def attributes=(attrs)
       attrs.each do |key, value|
         self.send("#{key}=", value) unless key == 'class'
       end
+    end
+    
+  private
+    def property(name)
+      properties[name]
     end
   
     def attributes_with_class

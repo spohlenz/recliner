@@ -1,8 +1,30 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
+class MyCustomClass
+  attr_accessor :a, :b
+  
+  def initialize(a, b)
+    @a = a; @b = b
+  end
+  
+  def self.from_couch(h)
+    new(h['a'], h['b']) if h
+  end
+  
+  def to_json
+    { 'a' => a, 'b' => b }.to_json
+  end
+  
+  def ==(other)
+    a == other.a && b == other.b
+  end
+end
+
 class PropertyDocument < Recliner::Document
   property :normal_property, String
   property :property_with_default_value, String, :default => 'the default'
+  property :property_with_default_lambda_value, String, :default => lambda { 'hello' }
+  property :property_with_default_lambda_value_yielding_doc, String, :default => lambda { |d| d.class.to_s }
   
   property :nested do
     property :first, String
@@ -14,14 +36,20 @@ class PropertyDocument < Recliner::Document
   property :a_time, Time
   property :a_date, Date
   property :a_hash, Hash
+  property :a_custom_class, MyCustomClass
 end
 
 describe "Basic properties" do
   subject { PropertyDocument.new }
   
   it "should create accessors for properties" do
-    subject.should respond_to(:normal_property)
-    subject.should respond_to(:normal_property=)
+    subject.normal_property = 'a string'
+    subject.normal_property.should == 'a string'
+  end
+  
+  it "should allow direct attribute setting/getting" do
+    subject.write_attribute(:normal_property, 'a string')
+    subject.read_attribute(:normal_property).should == 'a string'
   end
   
   it "should save the property value to the database" do
@@ -37,6 +65,14 @@ describe "Basic properties" do
     subject.property_with_default_value.should == 'the default'
   end
   
+  it "should support default procs/lambdas for properties" do
+    subject.property_with_default_lambda_value.should == 'hello'
+  end
+  
+  it "should yield document instance to default procs/lambdas" do
+    subject.property_with_default_lambda_value_yielding_doc.should == 'PropertyDocument'
+  end
+  
   it "should support nested properties"
   
   describe "Property serialization" do
@@ -47,5 +83,6 @@ describe "Basic properties" do
     it { t = Time.now; should serialize(:a_time).to(t) }
     it { should serialize(:a_date).to(Date.today) }
     it { should serialize(:a_hash).to({ 'num' => 5, 'str' => 'abc' }) }
+    it { should serialize(:a_custom_class).to(MyCustomClass.new('Hello', 123)) }
   end
 end

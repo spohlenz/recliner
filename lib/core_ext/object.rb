@@ -1,9 +1,9 @@
 class Object
-  def to_json
+  def to_couch
     self
   end
   
-  def self.from_json(val)
+  def self.from_couch(val)
     val
   end
 end

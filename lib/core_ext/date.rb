@@ -1,5 +1,5 @@
 class Date
-  def self.from_json(val)
+  def self.from_couch(val)
     case val
     when String
       parse(val)
