@@ -168,6 +168,38 @@ describe "Load a Recliner::Document" do
 end
 
 
+describe "Loading multiple Recliner::Documents" do
+  it "should return documents given multiple doc ids" do
+    CouchDB.document_at('http://localhost:5984/recliner-test/first', { :class => 'BasicDocument' })
+    CouchDB.document_at('http://localhost:5984/recliner-test/second', { :class => 'BasicDocument' })
+    CouchDB.document_at('http://localhost:5984/recliner-test/third', { :class => 'BasicDocument' })
+    
+    result = BasicDocument.load('first', 'second', 'third')
+    result.map(&:id).should == [ 'first', 'second', 'third' ]
+  end
+  
+  it "should raise Recliner::DocumentNotFound if any document id doesn't exist" do
+    CouchDB.document_at('http://localhost:5984/recliner-test/first', { :class => 'BasicDocument' })
+    CouchDB.document_at('http://localhost:5984/recliner-test/second', { :class => 'BasicDocument' })
+    CouchDB.no_document_at('http://localhost:5984/recliner-test/third')
+    
+    lambda {
+      BasicDocument.load('first', 'second', 'third')
+    }.should raise_error(Recliner::DocumentNotFound)
+  end
+  
+  it "should raise Recliner::DocumentNotFound if any document has an incorrect class" do
+    CouchDB.document_at('http://localhost:5984/recliner-test/first', { :class => 'BasicDocument' })
+    CouchDB.document_at('http://localhost:5984/recliner-test/second', { :class => 'BasicDocument' })
+    CouchDB.document_at('http://localhost:5984/recliner-test/third', { :class => 'WrongDocument' })
+    
+    lambda {
+      BasicDocument.load('first', 'second', 'third')
+    }.should raise_error(Recliner::DocumentNotFound)
+  end
+end
+
+
 module ReclinerTest
   class TestClass < Recliner::Document; end
 end  

@@ -56,13 +56,13 @@ class Recliner::Document
     private
       def create_property_accessors!(property)
         class_eval <<-END_RUBY
-          def #{property.name}
-            read_attribute(:#{property.name})
-          end
+          def #{property.name}                          # def title
+            read_attribute(:#{property.name})           #   read_attribute(:title)
+          end                                           # end
   
-          def #{property.name}=(value)
-            write_attribute(:#{property.name}, value)
-          end
+          def #{property.name}=(value)                  # def title(value)
+            write_attribute(:#{property.name}, value)   #   write_attribute(:title, value)
+          end                                           # end
         END_RUBY
       end
       

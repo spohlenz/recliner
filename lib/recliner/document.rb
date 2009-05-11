@@ -69,11 +69,12 @@ class Recliner::Document
     #
     #
     #
-    def load(id)
-      attrs = database.get(id)
-      raise Recliner::DocumentNotFound unless attrs['class'] == name
-      
-      instantiate_from_database(attrs)
+    def load(*ids)
+      if ids.size == 1
+        load_single(ids.first)
+      else
+        load_multiple(ids)
+      end
     end
     
     #
@@ -92,7 +93,22 @@ class Recliner::Document
     end
   
   private
+    def load_single(id)
+      attrs = database.get(id)
+      instantiate_from_database(attrs)
+    end
+    
+    def load_multiple(ids)
+      result = database.post('_all_docs?include_docs=true', { :keys => ids })
+      result['rows'].map { |row|
+        raise Recliner::DocumentNotFound unless row['doc']
+        instantiate_from_database(row['doc'])
+      }
+    end
+    
     def instantiate_from_database(attrs)
+      raise Recliner::DocumentNotFound unless attrs['class'] == name
+      
       returning(new) do |record|
         properties.each do |name, property|
           record.attributes[property.as] = property.type.from_couch(attrs[property.as])

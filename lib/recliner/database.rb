@@ -10,16 +10,16 @@ class Recliner::Database
     Recliner.get("#{uri}/#{id}")
   end
   
-  def post(payload)
-    Recliner.post(uri, payload)
+  def post(path, payload)
+    Recliner.post("#{uri}/#{path}", payload)
   end
   
-  def put(id, payload)
-    Recliner.put("#{uri}/#{id}", payload)
+  def put(path, payload)
+    Recliner.put("#{uri}/#{path}", payload)
   end
   
-  def delete(id)
-    Recliner.delete("#{uri}/#{id}")
+  def delete(path)
+    Recliner.delete("#{uri}/#{path}")
   end
   
   def delete!
