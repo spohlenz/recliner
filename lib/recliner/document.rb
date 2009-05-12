@@ -7,16 +7,21 @@ class Recliner::Document
   end
   
   autoload :Properties,    'recliner/properties'
+  autoload :Views,         'recliner/views'
   autoload :PrettyInspect, 'recliner/pretty_inspect'
   
-  include Properties, PrettyInspect
+  include Properties, Views, PrettyInspect
   
   # Define core properties
   
   property :id,  String, :as => '_id', :default => lambda { generate_guid }
   property :rev, String, :as => '_rev'
   
-  # Special case as old document needs to be deleted if the id is changed
+  # Define default views
+  
+  # view :all, :map => "if (doc.class == '#{name}') emit(null, doc)"
+  
+  # Special case for id setter as old document needs to be deleted if the id is changed
   def id=(new_id)
     @old_id = id unless new_record?
     attributes['_id'] = new_id
@@ -58,6 +63,11 @@ class Recliner::Document
   #
   def new_record?
     @new_record
+  end
+  
+  # Two documents are considered equal if they share the same document id and class
+  def ==(other)
+    other.class == self.class && other.id == self.id
   end
   
   # TODO: Extract out into Validation module
@@ -107,9 +117,11 @@ class Recliner::Document
     end
     
     def instantiate_from_database(attrs)
-      raise Recliner::DocumentNotFound unless attrs['class'] == name
+      raise Recliner::DocumentNotFound if name != 'Recliner::Document' && name != attrs['class']
       
-      returning(new) do |record|
+      klass = attrs['class'].constantize
+      
+      returning(klass.new) do |record|
         properties.each do |name, property|
           record.attributes[property.as] = property.type.from_couch(attrs[property.as])
         end

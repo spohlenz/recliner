@@ -165,6 +165,17 @@ describe "Load a Recliner::Document" do
       }.should raise_error(Recliner::DocumentNotFound)
     end
   end
+  
+  describe "loading via Recliner::Document" do
+    before(:each) do
+      CouchDB.document_at('http://localhost:5984/recliner-test/abc',
+                          { :class => 'BasicDocument', :_id => 'abc' })
+    end
+    
+    it "should return the same object as BasicDocument.load" do
+      Recliner::Document.load('abc').should == BasicDocument.load('abc')
+    end
+  end
 end
 
 
