@@ -1,6 +1,6 @@
 require 'uuid'
 
-class Recliner::Document
+module Recliner
   class Property < Struct.new(:name, :type, :as, :default)
     def default_value(instance)
       default.respond_to?(:call) ? default.call(instance) : default

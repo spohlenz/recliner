@@ -11,8 +11,12 @@ require 'core_ext'
 module Recliner
   VERSION = '0.0.1'
   
-  autoload :Database,   'recliner/database'
-  autoload :Document,   'recliner/document'
+  autoload :Database,      'recliner/database'
+  autoload :Document,      'recliner/document'
+  
+  autoload :Properties,    'recliner/properties'
+  autoload :Views,         'recliner/views'
+  autoload :PrettyInspect, 'recliner/pretty_inspect'
   
   class DocumentNotFound < StandardError; end
   class DocumentNotSaved < StandardError; end
