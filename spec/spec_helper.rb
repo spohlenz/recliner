@@ -28,3 +28,23 @@ Spec::Runner.configure do |config|
     recreate_database!
   end
 end
+
+class MyCustomClass
+  attr_accessor :a, :b
+  
+  def initialize(a, b)
+    @a = a; @b = b
+  end
+  
+  def self.from_couch(h)
+    new(h['a'], h['b']) if h
+  end
+  
+  def to_json
+    { 'a' => a, 'b' => b }.to_json
+  end
+  
+  def ==(other)
+    a == other.a && b == other.b
+  end
+end

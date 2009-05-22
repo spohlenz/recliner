@@ -6,8 +6,8 @@ class Recliner::Database
     create_database_if_missing!
   end
   
-  def get(id)
-    Recliner.get("#{uri}/#{id}")
+  def get(id, params={})
+    Recliner.get("#{uri}/#{id}", params)
   end
   
   def post(path, payload)

@@ -1,25 +1,5 @@
 require File.dirname(__FILE__) + '/../spec_helper'
 
-class MyCustomClass
-  attr_accessor :a, :b
-  
-  def initialize(a, b)
-    @a = a; @b = b
-  end
-  
-  def self.from_couch(h)
-    new(h['a'], h['b']) if h
-  end
-  
-  def to_json
-    { 'a' => a, 'b' => b }.to_json
-  end
-  
-  def ==(other)
-    a == other.a && b == other.b
-  end
-end
-
 class PropertyDocument < Recliner::Document
   property :normal_property, String
   property :property_with_default_value, String, :default => 'the default'
@@ -36,6 +16,7 @@ class PropertyDocument < Recliner::Document
   property :a_time, Time
   property :a_date, Date
   property :a_hash, Hash
+  property :a_boolean, Boolean
   property :a_custom_class, MyCustomClass
 end
 
@@ -47,9 +28,14 @@ describe "Basic properties" do
     subject.normal_property.should == 'a string'
   end
   
-  it "should allow direct attribute setting/getting" do
-    subject.write_attribute(:normal_property, 'a string')
-    subject.read_attribute(:normal_property).should == 'a string'
+  it "should allow getting properties using hash syntax []" do
+    subject.normal_property = 'a string'
+    subject[:normal_property].should == 'a string'
+  end
+  
+  it "should allow setting properties using hash syntax []=" do
+    subject[:normal_property] = 'a string'
+    subject.normal_property.should == 'a string'
   end
   
   it "should save the property value to the database" do
@@ -83,6 +69,7 @@ describe "Basic properties" do
     it { t = Time.now; should serialize(:a_time).to(t) }
     it { should serialize(:a_date).to(Date.today) }
     it { should serialize(:a_hash).to({ 'num' => 5, 'str' => 'abc' }) }
+    it { should serialize(:a_boolean).to(false) }
     it { should serialize(:a_custom_class).to(MyCustomClass.new('Hello', 123)) }
   end
 end

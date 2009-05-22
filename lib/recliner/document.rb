@@ -1,27 +1,42 @@
 module Recliner
   class Document
     class_inheritable_accessor :database_uri
-  
+    self.database_uri = 'http://localhost:5984/recliner-default'
+    
+    attr_reader :database
+    
     def initialize(attributes={})
       self.attributes = self.class.default_attributes(self).merge(attributes)
+      @database = self.class.database
       @new_record = true
+      
+      yield self if block_given?
+      
+      callback(:after_initialize) if respond_to?(:after_initialize)
     end
+    
     
     # Define core properties
     
-    include Properties
+    include Properties, CompositeProperties
   
     property :id,  String, :as => '_id', :default => lambda { generate_guid }
     property :rev, String, :as => '_rev'
   
-    # Define default views
   
-    # view :all, :map => "if (doc.class == '#{name}') emit(null, doc)"
+    # Define default views
+    
+    include Views
+    
+    view :all, :map => 'if (doc.class == "#{name}") emit(#{default_order}, doc);'
+    
+    default_order :id
   
     #
     # Example views
     #
     # view :by_title, :order => :title
+    # view :published, :conditions => { :published => true }
     # view :custom_map, :map => "emit(null, doc)"          # function is optional
     # view :custom_reduce, :map => "function(doc) { emit(doc.tag, doc); }",
     #                      :reduce => "function(keys, values) { return sum(values); }"
@@ -47,33 +62,34 @@ module Recliner
     #
     #
     def save
-      save!
-    rescue
-      false
+      create_or_update
     end
   
     #
     #
     #
     def save!
-      raise Recliner::DocumentNotSaved unless valid?
-    
-      result = self.class.database.put(id, attributes_with_class)
-      self.class.database.delete("#{@old_id}?rev=#{rev}") if id_changed?
-    
-      self.id = result['id']
-      self.rev = result['rev']
-    
-      @new_record = false
-    
-      true
+      save || raise(DocumentNotSaved)
     end
-  
+    
     #
     #
     #
+    def destroy
+      delete
+    end
+    
+    #
+    #
+    #
+    def delete
+      database.delete("#{id}?rev=#{rev}")
+      self
+    end
+    
+    # Returns true if this object hasn't been saved yet -- that is, a record for the object doesn't exist yet; otherwise, returns false.
     def new_record?
-      @new_record
+      @new_record || false
     end
   
     # Two documents are considered equal if they share the same document id and class
@@ -81,70 +97,167 @@ module Recliner
       other.class == self.class && other.id == self.id
     end
   
-    # TODO: Extract out into Validation module
-    def valid?
-      true
+  private
+    def create_or_update
+      result = new_record? ? create : update
+      result != false
     end
-  
+    
+    def create
+      save_to_database
+    end
+    
+    def update
+      save_to_database
+    end
+    
+    def save_to_database
+      result = database.put(id, attributes_with_class)
+      database.delete("#{@old_id}?rev=#{rev}") if id_changed?
+      
+      self.id = result['id']
+      self.rev = result['rev']
+      
+      @new_record = false
+      
+      true
+    rescue
+      false
+    end
+    
     class << self
       #
       #
       #
       def load(*ids)
-        if ids.size == 1
-          load_single(ids.first)
-        else
-          load_multiple(ids)
+        load_ids(ids, false)
+      end
+      
+      #
+      #
+      #
+      def load!(*ids)
+        load_ids(ids, true)
+      end
+      
+      #
+      #
+      #
+      def create(attributes={})
+        returning new(attributes) do |doc|
+          doc.save
         end
       end
-    
+      
+      #
+      #
+      #
+      def create!(attributes={})
+        returning new(attributes) do |doc|
+          doc.save!
+        end
+      end
+      
+      #
+      #
+      #
+      def destroy(id)
+        if id.is_a?(Array)
+          id.map { |i| destroy(i) }
+        else
+          load(id).destroy
+        end
+      end
+      
+      #
+      #
+      #
+      def delete(id)
+        if id.is_a?(Array)
+          id.map { |i| delete(i) }
+        else
+          load(id).delete
+        end
+      end
+      
       #
       #
       #
       def use_database!(uri)
-        @database = nil
+        @default_database = nil
         self.database_uri = uri
       end
-    
+      
       #
       #
       #
       def database
-        @database ||= Recliner::Database.new(database_uri)
+        Thread.current["#{name}_database"] || default_database
       end
-  
-    private
-      def load_single(id)
-        attrs = database.get(id)
-        instantiate_from_database(attrs)
-      end
-    
-      def load_multiple(ids)
-        result = database.post('_all_docs?include_docs=true', { :keys => ids })
-        result['rows'].map { |row|
-          raise Recliner::DocumentNotFound unless row['doc']
-          instantiate_from_database(row['doc'])
-        }
-      end
-    
-      def instantiate_from_database(attrs)
-        raise Recliner::DocumentNotFound if name != 'Recliner::Document' && name != attrs['class']
       
+      #
+      #
+      #
+      def with_database(db)
+        Thread.current["#{name}_database"] = db
+        
+        yield
+      ensure
+        Thread.current["#{name}_database"] = nil
+      end
+      
+      def instantiate_from_database(attrs)
         klass = attrs['class'].constantize
       
         returning(klass.new) do |record|
-          properties.each do |name, property|
+          klass.properties.each do |name, property|
             record.attributes[property.as] = property.type.from_couch(attrs[property.as])
           end
         
           record.instance_variable_set("@new_record", false)
+          record.send(:callback, :after_load) if record.respond_to?(:after_load)
         end
+      end
+    
+    private
+      def load_ids(ids, raise_exceptions=false)
+        if ids.size == 1
+          load_single(ids.first, raise_exceptions)
+        else
+          load_multiple(ids, raise_exceptions)
+        end
+      end
+      
+      def load_single(id, raise_exceptions=false)
+        attrs = database.get(id)
+        instantiate_from_database(attrs)
+      rescue Recliner::DocumentNotFound => e
+        raise e if raise_exceptions
+        nil
+      end
+    
+      def load_multiple(ids, raise_exceptions=false)
+        result = database.post('_all_docs?include_docs=true', { :keys => ids })
+        result['rows'].map { |row|
+          if row['doc'] && row['doc']['class'] == name
+            instantiate_from_database(row['doc'])
+          else
+            raise Recliner::DocumentNotFound if raise_exceptions
+            nil
+          end
+        }
+      end
+      
+      def default_database
+        @default_database ||= Recliner::Database.new(database_uri)
       end
     end
   end
   
   Document.class_eval do
-    include Views
+    include Validations
+    include Callbacks
+    include Timestamps
     include PrettyInspect
   end
 end

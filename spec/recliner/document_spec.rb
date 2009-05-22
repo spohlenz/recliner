@@ -8,6 +8,20 @@ describe "A Recliner::Document class" do
   it "should have two default properties" do
     subject.properties.should have(2).keys
   end
+  
+  it "should be instantiable with no attributes" do
+    BasicDocument.new.should be_an_instance_of(BasicDocument)
+  end
+  
+  it "should be instantiable with attributes" do
+    BasicDocument.new({}).should be_an_instance_of(BasicDocument)
+  end
+  
+  it "should be instantiable with a block" do
+    BasicDocument.new do |doc|
+      doc.should be_an_instance_of(BasicDocument)
+    end.should be_an_instance_of(BasicDocument)
+  end
 end
 
 describe "An instance of a Recliner::Document class" do
@@ -91,10 +105,10 @@ describe "Save a Recliner::Document" do
       subject.save.should be_false
     end
     
-    it "should raise a Recliner::StaleRevisionError error when using save!" do
+    it "should raise a Recliner::DocumentNotSaved error when using save!" do
       lambda {
         subject.save!
-      }.should raise_error(Recliner::StaleRevisionError)
+      }.should raise_error(Recliner::DocumentNotSaved)
     end
   end
   
@@ -113,6 +127,64 @@ describe "Save a Recliner::Document" do
       lambda {
         subject.save!
       }.should raise_error(Recliner::DocumentNotSaved)
+    end
+  end
+end
+
+describe "Creating a recliner document" do
+  describe "with #create" do
+    def do_create
+      BasicDocument.create(:id => '123')
+    end
+    
+    describe "a valid document" do
+      before(:each) { CouchDB.no_document_at('123') }
+      
+      it "should return the document" do
+        do_create.should be_an_instance_of(BasicDocument)
+      end
+      
+      it "should save the document" do
+        do_create.new_record?.should be_false
+      end
+    end
+    
+    describe "an invalid document" do
+      before(:each) { CouchDB.document_at('123', {}) }
+            
+      it "should return the document" do
+        do_create.should be_an_instance_of(BasicDocument)
+      end
+      
+      it "should not save the document" do
+        do_create.new_record?.should be_true
+      end
+    end
+  end
+  
+  describe "with #create!" do
+    def do_create!
+      BasicDocument.create!(:id => '123')
+    end
+    
+    describe "a valid document" do
+      before(:each) { CouchDB.no_document_at('123') }
+      
+      it "should return the document" do
+        do_create!.should be_an_instance_of(BasicDocument)
+      end
+      
+      it "should save the document" do
+        do_create!.new_record?.should be_false
+      end
+    end
+    
+    describe "an invalid document" do
+      before(:each) { CouchDB.document_at('123', {}) }
+      
+      it "should raise an exception" do
+        lambda { do_create! }.should raise_error
+      end
     end
   end
 end
@@ -146,22 +218,13 @@ describe "Load a Recliner::Document" do
       CouchDB.no_document_at('http://localhost:5984/recliner-test/abc')
     end
     
-    it "should raise a Recliner::DocumentNotFound exception" do
-      lambda {
-        BasicDocument.load('abc')
-      }.should raise_error(Recliner::DocumentNotFound)
-    end
-  end
-  
-  describe "a document with the incorrect class" do
-    before(:each) do
-      CouchDB.document_at('http://localhost:5984/recliner-test/abc',
-                          { :class => 'WrongDocument', :_id => 'abc' })
+    it "should be nil for load" do
+      BasicDocument.load('abc').should be_nil
     end
     
-    it "should raise a Recliner::DocumentNotFound exception" do
+    it "should raise a Recliner::DocumentNotFound exception for load!" do
       lambda {
-        BasicDocument.load('abc')
+        BasicDocument.load!('abc')
       }.should raise_error(Recliner::DocumentNotFound)
     end
   end
@@ -189,24 +252,100 @@ describe "Loading multiple Recliner::Documents" do
     result.map(&:id).should == [ 'first', 'second', 'third' ]
   end
   
-  it "should raise Recliner::DocumentNotFound if any document id doesn't exist" do
-    CouchDB.document_at('http://localhost:5984/recliner-test/first', { :class => 'BasicDocument' })
-    CouchDB.document_at('http://localhost:5984/recliner-test/second', { :class => 'BasicDocument' })
-    CouchDB.no_document_at('http://localhost:5984/recliner-test/third')
+  describe "#load" do
+    it "should return nil for any document that has the wrong class" do
+      CouchDB.document_at('http://localhost:5984/recliner-test/first', { :class => 'BasicDocument' })
+      CouchDB.document_at('http://localhost:5984/recliner-test/second', { :class => 'BasicDocument' })
+      CouchDB.document_at('http://localhost:5984/recliner-test/third', { :class => 'WrongDocument' })
     
-    lambda {
-      BasicDocument.load('first', 'second', 'third')
-    }.should raise_error(Recliner::DocumentNotFound)
+      result = BasicDocument.load('first', 'second', 'third')
+      result[0].id.should == 'first'
+      result[1].id.should == 'second'
+      result[2].should be_nil
+    end
+  
+    it "should return nil for any document id that doesn't exist" do
+      CouchDB.document_at('http://localhost:5984/recliner-test/first', { :class => 'BasicDocument' })
+      CouchDB.document_at('http://localhost:5984/recliner-test/second', { :class => 'BasicDocument' })
+      CouchDB.no_document_at('http://localhost:5984/recliner-test/third')
+    
+      result = BasicDocument.load('first', 'second', 'third')
+      result[0].id.should == 'first'
+      result[1].id.should == 'second'
+      result[2].should be_nil
+    end
   end
   
-  it "should raise Recliner::DocumentNotFound if any document has an incorrect class" do
-    CouchDB.document_at('http://localhost:5984/recliner-test/first', { :class => 'BasicDocument' })
-    CouchDB.document_at('http://localhost:5984/recliner-test/second', { :class => 'BasicDocument' })
-    CouchDB.document_at('http://localhost:5984/recliner-test/third', { :class => 'WrongDocument' })
+  describe "#load!" do
+    it "should raise Recliner::DocumentNotFound if any document has the wrong class" do
+      CouchDB.document_at('http://localhost:5984/recliner-test/first', { :class => 'BasicDocument' })
+      CouchDB.document_at('http://localhost:5984/recliner-test/second', { :class => 'BasicDocument' })
+      CouchDB.document_at('http://localhost:5984/recliner-test/third', { :class => 'WrongDocument' })
     
-    lambda {
-      BasicDocument.load('first', 'second', 'third')
-    }.should raise_error(Recliner::DocumentNotFound)
+      lambda {
+        BasicDocument.load!('first', 'second', 'third')
+      }.should raise_error(Recliner::DocumentNotFound)
+    end
+  
+    it "should raise Recliner::DocumentNotFound if any document id doesn't exist" do
+      CouchDB.document_at('http://localhost:5984/recliner-test/first', { :class => 'BasicDocument' })
+      CouchDB.document_at('http://localhost:5984/recliner-test/second', { :class => 'BasicDocument' })
+      CouchDB.no_document_at('http://localhost:5984/recliner-test/third')
+    
+      lambda {
+        BasicDocument.load!('first', 'second', 'third')
+      }.should raise_error(Recliner::DocumentNotFound)
+    end
+  end
+end
+
+
+describe "Destroying/deleting a Recliner::Document" do
+  before(:each) do
+    CouchDB.document_at('http://localhost:5984/recliner-test/123', { :class => 'BasicDocument' })
+    CouchDB.document_at('http://localhost:5984/recliner-test/456', { :class => 'BasicDocument' })
+  end
+  
+  subject { BasicDocument.load('123') }
+  
+  it "should remove the document when destroyed" do
+    subject.destroy
+    CouchDB.should_not have_document.at('http://localhost:5984/recliner-test/123')
+  end
+  
+  it "should remove the document when deleted" do
+    subject.delete
+    CouchDB.should_not have_document.at('http://localhost:5984/recliner-test/123')
+  end
+  
+  it "should return itself when destroyed" do
+    subject.destroy.should == subject
+  end
+  
+  it "should return itself when deleted" do
+    subject.delete.should == subject
+  end
+  
+  it "should be destroyable with a class method" do
+    BasicDocument.destroy('123')
+    CouchDB.should_not have_document.at('http://localhost:5984/recliner-test/123')
+  end
+  
+  it "should destroy multiple documents via class method" do
+    BasicDocument.destroy(['123', '456'])
+    CouchDB.should_not have_document.at('http://localhost:5984/recliner-test/123')
+    CouchDB.should_not have_document.at('http://localhost:5984/recliner-test/456')
+  end
+  
+  it "should be deletable with a class method" do
+    BasicDocument.delete('123')
+    CouchDB.should_not have_document.at('http://localhost:5984/recliner-test/123')
+  end
+  
+  it "should delete multiple documents via class method" do
+    BasicDocument.delete(['123', '456'])
+    CouchDB.should_not have_document.at('http://localhost:5984/recliner-test/123')
+    CouchDB.should_not have_document.at('http://localhost:5984/recliner-test/456')
   end
 end
 

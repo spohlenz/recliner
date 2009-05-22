@@ -72,7 +72,38 @@ module Recliner
         UUID.generate
       end
     end
+  
+    #
+    #
+    #
+    def attributes
+      @attributes ||= {}.with_indifferent_access
+    end
     
+    #
+    #
+    #
+    def attributes=(attrs)
+      attrs.each do |key, value|
+        self.send("#{key}=", value) unless key == 'class'
+      end
+    end
+    
+    #
+    #
+    #
+    def [](name)
+      read_attribute(name)
+    end
+    
+    #
+    #
+    #
+    def []=(name, value)
+      write_attribute(name, value)
+    end
+  
+  protected
     #
     #
     #
@@ -86,22 +117,6 @@ module Recliner
     def write_attribute(name, value)
       attributes[property(name).as] = value
       value
-    end
-    
-    #
-    #
-    #
-    def attributes
-      @attributes ||= {}.with_indifferent_access
-    end
-  
-    #
-    #
-    #
-    def attributes=(attrs)
-      attrs.each do |key, value|
-        self.send("#{key}=", value) unless key == 'class'
-      end
     end
     
   private
