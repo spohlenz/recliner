@@ -21,7 +21,10 @@ class ViewTestDocument < Recliner::Document
 end
 
 describe "A Recliner::Document" do
-  before(:each) { ViewTestDocument.instance_variable_set('@view_document', nil) }
+  before(:each) {
+    recreate_database!
+    ViewTestDocument.instance_variable_set('@view_document', nil)
+  }
   
   subject { ViewTestDocument }
   
@@ -45,6 +48,16 @@ describe "A Recliner::Document" do
   
   it "should have a default all view" do
     ViewTestDocument.views[:all].should == { :map => 'if (doc.class == "#{name}") emit(#{default_order}, doc);' }
+  end
+  
+  it "should get the first/last items using the all view" do
+    CouchDB.document_at('1', { :class => 'ViewTestDocument', :name => 'Aaron' })
+    CouchDB.document_at('2', { :class => 'ViewTestDocument', :name => 'Ben' })
+    CouchDB.document_at('3', { :class => 'ViewTestDocument', :name => 'Charlie' })
+    
+    ViewTestDocument.default_order :name
+    ViewTestDocument.first.name.should == 'Aaron'
+    ViewTestDocument.last.name.should == 'Charlie'
   end
   
   it "should have a getter/setter for default order" do

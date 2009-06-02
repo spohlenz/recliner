@@ -141,6 +141,16 @@ module Recliner
       end
       
       #
+      def first
+        all(:limit => 1).first
+      end
+      
+      #
+      def last
+        all(:limit => 1, :descending => true).first
+      end
+      
+      #
       #
       #
       def create(attributes={})

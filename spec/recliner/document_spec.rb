@@ -123,10 +123,10 @@ describe "Save a Recliner::Document" do
       subject.save.should be_false
     end
     
-    it "should raise a Recliner::DocumentNotSaved error when using save!" do
+    it "should raise a Recliner::DocumentInvalid error when using save!" do
       lambda {
         subject.save!
-      }.should raise_error(Recliner::DocumentNotSaved)
+      }.should raise_error(Recliner::DocumentInvalid)
     end
   end
 end

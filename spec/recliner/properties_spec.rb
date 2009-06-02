@@ -66,9 +66,10 @@ describe "Basic properties" do
     
     it { should serialize(:a_fixnum).to(78) }
     it { should serialize(:a_float).to(5.4) }
-    it { t = Time.now; should serialize(:a_time).to(t) }
+    it { should serialize(:a_time).to(Time.now) }
     it { should serialize(:a_date).to(Date.today) }
     it { should serialize(:a_hash).to({ 'num' => 5, 'str' => 'abc' }) }
+    it { should serialize(:a_boolean).to(true) }
     it { should serialize(:a_boolean).to(false) }
     it { should serialize(:a_custom_class).to(MyCustomClass.new('Hello', 123)) }
   end

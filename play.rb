@@ -6,7 +6,7 @@ class User < Recliner::Document
   
   property :name, String
   
-  view :by_name, :map => "if (doc.class == 'User') emit(doc.title.en, doc)"
+  default_order :name
 end
 
 User.database.delete!
