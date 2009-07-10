@@ -12,8 +12,10 @@ module Recliner
       end
     
       def to_s
-        @body
+        "\"#{@body}\""
       end
+      
+      alias to_json to_s
     
       def self.create(definition)
         returning Class.new(self) do |klass|
