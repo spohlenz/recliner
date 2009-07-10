@@ -1,4 +1,5 @@
 require 'uuid'
+require 'active_support/core_ext/hash/indifferent_access'
 
 module Recliner
   class Property < Struct.new(:name, :type, :as, :default)

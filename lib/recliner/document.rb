@@ -28,7 +28,7 @@ module Recliner
     
     include Views
     
-    view :all, :map => 'if (doc.class == "#{name}") emit(#{default_order}, doc);'
+    view :all, :map => 'if (doc.class == \'#{name}\') emit(#{default_order}, doc);'
     
     default_order :id
   
