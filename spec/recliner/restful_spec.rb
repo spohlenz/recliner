@@ -84,7 +84,7 @@ describe "RESTful CouchDB access" do
     
     it "should raise a Recliner::StaleRevisionError exception" do
       lambda {
-        Recliner.put(@uri, { :foo => 'baz', :abc => 2, :_rev => 'WRONG' })
+        Recliner.put(@uri, { :foo => 'baz', :abc => 2, :_rev => '999-1234' })
       }.should raise_error(Recliner::StaleRevisionError)
     end
   end
@@ -110,7 +110,7 @@ describe "RESTful CouchDB access" do
     
     it "should raise a Recliner::StaleRevisionError exception" do
       lambda {
-        Recliner.delete("#{@uri}?rev=WRONG")
+        Recliner.delete("#{@uri}?rev=999-1234")
       }.should raise_error(Recliner::StaleRevisionError)
     end
   end

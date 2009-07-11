@@ -96,12 +96,14 @@ module Recliner
     def ==(other)
       other.class == self.class && other.id == self.id
     end
-  
+    
   private
     def create_or_update
       result = new_record? ? create : update
       result != false
     end
+    
+    # create and update are separate methods so that different callbacks can be applied to each
     
     def create
       save_to_database
@@ -121,7 +123,7 @@ module Recliner
       @new_record = false
       
       true
-    rescue
+    rescue StaleRevisionError
       false
     end
     

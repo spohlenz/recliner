@@ -24,7 +24,7 @@ describe "A Recliner::Document class" do
   end
 end
 
-describe "An instance of a Recliner::Document class" do
+describe "An unsaved instance of a Recliner::Document class" do
   subject { BasicDocument.new }
   
   it "should have an id" do
@@ -33,6 +33,10 @@ describe "An instance of a Recliner::Document class" do
   
   it "should be a new record" do
     subject.new_record?.should be_true
+  end
+  
+  it "should not have a revision" do
+    subject.rev.should be_nil
   end
   
   it "should allow attributes to be assigned with a hash" do
@@ -58,7 +62,7 @@ describe "Save a Recliner::Document" do
     it "should have a revision" do
       subject.rev.should_not be_nil
     end
-  
+    
     it "should save the document in the database" do
       CouchDB.should have_document({ :class => 'BasicDocument', :_id => 'abc' }).
                      at('http://localhost:5984/recliner-test/abc')
@@ -98,7 +102,7 @@ describe "Save a Recliner::Document" do
     before(:each) do
       CouchDB.document_at('http://localhost:5984/recliner-test/abc',
                           { :class => 'BasicDocument', :_id => 'abc' })
-      subject.rev = 'WRONG'
+      subject.rev = '999-1234'
     end
     
     it "should not save the document" do

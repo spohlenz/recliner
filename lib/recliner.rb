@@ -8,6 +8,7 @@ $:.unshift File.dirname(__FILE__) unless
   $:.include?(File.expand_path(File.dirname(__FILE__)))
 
 require 'core_ext'
+require 'recliner/exceptions'
 
 module Recliner
   VERSION = '0.0.1'
@@ -24,10 +25,6 @@ module Recliner
   autoload :Timestamps,          'recliner/timestamps'
   autoload :PrettyInspect,       'recliner/pretty_inspect'
   
-  class DocumentNotFound < StandardError; end
-  class DocumentNotSaved < StandardError; end
-  class StaleRevisionError < StandardError; end
-  
   class << self
     def get(uri, params={})
       JSON.parse(RestClient.get("#{uri}#{to_query_string(params)}"))
@@ -41,19 +38,28 @@ module Recliner
     
     def put(uri, payload={})
       JSON.parse(RestClient.put(uri, payload.to_json))
-    rescue RestClient::RequestFailed
-      raise StaleRevisionError
+    rescue RestClient::RequestFailed => e
+      rescue_from_failed_request(e)
     end
     
     def delete(uri)
       RestClient.delete(uri)
     rescue RestClient::ResourceNotFound
       raise DocumentNotFound
-    rescue RestClient::RequestFailed
-      raise StaleRevisionError
+    rescue RestClient::RequestFailed => e
+      rescue_from_failed_request(e)
     end
   
   private
+    def rescue_from_failed_request(e)
+      case e.http_code
+      when 409
+        raise StaleRevisionError
+      else
+        raise CouchDBError, e.http_body
+      end
+    end
+  
     def to_query_string(params)
       str = params.map { |k, v| "#{URI.escape(k.to_s)}=#{URI.escape(v.to_s)}" }.join('&')
       str.blank? ? '' : "?#{str}"

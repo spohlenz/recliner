@@ -1,6 +1,6 @@
+require File.dirname(__FILE__) + '/view_functions'
+
 module Recliner
-  include ViewFunctions
-  
   class View
     attr_reader :map, :reduce
     
@@ -131,7 +131,7 @@ module Recliner
           end
         end
         
-        view_document.save if view_document.new_record? || update_required
+        view_document.save! if view_document.new_record? || update_required
         
         @views_initialized = true
       end
