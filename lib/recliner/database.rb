@@ -33,7 +33,9 @@ module Recliner
 
   private
     def create_database_if_missing!
-      create! rescue nil
+      Recliner.get("#{uri}")
+    rescue DocumentNotFound
+      create!
     end
   end
 end
