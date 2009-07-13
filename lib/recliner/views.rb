@@ -16,6 +16,10 @@ module Recliner
       end.to_json
     end
     
+    def self.from_couch(hash)
+      new(:map => hash['map'], :reduce => hash['reduce'])
+    end
+    
     def ==(other)
       to_json == other.to_json
     end
