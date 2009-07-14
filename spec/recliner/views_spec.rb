@@ -47,7 +47,7 @@ describe "A Recliner::Document" do
   end
   
   it "should have a default all view" do
-    ViewTestDocument.views[:all].should == { :map => 'if (doc.class == \'#{name}\') emit(#{default_order}, doc);' }
+    ViewTestDocument.views[:all].should == { :map => 'if (doc.class == "#{name}") emit(#{default_order}, doc);' }
   end
   
   it "should get the first/last items using the all view" do

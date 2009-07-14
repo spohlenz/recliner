@@ -75,14 +75,10 @@ module Recliner
     end
   
     #
-    #
-    #
     def attributes
       @attributes ||= {}.with_indifferent_access
     end
     
-    #
-    #
     #
     def attributes=(attrs)
       attrs.each do |key, value|
@@ -91,38 +87,29 @@ module Recliner
     end
     
     #
-    #
-    #
     def [](name)
       read_attribute(name)
     end
     
     #
-    #
-    #
     def []=(name, value)
       write_attribute(name, value)
     end
-  
-  protected
-    #
-    #
+    
     #
     def read_attribute(name)
-      attributes[property(name).as]
+      attributes[property(name).as] if property(name)
     end
     
     #
-    #
-    #
     def write_attribute(name, value)
-      attributes[property(name).as] = value
+      attributes[property(name).as] = value if property(name)
       value
     end
     
   private
     def property(name)
-      properties[name]
+      properties[name.to_sym]
     end
   
     def attributes_with_class

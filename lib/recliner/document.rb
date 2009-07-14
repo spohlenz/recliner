@@ -6,7 +6,12 @@ module Recliner
     attr_reader :database
     
     def initialize(attributes={})
-      self.attributes = self.class.default_attributes(self).merge(attributes)
+      self.class.default_attributes(self).each do |property, default|
+        write_attribute(property, default)
+      end
+      
+      self.attributes = attributes
+      
       @database = self.class.database
       @new_record = true
       
@@ -28,7 +33,7 @@ module Recliner
     
     include Views
     
-    view :all, :map => 'if (doc.class == \'#{name}\') emit(#{default_order}, doc);'
+    view :all, :map => 'if (doc.class == "#{name}") emit(#{default_order}, doc);'
     
     default_order :id
   
@@ -50,12 +55,12 @@ module Recliner
     # Special case for id setter as old document needs to be deleted if the id is changed
     def id=(new_id)
       @old_id = id unless new_record?
-      attributes['_id'] = new_id
+      write_attribute(:id, new_id)
     end
   
     # If the doc id has changed, we need to delete the old document when saving
     def id_changed?
-      @old_id && @old_id != id
+      !new_record? && @old_id && @old_id != id
     end
   
     #
@@ -223,7 +228,7 @@ module Recliner
       
         returning(klass.new) do |record|
           klass.properties.each do |name, property|
-            record.attributes[property.as] = property.type.from_couch(attrs[property.as])
+            record[property.name] = property.type.from_couch(attrs[property.as])
           end
         
           record.instance_variable_set("@new_record", false)
