@@ -24,6 +24,7 @@ module Recliner
   autoload :ViewFunctions,       'recliner/view_functions'
   autoload :Callbacks,           'recliner/callbacks'
   autoload :Validations,         'recliner/validations'
+  autoload :Associations,        'recliner/associations'
   autoload :Timestamps,          'recliner/timestamps'
   autoload :PrettyInspect,       'recliner/pretty_inspect'
   

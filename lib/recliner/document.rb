@@ -274,6 +274,7 @@ module Recliner
   Document.class_eval do
     include Validations
     include Callbacks
+    include Associations
     include Timestamps
     include PrettyInspect
   end

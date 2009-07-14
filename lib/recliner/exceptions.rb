@@ -26,4 +26,6 @@ module Recliner
   class DocumentNotSaved < StandardError; end
   
   class StaleRevisionError < StandardError; end
+  
+  class AssociationTypeMismatch < StandardError; end
 end
