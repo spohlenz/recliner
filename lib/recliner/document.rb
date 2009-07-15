@@ -1,5 +1,7 @@
 module Recliner
   class Document
+    undef_method :id
+    
     class_inheritable_accessor :database_uri
     self.database_uri = 'http://localhost:5984/recliner-default'
     

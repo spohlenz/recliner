@@ -47,17 +47,9 @@ module Recliner
       when 0
         database.get("#{id}/_view/#{view}", options)
       when 1
-        database.get("#{id}/_view/#{view}", options.merge(:key => quote_key(keys.first)))
+        database.get("#{id}/_view/#{view}", options.merge(:key => keys.first))
       else
         database.post("#{id}/_view/#{view}", { :keys => keys })
-      end
-    end
-    
-    def quote_key(key)
-      if key.is_a?(String)
-        "\"#{key}\""
-      else
-        key
       end
     end
   end

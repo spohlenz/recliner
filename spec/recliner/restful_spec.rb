@@ -25,6 +25,22 @@ describe "RESTful CouchDB access" do
     end
   end
   
+  describe "GET with parameters" do
+    before(:each) do
+      @uri = 'http://localhost:5984/recliner-test/abc'
+    end
+    
+    it "should quote string params" do
+      RestClient.should_receive(:get).with("#{@uri}?key=%22abc-123%22").and_return('{}')
+      Recliner.get(@uri, :key => 'abc-123')
+    end
+    
+    it "should not quote integer params" do
+      RestClient.should_receive(:get).with("#{@uri}?limit=5").and_return('{}')
+      Recliner.get(@uri, :limit => 5)
+    end
+  end
+  
   describe "POST a new document" do
     before(:each) do
       @uri = 'http://localhost:5984/recliner-test'
