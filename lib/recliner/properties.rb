@@ -30,7 +30,7 @@ module Recliner
           
           create_property_accessors!(prop)
         elsif block_given?
-          
+          raise 'Not yet supported'
         else
           raise 'Either a type or block must be provided'
         end
@@ -56,14 +56,23 @@ module Recliner
     
     private
       def create_property_accessors!(property)
+        create_property_reader!(property.name) unless instance_methods.include?(property.name)
+        create_property_writer!(property.name) unless instance_methods.include?("#{property.name}=")
+      end
+      
+      def create_property_reader!(name)
         class_eval <<-END_RUBY
-          def #{property.name}                          # def title
-            read_attribute(:#{property.name})           #   read_attribute(:title)
-          end                                           # end
-  
-          def #{property.name}=(value)                  # def title(value)
-            write_attribute(:#{property.name}, value)   #   write_attribute(:title, value)
-          end                                           # end
+          def #{name}                          # def title
+            read_attribute(:#{name})           #   read_attribute(:title)
+          end                                  # end
+        END_RUBY
+      end
+      
+      def create_property_writer!(name)
+        class_eval <<-END_RUBY
+          def #{name}=(value)                  # def title(value)
+            write_attribute(:#{name}, value)   #   write_attribute(:title, value)
+          end                                  # end
         END_RUBY
       end
       

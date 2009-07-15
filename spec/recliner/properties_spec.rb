@@ -6,10 +6,10 @@ class PropertyDocument < Recliner::Document
   property :property_with_default_lambda_value, String, :default => lambda { 'hello' }
   property :property_with_default_lambda_value_yielding_doc, String, :default => lambda { |d| d.class.to_s }
   
-  property :nested do
-    property :first, String
-    property :second, String
-  end
+  #property :nested do
+  #  property :first, String
+  #  property :second, String
+  #end
   
   property :a_fixnum, Fixnum
   property :a_float, Float
