@@ -64,7 +64,7 @@ module Recliner
     end
   
     def to_query_string(params)
-      str = params.map { |k, v| "#{URI.escape(k.to_s)}=#{URI.escape(v.to_s)}" }.join('&')
+      str = params.map { |k, v| "#{URI.escape(k.to_s)}=#{URI.escape(v.to_json)}" }.join('&')
       str.blank? ? '' : "?#{str}"
     end
   end
