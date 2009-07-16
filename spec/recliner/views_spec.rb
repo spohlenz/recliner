@@ -157,6 +157,16 @@ describe "A Recliner::Document" do
       result[1].name.should == 'Aaron'
     end
     
+    it "should be callable with a keys option" do
+      CouchDB.document_at('1', { :class => 'ViewTestDocument', :name => 'Aaron' })
+      CouchDB.document_at('2', { :class => 'ViewTestDocument', :name => 'Ben' })
+      CouchDB.document_at('3', { :class => 'ViewTestDocument', :name => 'Charlie' })
+      
+      result = ViewTestDocument.by_name(:keys => ['Ben', 'Aaron'])
+      result[0].name.should == 'Ben'
+      result[1].name.should == 'Aaron'
+    end
+    
     it "should be callable with options" do
       CouchDB.document_at('1', { :class => 'ViewTestDocument', :name => 'Aaron' })
       CouchDB.document_at('2', { :class => 'ViewTestDocument', :name => 'Ben' })

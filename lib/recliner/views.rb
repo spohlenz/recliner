@@ -43,13 +43,15 @@ module Recliner
     end
     
     def fetch_result(view, keys, options)
+      keys = options.delete(:keys) if options[:keys]
+      
       case keys.size
       when 0
         database.get("#{id}/_view/#{view}", options)
       when 1
         database.get("#{id}/_view/#{view}", options.merge(:key => keys.first))
       else
-        database.post("#{id}/_view/#{view}", { :keys => keys })
+        database.post("#{id}/_view/#{view}", { :keys => keys }, options)
       end
     end
   end
