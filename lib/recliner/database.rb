@@ -11,12 +11,12 @@ module Recliner
       Recliner.get("#{uri}/#{id}", params)
     end
   
-    def post(path, payload)
-      Recliner.post("#{uri}/#{path}", payload)
+    def post(path, payload, params={})
+      Recliner.post("#{uri}/#{path}", payload, params)
     end
   
-    def put(path, payload)
-      Recliner.put("#{uri}/#{path}", payload)
+    def put(path, payload, params={})
+      Recliner.put("#{uri}/#{path}", payload, params)
     end
   
     def delete(path)

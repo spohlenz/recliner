@@ -35,12 +35,12 @@ module Recliner
       raise DocumentNotFound
     end
     
-    def post(uri, payload={})
-      JSON.parse(RestClient.post(uri, payload.to_json))
+    def post(uri, payload={}, params={})
+      JSON.parse(RestClient.post("#{uri}#{to_query_string(params)}", payload.to_json))
     end
     
-    def put(uri, payload={})
-      JSON.parse(RestClient.put(uri, payload.to_json))
+    def put(uri, payload={}, params={})
+      JSON.parse(RestClient.put("#{uri}#{to_query_string(params)}", payload.to_json))
     rescue RestClient::RequestFailed => e
       rescue_from_failed_request(e)
     end
