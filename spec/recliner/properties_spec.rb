@@ -28,6 +28,17 @@ describe "Basic properties" do
     subject.normal_property.should == 'a string'
   end
   
+  it "should create query methods for properties" do
+    subject.normal_property = nil
+    subject.normal_property?.should be_false
+    
+    subject.normal_property = ''
+    subject.normal_property?.should be_false
+    
+    subject.normal_property = 'some string'
+    subject.normal_property?.should be_true
+  end
+  
   it "should allow getting properties using hash syntax []" do
     subject.normal_property = 'a string'
     subject[:normal_property].should == 'a string'

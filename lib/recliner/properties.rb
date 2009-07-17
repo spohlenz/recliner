@@ -58,6 +58,7 @@ module Recliner
       def create_property_accessors!(property)
         create_property_reader!(property.name) unless instance_methods.include?(property.name)
         create_property_writer!(property.name) unless instance_methods.include?("#{property.name}=")
+        create_property_query!(property.name) unless instance_methods.include?("#{property.name}?")
       end
       
       def create_property_reader!(name)
@@ -72,6 +73,14 @@ module Recliner
         class_eval <<-END_RUBY
           def #{name}=(value)                  # def title(value)
             write_attribute(:#{name}, value)   #   write_attribute(:title, value)
+          end                                  # end
+        END_RUBY
+      end
+      
+      def create_property_query!(name)
+        class_eval <<-END_RUBY
+          def #{name}?                         # def title?
+            !#{name}.blank?                    #   !title.blank?
           end                                  # end
         END_RUBY
       end
