@@ -1,4 +1,4 @@
-require File.dirname(__FILE__) + '/../spec_helper'
+require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe "Recliner::MapViewFunction" do
   it "should wrap the body with a javascript function definition if not given" do
