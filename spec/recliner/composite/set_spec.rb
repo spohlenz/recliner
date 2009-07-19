@@ -16,9 +16,15 @@ describe "Recliner::Document#Set" do
     ]
     
     result = @set.from_couch(data)
+    result.should be_a_kind_of(Recliner::Document::Set)
     
     result[0].should == MyCustomClass.new('Hello', 123)
     result[1].should == MyCustomClass.new(456, 'Ciao')
+  end
+  
+  it "should load an empty set for a null couch representation" do
+    result = @set.from_couch(nil)
+    result.should be_a_kind_of(Recliner::Document::Set)
   end
   
   describe "An instance of the Set" do

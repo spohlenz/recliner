@@ -17,9 +17,15 @@ describe "Recliner::Document#Map" do
     }
     
     result = @map.from_couch(data)
+    result.should be_a_kind_of(Recliner::Document::Map)
     
     result['hello'].should == MyCustomClass.new('Hello', 123)
     result['cya'].should == MyCustomClass.new(456, 'Ciao')
+  end
+  
+  it "should load an empty map for a null couch representation" do
+    result = @map.from_couch(nil)
+    result.should be_a_kind_of(Recliner::Document::Map)
   end
   
   describe "An instance of the Map" do

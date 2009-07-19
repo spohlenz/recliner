@@ -4,7 +4,7 @@ module Recliner
       class_inheritable_accessor :from, :to
       
       def self.from_couch(hash)
-        self[*hash.map { |key, value| [ from.from_couch(key), to.from_couch(value) ] }.flatten]
+        self[*(hash || {}).map { |key, value| [ from.from_couch(key), to.from_couch(value) ] }.flatten]
       end
       
       def self.inspect
@@ -20,7 +20,7 @@ module Recliner
       class_inheritable_accessor :type
       
       def self.from_couch(array)
-        self[*array.map { |item| type.from_couch(item) }]
+        self[*(array || []).map { |item| type.from_couch(item) }]
       end
       
       def self.inspect
