@@ -9,7 +9,7 @@ module Recliner
       @reduce = Recliner::ReduceViewFunction.new(options[:reduce]) if options[:reduce]
     end
     
-    def to_json
+    def to_json(options=nil)
       returning({}) do |result|
         result[:map] = map
         result[:reduce] = reduce if reduce

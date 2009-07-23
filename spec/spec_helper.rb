@@ -40,7 +40,7 @@ class MyCustomClass
     new(h['a'], h['b']) if h
   end
   
-  def to_json
+  def to_json(options=nil)
     { 'a' => a, 'b' => b }.to_json
   end
   

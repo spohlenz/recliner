@@ -14,7 +14,7 @@ module Recliner
       @body
     end
     
-    def to_json
+    def to_json(options=nil)
       "\"#{to_s.gsub(/"/, '\"')}\""
     end
     
