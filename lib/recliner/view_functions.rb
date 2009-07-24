@@ -14,8 +14,8 @@ module Recliner
       @body
     end
     
-    def to_json(options=nil)
-      "\"#{to_s.gsub(/"/, '\"')}\""
+    def to_couch
+      @body
     end
     
     def self.create(definition)

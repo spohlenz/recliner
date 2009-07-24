@@ -39,11 +39,12 @@ describe "Recliner::Document#Map" do
       subject.should be_a_kind_of(Hash)
     end
     
-    it "should serialize to json representation" do
+    it "should serialize to couch representation" do
       subject['hello'] = MyCustomClass.new('Hello', 123)
       subject['cya'] = MyCustomClass.new(456, 'Ciao')
       
-      subject.to_json.should == '{"cya":{"a":456,"b":"Ciao"},"hello":{"a":"Hello","b":123}}'
+      subject.to_couch.should == { 'hello' => { :a => 'Hello', :b => 123 },
+                                   'cya'   => { :a => 456,     :b => 'Ciao' } }
     end
   end
 end

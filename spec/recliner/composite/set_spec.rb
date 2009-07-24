@@ -42,7 +42,7 @@ describe "Recliner::Document#Set" do
       subject << MyCustomClass.new('Hello', 123)
       subject << MyCustomClass.new(456, 'Ciao')
       
-      subject.to_json.should == '[{"a":"Hello","b":123},{"a":456,"b":"Ciao"}]'
+      subject.to_couch.should == [{ :a => 'Hello', :b => 123 }, { :a => 456, :b => 'Ciao'}]
     end
   end
 end

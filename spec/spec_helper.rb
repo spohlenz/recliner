@@ -40,11 +40,12 @@ class MyCustomClass
     new(h['a'], h['b']) if h
   end
   
-  def to_json(options=nil)
-    { 'a' => a, 'b' => b }.to_json
+  def to_couch
+    { :a => a, :b => b }
   end
   
   def ==(other)
-    a == other.a && b == other.b
+    other.is_a?(MyCustomClass) &&
+      a == other.a && b == other.b
   end
 end

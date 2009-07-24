@@ -125,6 +125,10 @@ module Recliner
       value
     end
     
+    def to_couch
+      attributes_with_class.to_couch
+    end
+    
   private
     def property(name)
       properties[name.to_sym]

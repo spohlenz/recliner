@@ -9,11 +9,11 @@ module Recliner
       @reduce = Recliner::ReduceViewFunction.new(options[:reduce]) if options[:reduce]
     end
     
-    def to_json(options=nil)
+    def to_couch
       returning({}) do |result|
         result[:map] = map
         result[:reduce] = reduce if reduce
-      end.to_json
+      end.to_couch
     end
     
     def self.from_couch(hash)
@@ -21,7 +21,7 @@ module Recliner
     end
     
     def ==(other)
-      to_json == other.to_json
+      to_couch.to_json == other.to_couch.to_json
     end
   end
   

@@ -121,7 +121,7 @@ module Recliner
     end
     
     def save_to_database
-      result = database.put(id, attributes_with_class)
+      result = database.put(id, to_couch)
       database.delete("#{@old_id}?rev=#{rev}") if id_changed?
       
       self.id = result['id']
