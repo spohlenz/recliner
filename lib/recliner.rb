@@ -1,11 +1,16 @@
-require 'active_support'
+$:.unshift File.dirname(__FILE__) unless
+  $:.include?(File.dirname(__FILE__)) ||
+  $:.include?(File.expand_path(File.dirname(__FILE__)))
+
 require 'json'
 require 'rest_client'
 require 'uri'
 
-$:.unshift File.dirname(__FILE__) unless
-  $:.include?(File.dirname(__FILE__)) ||
-  $:.include?(File.expand_path(File.dirname(__FILE__)))
+require 'active_support'
+
+activemodel_path = "#{File.dirname(__FILE__)}/../vendor/activemodel/lib"
+$:.unshift(activemodel_path) if File.directory?(activemodel_path)
+require 'active_model'
 
 require 'core_ext'
 

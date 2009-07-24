@@ -279,5 +279,7 @@ module Recliner
     include Associations
     include Timestamps
     include PrettyInspect
+    
+    include ActiveModel::Conversion
   end
 end

@@ -44,6 +44,10 @@ describe "An unsaved instance of a Recliner::Document class" do
     subject.id.should == '123'
     subject.rev.should == '456'
   end
+  
+  it "should be ActiveModel compliant" do
+    subject.should respond_to(:to_model)
+  end
 end
 
 describe "Save a Recliner::Document" do
