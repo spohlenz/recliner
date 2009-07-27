@@ -3,13 +3,13 @@ module Recliner
   end
   
   module Validations
-    def self.included(base)
-      base.alias_method_chain :save, :validation
-      base.alias_method_chain :save!, :validation
-    end
+    extend ActiveSupport::Concern
     
-    def valid?
-      true
+    include ActiveModel::Validations
+    
+    included do
+      alias_method_chain :save, :validation
+      alias_method_chain :save!, :validation
     end
     
     def save_with_validation
