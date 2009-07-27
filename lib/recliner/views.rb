@@ -57,11 +57,11 @@ module Recliner
   end
   
   module Views
-    def self.included(base)
-      base.extend(ClassMethods)
-      
-      base.class_inheritable_accessor :views
-      base.views = {}
+    extend ActiveSupport::Concern
+    
+    included do
+      class_inheritable_accessor :views
+      self.views = {}
     end
     
     module ClassMethods

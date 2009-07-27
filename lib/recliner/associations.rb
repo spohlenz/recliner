@@ -1,11 +1,11 @@
 module Recliner
   module Associations
+    extend ActiveSupport::Concern
+    
     autoload :BelongsTo, 'recliner/associations/belongs_to'
     
-    def self.included(base)
-      base.extend(ClassMethods)
-      
-      base.extend(BelongsTo::ClassMethods)
+    included do
+      extend BelongsTo::ClassMethods
     end
     
     module ClassMethods

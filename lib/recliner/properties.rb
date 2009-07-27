@@ -9,11 +9,11 @@ module Recliner
   end
   
   module Properties
-    def self.included(base)
-      base.extend(ClassMethods)
+    extend ActiveSupport::Concern
     
-      base.class_inheritable_accessor :properties
-      base.properties = {}
+    included do
+      class_inheritable_accessor :properties
+      self.properties = {}
     end
     
     module ClassMethods

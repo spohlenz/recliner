@@ -1,8 +1,6 @@
 module Recliner
   module PrettyInspect
-    def self.included(base)
-      base.extend(ClassMethods)
-    end
+    extend ActiveSupport::Concern
   
     def inspect
       "#<#{self.class.name} #{attributes_for_inspect}>"

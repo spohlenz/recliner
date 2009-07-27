@@ -1,18 +1,20 @@
 module Recliner
   module Callbacks
+    extend ActiveSupport::Concern
+    
     CALLBACKS = %w(
       after_initialize after_load before_validation before_validation_on_create before_validation_on_update
       after_validation after_validation_on_create after_validation_on_update before_save before_create
       after_save after_create before_update after_update before_destroy after_destroy
     )
     
-    def self.included(base)
+    included do
       [:create_or_update, :create, :update, :valid?, :destroy].each do |method|
-        base.send :alias_method_chain, method, :callbacks
+        alias_method_chain method, :callbacks
       end
       
-      base.send :include, ActiveSupport::Callbacks
-      base.define_callbacks *CALLBACKS
+      include ActiveSupport::Callbacks
+      define_callbacks *CALLBACKS
     end
     
     

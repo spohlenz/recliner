@@ -1,8 +1,6 @@
 module Recliner
   module Timestamps
-    def self.included(base)
-      base.extend ClassMethods
-    end
+    extend ActiveSupport::Concern
     
     module ClassMethods
       def timestamps!
