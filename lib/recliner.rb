@@ -1,16 +1,16 @@
-$:.unshift File.dirname(__FILE__) unless
-  $:.include?(File.dirname(__FILE__)) ||
-  $:.include?(File.expand_path(File.dirname(__FILE__)))
+activesupport_path = "#{File.dirname(__FILE__)}/../vendor/activesupport/lib"
+$:.unshift(activesupport_path) if File.directory?(activesupport_path)
+
+activemodel_path = "#{File.dirname(__FILE__)}/../vendor/activemodel/lib"
+$:.unshift(activemodel_path) if File.directory?(activemodel_path)
 
 require 'json'
 require 'rest_client'
 require 'uri'
 
-require 'active_support'
-
-activemodel_path = "#{File.dirname(__FILE__)}/../vendor/activemodel/lib"
-$:.unshift(activemodel_path) if File.directory?(activemodel_path)
-require 'active_model'
+$:.unshift File.dirname(__FILE__) unless
+  $:.include?(File.dirname(__FILE__)) ||
+  $:.include?(File.expand_path(File.dirname(__FILE__)))
 
 require 'core_ext'
 

@@ -1,3 +1,6 @@
+require 'active_support/core_ext'
+require 'active_model'
+
 module Recliner
   class Document
     undef_method :id
