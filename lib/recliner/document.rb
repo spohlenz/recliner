@@ -69,28 +69,20 @@ module Recliner
     end
   
     #
-    #
-    #
     def save
       create_or_update
     end
   
-    #
-    #
     #
     def save!
       save || raise(DocumentNotSaved)
     end
     
     #
-    #
-    #
     def destroy
       delete
     end
     
-    #
-    #
     #
     def delete
       database.delete("#{id}?rev=#{rev}")
@@ -139,14 +131,10 @@ module Recliner
     
     class << self
       #
-      #
-      #
       def load(*ids)
         load_ids(ids, false)
       end
       
-      #
-      #
       #
       def load!(*ids)
         load_ids(ids, true)
@@ -163,8 +151,6 @@ module Recliner
       end
       
       #
-      #
-      #
       def create(attributes={})
         returning new(attributes) do |doc|
           doc.save
@@ -172,16 +158,12 @@ module Recliner
       end
       
       #
-      #
-      #
       def create!(attributes={})
         returning new(attributes) do |doc|
           doc.save!
         end
       end
       
-      #
-      #
       #
       def destroy(id)
         if id.is_a?(Array)
@@ -192,8 +174,6 @@ module Recliner
       end
       
       #
-      #
-      #
       def delete(id)
         if id.is_a?(Array)
           id.map { |i| delete(i) }
@@ -203,22 +183,16 @@ module Recliner
       end
       
       #
-      #
-      #
       def use_database!(uri)
         @default_database = nil
         self.database_uri = uri
       end
       
       #
-      #
-      #
       def database
         Thread.current["#{name}_database"] || default_database
       end
       
-      #
-      #
       #
       def with_database(db)
         Thread.current["#{name}_database"] = db
