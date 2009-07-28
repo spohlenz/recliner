@@ -53,6 +53,14 @@ module Recliner
       else
         database.post("#{id}/_view/#{view}", { :keys => keys }, options)
       end
+    rescue DocumentNotFound
+      # The view document disappeared while we were working with it (maybe the database was recreated).
+      # Recreate the view.
+      
+      @new_record = true
+      attributes.delete(:_rev)
+      save!
+      fetch_result(view, keys, options)
     end
   end
   
