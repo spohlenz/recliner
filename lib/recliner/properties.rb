@@ -14,6 +14,8 @@ module Recliner
     included do
       class_inheritable_accessor :properties
       self.properties = {}
+      
+      attr_protected :class
     end
     
     module ClassMethods
@@ -34,6 +36,18 @@ module Recliner
         else
           raise 'Either a type or block must be provided'
         end
+        
+        attr_protected(name) if options[:protected]
+      end
+      
+      #
+      def attr_protected(*attrs)
+        write_inheritable_attribute(:attr_protected, attrs.map { |a| a.to_s } + (protected_attributes || []))
+      end
+      
+      #
+      def protected_attributes
+        read_inheritable_attribute(:attr_protected)
       end
       
       #
@@ -99,8 +113,8 @@ module Recliner
     
     #
     def attributes=(attrs)
-      attrs.each do |key, value|
-        self.send("#{key}=", value) unless key == 'class'
+      remove_protected_attributes(attrs).each do |key, value|
+        self.send("#{key}=", value)
       end
     end
     
@@ -136,6 +150,10 @@ module Recliner
   
     def attributes_with_class
       attributes.merge(:class => self.class.name)
+    end
+    
+    def remove_protected_attributes(attrs)
+      attrs.reject { |key, value| self.class.protected_attributes.include?(key.to_s) }
     end
   end
 end

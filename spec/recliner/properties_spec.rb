@@ -84,4 +84,16 @@ describe "Basic properties" do
     it { should serialize(:a_boolean).to(false) }
     it { should serialize(:a_custom_class).to(MyCustomClass.new('Hello', 123)) }
   end
+  
+  it "should allow attributes/properties to be protected from mass assignment" do
+    PropertyDocument.attr_protected :normal_property
+    subject.attributes = { :normal_property => 'Test' }
+    subject.normal_property.should_not == 'Test'
+  end
+  
+  it "should allow properties to be protected from mass assignment when defined" do
+    PropertyDocument.property :protected_property, String, :protected => true
+    subject.attributes = { :protected_property => 'Test' }
+    subject.protected_property.should_not == 'Test'
+  end
 end
