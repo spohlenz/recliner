@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-require 'models/basic_document'
-require 'models/scoped_document'
+require 'models/basic'
+require 'models/scoped'
 
 describe "A Recliner::Document class" do
   subject { BasicDocument }

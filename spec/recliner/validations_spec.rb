@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-require 'models/validated_document'
+require 'models/validated'
 
 describe "An invalid Recliner::Document" do
   before(:each) do

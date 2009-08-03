@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-class DatabaseTestDocument < Recliner::Document; end
+require 'models/database_test'
 
 describe "Recliner::Database" do
   before(:each) do

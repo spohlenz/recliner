@@ -1,6 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-require 'models/property_document'
+require 'models/property'
 
 describe "Basic properties" do
   subject { PropertyDocument.new }
