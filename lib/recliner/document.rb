@@ -38,10 +38,11 @@ module Recliner
     
     include Views
     
-    view :all, :map => 'if (doc.class == "#{name}") emit(#{default_order}, doc);'
+    view :all
     
     default_order :id
-  
+    default_conditions :class => '#{name}'
+    
     #
     # Example views
     #

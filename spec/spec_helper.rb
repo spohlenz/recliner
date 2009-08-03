@@ -6,8 +6,9 @@ require 'spec'
 Dir[File.dirname(__FILE__) + '/matchers/*.rb'].each { |f| require f }
 Dir[File.dirname(__FILE__) + '/helpers/*.rb'].each { |f| require f }
 
-
 require File.dirname(__FILE__) + '/../lib/recliner'
+
+$LOAD_PATH.unshift(File.dirname(__FILE__))
 
 DEFAULT_DATABASE = 'http://localhost:5984/recliner-test'
 

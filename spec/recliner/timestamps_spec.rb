@@ -1,8 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-class TimestampedDocument < Recliner::Document
-  timestamps!
-end
+require 'models/timestamped_document'
 
 describe "A time-stamped document" do
   subject { TimestampedDocument.new }

@@ -1,9 +1,6 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-class ParentDocument < Recliner::Document; end
-class ChildDocument < Recliner::Document
-  belongs_to :parent
-end
+require 'models/parent_and_child'
 
 describe "A Document which belongs to another" do
   before(:each) do

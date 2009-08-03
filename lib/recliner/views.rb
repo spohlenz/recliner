@@ -5,8 +5,12 @@ module Recliner
     attr_reader :map, :reduce
     
     def initialize(options={})
-      @map    = Recliner::MapViewFunction.new(options[:map])
-      @reduce = Recliner::ReduceViewFunction.new(options[:reduce]) if options[:reduce]
+      if options[:map]
+        @map    = Recliner::MapViewFunction.new(options[:map])
+        @reduce = Recliner::ReduceViewFunction.new(options[:reduce]) if options[:reduce]
+      else
+        @map, @reduce = generate(options)
+      end
     end
     
     def to_couch
@@ -23,6 +27,23 @@ module Recliner
     def ==(other)
       to_couch.to_json == other.to_couch.to_json
     end
+  
+  private
+    def generate(options)
+      map = ""
+      
+      map << "if (#{conditions(options)}) {"
+      map << "  emit(doc.#{options[:order]}, doc);"
+      map << "}"
+      
+      [Recliner::MapViewFunction.new(map), nil]
+    end
+    
+    def conditions(options)
+      options[:conditions!].map { |key, value|
+        "doc.#{key} === #{value.to_json}"
+      }.join(' && ')
+    end
   end
   
   class ViewDocument < Recliner::Document
@@ -38,7 +59,11 @@ module Recliner
     def fetch(view, keys, options)
       result = fetch_result(view, keys, options)
       result['rows'].map { |row|
-        self.class.instantiate_from_database(row['value'])
+        if row['value'].is_a?(Hash) && row['value']['class']
+          self.class.instantiate_from_database(row['value'])
+        else
+          row['value']
+        end
       }
     end
     
@@ -53,6 +78,7 @@ module Recliner
       else
         database.post("#{id}/_view/#{view}", { :keys => keys }, options)
       end
+      
     rescue DocumentNotFound
       # The view document disappeared while we were working with it (maybe the database was recreated).
       # Recreate the view.
@@ -93,11 +119,24 @@ module Recliner
       #
       def default_order(property=nil)
         if property
-          write_inheritable_attribute(:default_order, "doc.#{properties[property].as}")
+          write_inheritable_attribute(:default_order, properties[property].as)
           @views_initialized = false
         end
         
         read_inheritable_attribute(:default_order)
+      end
+      
+      def default_conditions(conditions=nil)
+        if conditions
+          write_inheritable_attribute(:default_conditions, conditions)
+          @views_initialized = false
+        end
+        
+        read_inheritable_attribute(:default_conditions)
+      end
+      
+      def count
+        all.size
       end
       
       def view_document
@@ -118,7 +157,14 @@ module Recliner
       def interpolate_hash_values(hash)
         returning(hash.dup) do |result|
           result.each do |key, value|
-            result[key] = interpolate(value)
+            result[key] = case value
+            when String
+              interpolate(value)
+            when Hash
+              interpolate_hash_values(value)
+            else
+              value
+            end
           end
         end
       end
@@ -129,6 +175,7 @@ module Recliner
         update_required = false
         
         views.each do |name, options|
+          options = { :order => default_order, :conditions! => default_conditions }.merge(options)
           view = View.new(interpolate_hash_values(options))
           
           if view_document.views[name.to_s] != view

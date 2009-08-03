@@ -1,5 +1,8 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
+require 'models/view_test_document'
+require 'models/basic_document'
+
 describe "Recliner::ViewDocument" do
   subject { Recliner::ViewDocument.new }
   
@@ -16,15 +19,12 @@ describe "Recliner::ViewDocument" do
   end
 end
 
-class ViewTestDocument < Recliner::Document
-  property :name, String
-end
-
 describe "A Recliner::Document" do
-  before(:each) {
+  before(:each) do
     recreate_database!
-    ViewTestDocument.instance_variable_set('@view_document', nil)
-  }
+    
+    ViewTestDocument.reset!
+  end
   
   subject { ViewTestDocument }
   
@@ -47,7 +47,11 @@ describe "A Recliner::Document" do
   end
   
   it "should have a default all view" do
-    ViewTestDocument.views[:all].should == { :map => 'if (doc.class == "#{name}") emit(#{default_order}, doc);' }
+    CouchDB.document_at('1', { :class => 'ViewTestDocument' })
+    CouchDB.document_at('2', { :class => 'ViewTestDocument' })
+    CouchDB.document_at('3', { :class => 'ViewTestDocument' })
+    
+    ViewTestDocument.all.map(&:id).should == ['1', '2', '3']
   end
   
   it "should get the first/last items using the all view" do
@@ -60,12 +64,24 @@ describe "A Recliner::Document" do
     ViewTestDocument.last.name.should == 'Charlie'
   end
   
+  it "should get the count of the model" do
+    CouchDB.document_at('1', { :class => 'ViewTestDocument', :name => 'Aaron' })
+    ViewTestDocument.count.should == 1
+    CouchDB.document_at('2', { :class => 'ViewTestDocument', :name => 'Ben' })
+    ViewTestDocument.count.should == 2
+  end
+  
   it "should have a getter/setter for default order" do
     ViewTestDocument.default_order :name
-    ViewTestDocument.default_order.should == 'doc.name'
+    ViewTestDocument.default_order.should == 'name'
     
     ViewTestDocument.default_order :id
-    ViewTestDocument.default_order.should == 'doc._id'
+    ViewTestDocument.default_order.should == '_id'
+  end
+  
+  it "should have a getter/setter for default conditions" do
+    ViewTestDocument.default_conditions :foo => true
+    ViewTestDocument.default_conditions.should == { :foo => true }
   end
   
   describe "initializing views" do
@@ -111,9 +127,9 @@ describe "A Recliner::Document" do
     end
   end
   
-  describe "calling a view" do
+  describe "calling a map view" do
     before(:each) do
-      ViewTestDocument.view :by_name, :map => 'function(doc) { if (doc.class == \'ViewTestDocument\') emit(doc.name, doc); }'
+      ViewTestDocument.view :by_name, :map => 'function(doc) { if (doc.class == "ViewTestDocument") emit(doc.name, doc); }'
     end
     
     it "should initialize views when called" do
@@ -175,6 +191,77 @@ describe "A Recliner::Document" do
       result = ViewTestDocument.by_name(:descending => true)
       result[0].name.should == 'Ben'
       result[1].name.should == 'Aaron'
+    end
+  end
+  
+  # describe "calling a map/reduce view" do
+  #   before(:each) do
+  #     ViewTestDocument.view :count_by_name, :map => 'if (doc.class == "ViewTestDocument") emit(doc.name, 1);',
+  #                                           :reduce => 'return sum(values);'
+  #                                           
+  #     CouchDB.document_at('1', { :class => 'ViewTestDocument', :name => 'Aaron' })
+  #     CouchDB.document_at('2', { :class => 'ViewTestDocument', :name => 'Ben' })
+  #     CouchDB.document_at('3', { :class => 'ViewTestDocument', :name => 'Ben' })
+  #   end
+  #   
+  #   it "should be callable without grouping" do
+  #     ViewTestDocument.count_by_name.should == 3
+  #   end
+  #   
+  #   it "should be callable with grouping" do
+  #     ViewTestDocument.count_by_name(:group => true).should == { 'Aaron' => 1, 'Ben' => 2 }
+  #   end
+  #   
+  #   it "should be callable with a key" do
+  #     ViewTestDocument.count_by_name('Aaron').should == 1
+  #     ViewTestDocument.count_by_name('Ben').should == 2
+  #   end
+  # end
+  
+  describe "- defining views" do
+    describe "with no options" do
+      before(:each) do
+        ViewTestDocument.create!(:id => '1', :name => 'Ben')
+        ViewTestDocument.create!(:id => '2', :name => 'Charlie')
+        BasicDocument.create!
+        
+        ViewTestDocument.view :no_option_view
+      end
+      
+      it "should only return instances of ViewTestDocument" do
+        ViewTestDocument.no_option_view.size.should == 2
+        ViewTestDocument.no_option_view.all? { |doc| doc.should be_an_instance_of(ViewTestDocument) }
+      end
+      
+      it "should order by default order (id)" do
+        ViewTestDocument.no_option_view.map(&:id).should == ['1', '2']
+      end
+    end
+    
+    describe "with :order option" do
+      before(:each) do
+        @names = %w(Aaron Charlie Rudolph Ben)
+        @names.each { |name| ViewTestDocument.create!(:name => name) }
+        
+        ViewTestDocument.view :order_view, :order => :name
+      end
+      
+      it "should order results with no key" do
+        ViewTestDocument.order_view.map(&:name).should == @names.sort
+      end
+      
+      it "should order results descending" do
+        ViewTestDocument.order_view(:descending => true).map(&:name).should == @names.sort.reverse
+      end
+      
+      it "should give correct results with single key" do
+        ViewTestDocument.order_view('Charlie').first.name.should == 'Charlie'
+        ViewTestDocument.order_view('Ben').first.name.should == 'Ben'
+      end
+      
+      it "should give correct results with multiple keys" do
+        ViewTestDocument.order_view('Charlie', 'Ben').map(&:name).should == ['Charlie', 'Ben']
+      end
     end
   end
 end

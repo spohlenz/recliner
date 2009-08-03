@@ -1,6 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-class BasicDocument < Recliner::Document; end
+require 'models/basic_document'
+require 'models/scoped_document'
 
 describe "A Recliner::Document class" do
   subject { BasicDocument }
@@ -357,13 +358,8 @@ describe "Destroying/deleting a Recliner::Document" do
   end
 end
 
-
-module ReclinerTest
-  class TestClass < Recliner::Document; end
-end  
-
 describe "Save a scoped Recliner::Document" do
-  subject { ReclinerTest::TestClass.new(:id => '1234') }
+  subject { ReclinerTest::TestDocument.new(:id => '1234') }
   
   before(:each) do
     CouchDB.no_document_at('http://localhost:5984/recliner-test/1234')
@@ -371,7 +367,7 @@ describe "Save a scoped Recliner::Document" do
   end
   
   it "should set the class attribute correctly" do
-    CouchDB.should have_document({ :class => 'ReclinerTest::TestClass' }).
+    CouchDB.should have_document({ :class => 'ReclinerTest::TestDocument' }).
                    at('http://localhost:5984/recliner-test/1234')
   end
 end
