@@ -263,5 +263,25 @@ describe "A Recliner::Document" do
         ViewTestDocument.order_view('Charlie', 'Ben').map(&:name).should == ['Charlie', 'Ben']
       end
     end
+    
+    describe "with array :key option" do
+      before(:each) do
+        ViewTestDocument.create!(:id => '1', :name => 'A')
+        ViewTestDocument.create!(:id => '2', :name => 'A')
+        ViewTestDocument.create!(:id => '3', :name => 'B')
+        ViewTestDocument.create!(:id => '4', :name => 'A')
+        
+        ViewTestDocument.view :key_view, :key => [ :name, :_id ]
+      end
+      
+      it "should order results with no key" do
+        ViewTestDocument.key_view.map(&:id).should == [ '1', '2', '4', '3' ]
+      end
+      
+      it "should give correct results with single key" do
+        ViewTestDocument.key_view(['A', '1']).first.id.should == '1'
+        ViewTestDocument.key_view(['A', '4']).first.id.should == '4'
+      end
+    end
   end
 end

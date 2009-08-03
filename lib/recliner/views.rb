@@ -33,10 +33,20 @@ module Recliner
       map = ""
       
       map << "if (#{conditions(options)}) {"
-      map << "  emit(doc.#{options[:order]}, doc);"
+      map << "  emit(#{key(options)}, doc);"
       map << "}"
       
       [Recliner::MapViewFunction.new(map), nil]
+    end
+    
+    def key(options)
+      key = options[:key] || options[:order]
+      
+      if key.is_a?(Array)
+        '[' + key.map { |k| "doc.#{k}" }.join(', ') + ']'
+      else
+        "doc.#{key}"
+      end
     end
     
     def conditions(options)
