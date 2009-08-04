@@ -302,5 +302,19 @@ describe "A Recliner::Document" do
         ViewTestDocument.hash_conditions_view.map(&:id).should == [ '1', '2', '4' ]
       end
     end
+    
+    describe "with :select option" do
+      before(:each) do
+        ViewTestDocument.create!(:id => '1', :name => 'A')
+        ViewTestDocument.view :select_single_view, :select => :class
+        ViewTestDocument.view :select_array_view, :select => [ :_id, :class ]
+      end
+      
+      it "should only select chosen fields" do
+        result = ViewTestDocument.select_single_view.first
+        result.id.should be_nil
+        result.name.should be_nil
+      end
+    end
   end
 end

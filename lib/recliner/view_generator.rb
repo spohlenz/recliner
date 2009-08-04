@@ -10,7 +10,7 @@ module Recliner
       map = ""
       
       map << "if (#{conditions}) {"
-      map << "  emit(#{key}, doc);"
+      map << "  emit(#{key}, #{value});"
       map << "}"
       
       [Recliner::MapViewFunction.new(map), nil]
@@ -24,6 +24,16 @@ module Recliner
         '[' + key.map { |k| "doc.#{k}" }.join(', ') + ']'
       else
         "doc.#{key}"
+      end
+    end
+    
+    def value
+      if options[:select]
+        "{" + Array(options[:select]).map { |field|
+          "\"#{field}\": doc.#{field}"
+        }.join(",") + "}"
+      else
+        'doc'
       end
     end
     
