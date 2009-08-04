@@ -284,32 +284,21 @@ describe "A Recliner::Document" do
       end
     end
     
-    describe "with string :conditions" do
+    describe "with :conditions option" do
       before(:each) do
         ViewTestDocument.create!(:id => '1', :name => 'A')
         ViewTestDocument.create!(:id => '2', :name => 'A')
         ViewTestDocument.create!(:id => '3', :name => 'B')
         ViewTestDocument.create!(:id => '4', :name => 'A')
-        
-        ViewTestDocument.view :string_conditions_view, :conditions => 'doc.name == "A"'
       end
       
-      it "should only fetch documents matching conditions" do
+      it "should only fetch documents matching conditions string" do
+        ViewTestDocument.view :string_conditions_view, :conditions => 'doc.name == "A"'
         ViewTestDocument.string_conditions_view.map(&:id).should == [ '1', '2', '4' ]
       end
-    end
-    
-    describe "with hash :conditions" do
-      before(:each) do
-        ViewTestDocument.create!(:id => '1', :name => 'A')
-        ViewTestDocument.create!(:id => '2', :name => 'A')
-        ViewTestDocument.create!(:id => '3', :name => 'B')
-        ViewTestDocument.create!(:id => '4', :name => 'A')
-        
-        ViewTestDocument.view :hash_conditions_view, :conditions => { :name => 'A' }
-      end
       
-      it "should only fetch documents matching conditions" do
+      it "should only fetch documents matching conditions hash" do
+        ViewTestDocument.view :hash_conditions_view, :conditions => { :name => 'A' }
         ViewTestDocument.hash_conditions_view.map(&:id).should == [ '1', '2', '4' ]
       end
     end
