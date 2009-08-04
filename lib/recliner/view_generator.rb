@@ -28,9 +28,16 @@ module Recliner
     end
     
     def conditions
-      options[:conditions!].map { |key, value|
-        "doc.#{key} === #{value.to_json}"
-      }.join(' && ')
+      conditions = options[:conditions!].map { |k, v| "doc.#{k} === #{v.to_json}" }
+      
+      case options[:conditions]
+      when Hash
+        conditions += options[:conditions].map { |k, v| "doc.#{k} === #{v.to_json}" }
+      when String
+        conditions << "(#{options[:conditions]})"
+      end
+      
+      conditions.join(' && ')
     end
   end
 end
