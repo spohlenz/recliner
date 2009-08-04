@@ -290,6 +290,8 @@ describe "A Recliner::Document" do
         ViewTestDocument.create!(:id => '2', :name => 'A')
         ViewTestDocument.create!(:id => '3', :name => 'B')
         ViewTestDocument.create!(:id => '4', :name => 'A')
+        ViewTestDocument.create!(:id => '5')
+        BasicDocument.create!(:id => '6')
       end
       
       it "should only fetch documents matching conditions string" do
@@ -300,6 +302,16 @@ describe "A Recliner::Document" do
       it "should only fetch documents matching conditions hash" do
         ViewTestDocument.view :hash_conditions_view, :conditions => { :name => 'A' }
         ViewTestDocument.hash_conditions_view.map(&:id).should == [ '1', '2', '4' ]
+      end
+      
+      it "should fetch boolean conditions correctly" do
+        ViewTestDocument.view :boolean_conditions_view, :conditions => { :name => true }
+        ViewTestDocument.boolean_conditions_view.map(&:id).should == [ '1', '2', '3', '4' ]
+      end
+      
+      it "should take priority over default conditions" do
+        ViewTestDocument.view :priority_conditions_view, :conditions => { :class => 'BasicDocument' }
+        ViewTestDocument.priority_conditions_view.map(&:id).should == ['6']
       end
     end
     

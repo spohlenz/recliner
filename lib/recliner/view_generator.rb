@@ -40,16 +40,30 @@ module Recliner
     end
     
     def conditions
-      conditions = options[:conditions!].map { |k, v| "doc.#{k} === #{v.to_json}" }
-      
       case options[:conditions]
       when Hash
-        conditions += options[:conditions].map { |k, v| "doc.#{k} === #{v.to_json}" }
+        conditions = field_conditions(options[:conditions!].merge(options[:conditions]))
       when String
+        conditions = field_conditions(options[:conditions!])
         conditions << "(#{options[:conditions]})"
+      else
+        conditions = field_conditions(options[:conditions!])
       end
       
       conditions.join(' && ')
+    end
+    
+    def field_conditions(conditions)
+      conditions.map { |k, v|
+        case v
+        when true
+          "doc.#{k}"
+        when false
+          "!doc.#{k}"
+        else
+          "doc.#{k} === #{v.to_json}"
+        end
+      }
     end
     
     memoize :key, :value, :conditions
