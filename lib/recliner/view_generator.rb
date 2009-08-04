@@ -1,5 +1,7 @@
 module Recliner
   class ViewGenerator
+    extend ActiveSupport::Memoizable
+    
     attr_reader :options
     
     def initialize(options)
@@ -9,9 +11,9 @@ module Recliner
     def generate
       map = ""
       
-      map << "if (#{conditions}) {"
+      map << "if (#{conditions}) {" unless conditions.blank?
       map << "  emit(#{key}, #{value});"
-      map << "}"
+      map << "}" unless conditions.blank?
       
       [Recliner::MapViewFunction.new(map), nil]
     end
@@ -49,5 +51,7 @@ module Recliner
       
       conditions.join(' && ')
     end
+    
+    memoize :key, :value, :conditions
   end
 end

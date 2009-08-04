@@ -303,6 +303,20 @@ describe "A Recliner::Document" do
       end
     end
     
+    describe "with :conditions! option" do
+      before(:each) do
+        ViewTestDocument.create!(:id => '1', :name => 'A')
+        ViewTestDocument.create!(:id => '2', :name => 'A')
+        BasicDocument.create!(:id => '3')
+        
+        ViewTestDocument.view :override_conditions_view, :conditions! => {}
+      end
+      
+      it "should override default conditions" do
+        ViewTestDocument.override_conditions_view.map(&:id).should == [ '1', '2', '3' ]
+      end
+    end
+    
     describe "with :select option" do
       before(:each) do
         ViewTestDocument.create!(:id => '1', :name => 'A')
