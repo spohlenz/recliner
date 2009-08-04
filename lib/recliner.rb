@@ -27,6 +27,7 @@ module Recliner
   autoload :CompositeProperties, 'recliner/composite_properties'
   autoload :Views,               'recliner/views'
   autoload :ViewFunctions,       'recliner/view_functions'
+  autoload :ViewGenerator,       'recliner/view_generator'
   autoload :Callbacks,           'recliner/callbacks'
   autoload :Validations,         'recliner/validations'
   autoload :Associations,        'recliner/associations'

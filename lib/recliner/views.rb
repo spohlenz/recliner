@@ -9,7 +9,7 @@ module Recliner
         @map    = Recliner::MapViewFunction.new(options[:map])
         @reduce = Recliner::ReduceViewFunction.new(options[:reduce]) if options[:reduce]
       else
-        @map, @reduce = generate(options)
+        @map, @reduce = Recliner::ViewGenerator.new(options).generate
       end
     end
     
@@ -26,33 +26,6 @@ module Recliner
     
     def ==(other)
       to_couch.to_json == other.to_couch.to_json
-    end
-  
-  private
-    def generate(options)
-      map = ""
-      
-      map << "if (#{conditions(options)}) {"
-      map << "  emit(#{key(options)}, doc);"
-      map << "}"
-      
-      [Recliner::MapViewFunction.new(map), nil]
-    end
-    
-    def key(options)
-      key = options[:key] || options[:order]
-      
-      if key.is_a?(Array)
-        '[' + key.map { |k| "doc.#{k}" }.join(', ') + ']'
-      else
-        "doc.#{key}"
-      end
-    end
-    
-    def conditions(options)
-      options[:conditions!].map { |key, value|
-        "doc.#{key} === #{value.to_json}"
-      }.join(' && ')
     end
   end
   
