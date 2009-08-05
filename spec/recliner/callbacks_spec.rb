@@ -1,7 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-require 'models/callback_test'
-
 describe "Recliner callbacks" do
   it "should run each type of callback when initializing" do
     instance = CallbackTestDocument.new

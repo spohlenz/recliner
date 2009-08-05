@@ -1,3 +1,24 @@
+class MyCustomClass
+  attr_accessor :a, :b
+  
+  def initialize(a, b)
+    @a = a; @b = b
+  end
+  
+  def self.from_couch(h)
+    new(h['a'], h['b']) if h
+  end
+  
+  def to_couch
+    { :a => a, :b => b }
+  end
+  
+  def ==(other)
+    other.is_a?(MyCustomClass) &&
+      a == other.a && b == other.b
+  end
+end
+
 class PropertyDocument < Recliner::Document
   property :normal_property, String
   property :property_with_default_value, String, :default => 'the default'

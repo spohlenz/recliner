@@ -1,8 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-require 'models/view_test'
-require 'models/basic'
-
 describe "Recliner::ViewDocument" do
   subject { Recliner::ViewDocument.new }
   

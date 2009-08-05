@@ -1,7 +1,5 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
-require 'models/database_test'
-
 describe "Recliner::Database" do
   before(:each) do
     @db = Recliner::Database.new('http://localhost:5984/recliner-test-alt')
