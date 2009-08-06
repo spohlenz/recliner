@@ -25,7 +25,7 @@ describe Recliner, "Validations" do
     end
   
     it "should have an errors object" do
-      subject.errors.should be_instance_of(ActiveModel::Errors)
+      subject.errors.should be_instance_of(Recliner::Errors)
     end
   
     it "should not save" do

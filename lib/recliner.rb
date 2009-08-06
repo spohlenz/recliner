@@ -4,6 +4,7 @@ $:.unshift(activesupport_path) if File.directory?(activesupport_path)
 activemodel_path = "#{File.dirname(__FILE__)}/../vendor/activemodel/lib"
 $:.unshift(activemodel_path) if File.directory?(activemodel_path)
 
+require 'active_support'
 require 'json'
 require 'rest_client'
 require 'uri'
@@ -75,3 +76,5 @@ module Recliner
     end
   end
 end
+
+I18n.load_path << File.dirname(__FILE__) + '/recliner/locale/en.yml'
