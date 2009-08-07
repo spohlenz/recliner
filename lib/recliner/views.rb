@@ -170,6 +170,10 @@ module Recliner
         view_document.save! if view_document.new_record? || update_required
         
         @views_initialized = true
+        
+      rescue DocumentNotSaved
+        @view_document = nil
+        initialize_views!
       end
     end
   end

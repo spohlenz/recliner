@@ -9,13 +9,12 @@ describe Recliner::Document, "validates_uniqueness_of" do
     ActiveModel::ValidationsRepairHelper::Toolbox.reset_validations(@validation_repairs)
   end
   
+  subject { UniqueDocument.new }
+  
   describe "with no options" do
     before(:each) do
       UniqueDocument.validates_uniqueness_of :name
-      UniqueDocument.all.map { |d| d.destroy }
     end
-    
-    subject { UniqueDocument.new }
     
     describe "no other documents exist with the same name" do
       before(:each) do
@@ -38,6 +37,43 @@ describe Recliner::Document, "validates_uniqueness_of" do
     describe "another document with the same name exists" do
       before(:each) do
         UniqueDocument.create!(:name => 'Test')
+      end
+      
+      it "should not be valid" do
+        subject.name = 'Test'
+        subject.should_not be_valid
+      end
+    end
+  end
+  
+  describe "with scope option" do
+    before(:each) do
+      UniqueDocument.validates_uniqueness_of :name, :scope => :country
+    end
+    
+    subject { UniqueDocument.new(:country => 'USA') }
+    
+    describe "no other documents exist with the same name/country" do
+      before(:each) do
+        UniqueDocument.create!(:name => 'Test', :country => 'Australia')
+      end
+      
+      it "should be valid when creating" do
+        subject.name = 'Test'
+        subject.should be_valid
+      end
+      
+      it "should be valid when updating" do
+        subject.name = 'Test'
+        subject.save!
+
+        subject.should be_valid
+      end
+    end
+    
+    describe "another document with the same name and country exists" do
+      before(:each) do
+        UniqueDocument.create!(:name => 'Test', :country => 'USA')
       end
       
       it "should not be valid" do

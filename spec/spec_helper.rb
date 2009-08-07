@@ -16,7 +16,7 @@ def set_database!
 end
 
 Spec::Runner.configure do |config|
-  config.before(:all) do
+  config.before(:each) do
     set_database!
     recreate_database!
   end
