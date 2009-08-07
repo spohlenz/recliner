@@ -82,4 +82,76 @@ describe Recliner::Document, "validates_uniqueness_of" do
       end
     end
   end
+  
+  describe "with custom view (single key)" do
+    before(:each) do
+      UniqueDocument.view :custom_view, :key => :name, :select => :_id, :conditions! => {}
+      UniqueDocument.validates_uniqueness_of :name, :view => :custom_view
+    end
+    
+    subject { UniqueDocument.new }
+    
+    describe "no other documents exist with the same name/country" do
+      it "should be valid when creating" do
+        subject.name = 'Test'
+        subject.should be_valid
+      end
+      
+      it "should be valid when updating" do
+        subject.name = 'Test'
+        subject.save!
+  
+        subject.should be_valid
+      end
+    end
+    
+    describe "another document with the same name and country exists" do
+      before(:each) do
+        ValidatedDocument.create!(:name => 'Test')
+      end
+      
+      it "should not be valid" do
+        subject.name = 'Test'
+        subject.should_not be_valid
+      end
+    end
+  end
+  
+  describe "with custom view (multiple keys)" do
+    before(:each) do
+      UniqueDocument.view :custom_view, :key => [:name, :country], :select => :_id, :conditions! => {}
+      UniqueDocument.validates_uniqueness_of :name, :view => :custom_view
+    end
+    
+    subject { UniqueDocument.new(:country => 'USA') }
+    
+    describe "no other documents exist with the same name/country" do
+      before(:each) do
+        UniqueDocument.create!(:name => 'Test', :country => 'Australia')
+      end
+      
+      it "should be valid when creating" do
+        subject.name = 'Test'
+        subject.should be_valid
+      end
+      
+      it "should be valid when updating" do
+        subject.name = 'Test'
+        subject.save!
+  
+        subject.should be_valid
+      end
+    end
+    
+    describe "another document with the same name and country exists" do
+      before(:each) do
+        ValidatedDocument.create!(:name => 'Test', :country => 'USA')
+      end
+      
+      it "should not be valid" do
+        subject.name = 'Test'
+        subject.should_not be_valid
+      end
+    end
+  end
 end
