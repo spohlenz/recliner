@@ -41,6 +41,20 @@ module Recliner
       write_attribute(name, value)
     end
     
+    def clone_attributes(reader_method = :read_attribute, attributes = {})
+      self.attribute_names.inject(attributes) do |attrs, name|
+        attrs[name] = clone_attribute_value(reader_method, name)
+        attrs
+      end
+    end
+
+    def clone_attribute_value(reader_method, attribute_name)
+      value = send(reader_method, attribute_name)
+      value.duplicable? ? value.clone : value
+    rescue TypeError, NoMethodError
+      value
+    end
+    
     def method_missing(method_id, *args, &block)
       # If we haven't generated any methods yet, generate them, then
       # see if we've created the method we're looking for.

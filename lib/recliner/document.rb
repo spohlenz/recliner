@@ -262,7 +262,7 @@ module Recliner
     
     include AttributeMethods
     include AttributeMethods::Read, AttributeMethods::Write, AttributeMethods::Query
-    include AttributeMethods::Defaults, AttributeMethods::Protected
+    include AttributeMethods::Defaults, AttributeMethods::Protected, AttributeMethods::Dirty
     
     include CompositeProperties
     include Views
