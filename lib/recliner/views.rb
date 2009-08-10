@@ -1,5 +1,20 @@
 require File.dirname(__FILE__) + '/view_functions'
 
+#
+# Example views
+#
+# view :by_title, :order => :title
+# view :published, :conditions => { :published => true }
+# view :custom_map, :map => "emit(null, doc)"          # function is optional
+# view :custom_reduce, :map => "function(doc) { emit(doc.tag, doc); }",
+#                      :reduce => "function(keys, values) { return sum(values); }"
+#
+#
+# Overrides default order for 'all' view
+#
+# default_order :title
+#
+
 module Recliner
   class View
     attr_reader :map, :reduce
@@ -77,17 +92,23 @@ module Recliner
     extend ActiveSupport::Concern
     
     included do
-      class_inheritable_accessor :views
-      self.views = {}
+      view :all
+      
+      default_order :id
+      default_conditions :class => '#{name}'
     end
     
     module ClassMethods
+      def views
+        read_inheritable_attribute(:views) || write_inheritable_attribute(:views, {})
+      end
+      
       #
       #
       #
       def view(name, options={})
         views[name] = options
-        @views_initialized = false
+        reset_views!
         
         class_eval <<-END_RUBY
           def self.#{name}(*args)                     # def self.by_name(*args)
@@ -103,7 +124,7 @@ module Recliner
       def default_order(property=nil)
         if property
           write_inheritable_attribute(:default_order, properties[property].as)
-          @views_initialized = false
+          reset_views!
         end
         
         read_inheritable_attribute(:default_order)
@@ -112,7 +133,7 @@ module Recliner
       def default_conditions(conditions=nil)
         if conditions
           write_inheritable_attribute(:default_conditions, conditions)
-          @views_initialized = false
+          reset_views!
         end
         
         read_inheritable_attribute(:default_conditions)
@@ -123,7 +144,7 @@ module Recliner
       end
       
       def view_document
-        @view_document ||= 
+        @_view_document ||= 
           ViewDocument.with_database(database) do
             ViewDocument.load(view_document_id) || ViewDocument.new(:id => view_document_id)
           end
@@ -152,8 +173,21 @@ module Recliner
         end
       end
       
+      def views_initialized?
+        @_views_initialized
+      end
+      
+      def views_initialized!
+        @_views_initialized = true
+      end
+      
+      def reset_views!
+        @_view_document = nil
+        @_views_initialized = false
+      end
+      
       def initialize_views!
-        return if @views_initialized
+        return if views_initialized?
         
         update_required = false
         
@@ -169,10 +203,10 @@ module Recliner
         
         view_document.save! if view_document.new_record? || update_required
         
-        @views_initialized = true
+        views_initialized!
         
       rescue DocumentNotSaved
-        @view_document = nil
+        reset_views!
         initialize_views!
       end
     end

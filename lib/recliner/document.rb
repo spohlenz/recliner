@@ -11,10 +11,6 @@ module Recliner
     attr_reader :database
     
     def initialize(attributes={})
-      self.class.default_attributes(self).each do |property, default|
-        write_attribute(property, default)
-      end
-      
       self.attributes = attributes
       
       @database = self.class.database
@@ -25,38 +21,9 @@ module Recliner
       callback(:after_initialize) if respond_to?(:after_initialize)
     end
     
-    
-    # Define core properties
-    
-    include Properties, CompositeProperties
-  
-    property :id,  String, :as => '_id', :default => lambda { generate_guid }
-    property :rev, String, :as => '_rev'
-  
-  
-    # Define default views
-    
-    include Views
-    
-    view :all
-    
-    default_order :id
-    default_conditions :class => '#{name}'
-    
-    #
-    # Example views
-    #
-    # view :by_title, :order => :title
-    # view :published, :conditions => { :published => true }
-    # view :custom_map, :map => "emit(null, doc)"          # function is optional
-    # view :custom_reduce, :map => "function(doc) { emit(doc.tag, doc); }",
-    #                      :reduce => "function(keys, values) { return sum(values); }"
-    #
-    #
-    # Overrides default order for 'all' view
-    #
-    # default_order :title
-    #
+    def to_couch
+      attributes_with_class.to_couch
+    end
   
     # Special case for id setter as old document needs to be deleted if the id is changed
     def id=(new_id)
@@ -291,6 +258,14 @@ module Recliner
   end
   
   Document.class_eval do
+    include Properties
+    
+    include AttributeMethods
+    include AttributeMethods::Read, AttributeMethods::Write, AttributeMethods::Query
+    include AttributeMethods::Defaults, AttributeMethods::Protected
+    
+    include CompositeProperties
+    include Views
     include Validations
     include Callbacks
     include Associations

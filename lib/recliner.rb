@@ -24,6 +24,7 @@ module Recliner
   autoload :Database,            'recliner/database'
   autoload :Document,            'recliner/document'
   
+  autoload :AttributeMethods,    'recliner/attribute_methods'
   autoload :Properties,          'recliner/properties'
   autoload :CompositeProperties, 'recliner/composite_properties'
   autoload :Views,               'recliner/views'
