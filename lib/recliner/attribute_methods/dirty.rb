@@ -57,6 +57,13 @@ module Recliner
         status
       end
       
+      def old_attributes
+        changed_attributes.inject(attributes.dup) do |attributes, (attr, old)|
+          attributes[attr] = old
+          attributes
+        end
+      end
+      
     private
       # Map of change <tt>attr => original value</tt>.
       def changed_attributes

@@ -13,6 +13,10 @@ describe Recliner::Document, "change tracking" do
     it "should have an empty changes hash" do
       subject.changes.should == {}
     end
+    
+    it "should have old attributes equal to current attributes" do
+      subject.old_attributes.should == subject.attributes
+    end
   end
   
   describe "A changed document" do
@@ -34,6 +38,15 @@ describe Recliner::Document, "change tracking" do
       subject.save!
       subject.changed.should == []
       subject.changes.should == {}
+    end
+    
+    it "should have a hash of old attributes" do
+      subject.old_attributes.should == {
+        'name' => 'Original',
+        '_id'  => subject.id,
+        '_rev' => subject.rev,
+        'country' => nil
+      }
     end
   end
 end
