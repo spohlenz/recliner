@@ -1,10 +1,17 @@
 require 'rubygems'
+
 require 'spec/rake/spectask'
+require 'cucumber/rake/task'
 
 task :default => :spec
 
 Spec::Rake::SpecTask.new(:spec) do |t|
   t.spec_opts = ['--options', "#{File.expand_path(File.dirname(__FILE__))}/spec/spec.opts"]
+end
+
+Cucumber::Rake::Task.new(:features) do |t|
+  t.fork = true
+  t.cucumber_opts = ['--format', (ENV['CUCUMBER_FORMAT'] || 'pretty'), '-r features']
 end
 
 namespace :spec do
