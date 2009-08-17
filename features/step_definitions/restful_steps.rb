@@ -1,34 +1,34 @@
 When /^I GET "([^\"]*)"$/ do |uri|
-  record_result_and_exception { Recliner.get(uri) }
+  @result = record_exception { Recliner.get(uri) }
 end
 
 When /^I GET "([^\"]*)" with:$/ do |uri, params|
   params = eval_hash_keys(params.rows_hash)
-  record_result_and_exception { Recliner.get(uri, params) }
+  @result = record_exception { Recliner.get(uri, params) }
 end
 
 When /^I PUT to "([^\"]*)"$/ do |uri|
-  record_result_and_exception { Recliner.put(uri, {}) }
+  @result = record_exception { Recliner.put(uri, {}) }
 end
 
 When /^I PUT to "([^\"]*)" with the revision$/ do |uri|
-  record_result_and_exception { Recliner.put(uri, { '_rev' => @revision }) }
+  @result = record_exception { Recliner.put(uri, { '_rev' => @revision }) }
 end
 
 When /^I POST to "([^\"]*)"$/ do |uri|
-  record_result_and_exception { Recliner.post(uri, {}) }
+  @result = record_exception { Recliner.post(uri, {}) }
 end
 
 When /^I POST to "([^\"]*)" with:$/ do |uri, payload|
-  record_result_and_exception { Recliner.post(uri, eval(payload)) }
+  @result = record_exception { Recliner.post(uri, eval(payload)) }
 end
 
 When /^I DELETE "([^\"]*)" with the revision$/ do |uri|
-  record_result_and_exception { Recliner.delete("#{uri}?rev=#{@revision}") }
+  @result = record_exception { Recliner.delete("#{uri}?rev=#{@revision}") }
 end
 
 When /^I DELETE "([^\"]*)"$/ do |uri|
-  record_result_and_exception { Recliner.delete(uri) }
+  @result = record_exception { Recliner.delete(uri) }
 end
 
 Then /^the result should have key "([^\"]*)"$/ do |key|

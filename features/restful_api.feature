@@ -1,7 +1,6 @@
 Feature: RESTful CouchDB access
-  As a developer
-  I want to bypass the Recliner::Document abstraction
   So that I can implement low-level functionality
+  I want to bypass the Recliner::Document abstraction
   
   Background:
     Given the database "http://localhost:5984/recliner-test" exists

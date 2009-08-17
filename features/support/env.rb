@@ -1,14 +1,17 @@
+$LOAD_PATH.unshift(File.dirname(__FILE__) + "/../../lib")
+
 require 'recliner'
 require 'restclient'
 
 module ReclinerWorld
-  def record_result_and_exception
+  def record_exception
     begin
-      @result = yield
+      result = yield
       @exception = nil
+      result
     rescue => e
-      @result = nil
       @exception = e
+      nil
     end
   end
   
