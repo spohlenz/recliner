@@ -1,40 +1,41 @@
 activesupport_path = "#{File.dirname(__FILE__)}/../vendor/activesupport/lib"
 $:.unshift(activesupport_path) if File.directory?(activesupport_path)
 
-activemodel_path = "#{File.dirname(__FILE__)}/../vendor/activemodel/lib"
-$:.unshift(activemodel_path) if File.directory?(activemodel_path)
+# activemodel_path = "#{File.dirname(__FILE__)}/../vendor/activemodel/lib"
+# $:.unshift(activemodel_path) if File.directory?(activemodel_path)
+# 
+require 'active_support/core_ext/object/blank'
 
-require 'active_support/core_ext'
 require 'json'
-require 'rest_client'
-require 'uri'
-
+require 'restclient'
+# require 'uri'
+# 
 $:.unshift File.dirname(__FILE__) unless
   $:.include?(File.dirname(__FILE__)) ||
   $:.include?(File.expand_path(File.dirname(__FILE__)))
-
-require 'core_ext'
-
-require 'recliner/configuration'
+# 
+# require 'core_ext'
+# 
+# require 'recliner/configuration'
 require 'recliner/exceptions'
 
 module Recliner
   VERSION = '0.0.1'
   
-  autoload :Database,            'recliner/database'
-  autoload :Document,            'recliner/document'
-  
-  autoload :AttributeMethods,    'recliner/attribute_methods'
-  autoload :Properties,          'recliner/properties'
-  autoload :CompositeProperties, 'recliner/composite_properties'
-  autoload :Views,               'recliner/views'
-  autoload :ViewFunctions,       'recliner/view_functions'
-  autoload :ViewGenerator,       'recliner/view_generator'
-  autoload :Callbacks,           'recliner/callbacks'
-  autoload :Validations,         'recliner/validations'
-  autoload :Associations,        'recliner/associations'
-  autoload :Timestamps,          'recliner/timestamps'
-  autoload :PrettyInspect,       'recliner/pretty_inspect'
+  # autoload :Database,            'recliner/database'
+  # autoload :Document,            'recliner/document'
+  # 
+  # autoload :AttributeMethods,    'recliner/attribute_methods'
+  # autoload :Properties,          'recliner/properties'
+  # autoload :CompositeProperties, 'recliner/composite_properties'
+  # autoload :Views,               'recliner/views'
+  # autoload :ViewFunctions,       'recliner/view_functions'
+  # autoload :ViewGenerator,       'recliner/view_generator'
+  # autoload :Callbacks,           'recliner/callbacks'
+  # autoload :Validations,         'recliner/validations'
+  # autoload :Associations,        'recliner/associations'
+  # autoload :Timestamps,          'recliner/timestamps'
+  # autoload :PrettyInspect,       'recliner/pretty_inspect'
   
   class << self
     def get(uri, params={})
@@ -81,4 +82,4 @@ module Recliner
   end
 end
 
-I18n.load_path << File.dirname(__FILE__) + '/recliner/locale/en.yml'
+# I18n.load_path << File.dirname(__FILE__) + '/recliner/locale/en.yml'
