@@ -4,7 +4,7 @@ $:.unshift(activesupport_path) if File.directory?(activesupport_path)
 activemodel_path = "#{File.dirname(__FILE__)}/../vendor/activemodel/lib"
 $:.unshift(activemodel_path) if File.directory?(activemodel_path)
 
-require 'active_support'
+require 'active_support/core_ext'
 require 'json'
 require 'rest_client'
 require 'uri'
@@ -38,30 +38,33 @@ module Recliner
   
   class << self
     def get(uri, params={})
-      JSON.parse(RestClient.get("#{uri}#{to_query_string(params)}"))
-    rescue RestClient::ResourceNotFound
-      raise DocumentNotFound
+      request(:get, uri, params)
     end
     
     def post(uri, payload={}, params={})
-      JSON.parse(RestClient.post("#{uri}#{to_query_string(params)}", payload.to_json))
+      request(:post, uri, params, payload)
     end
     
     def put(uri, payload={}, params={})
-      JSON.parse(RestClient.put("#{uri}#{to_query_string(params)}", payload.to_json))
-    rescue RestClient::RequestFailed => e
-      rescue_from_failed_request(e)
+      request(:put, uri, params, payload)
     end
     
     def delete(uri)
-      RestClient.delete(uri)
+      request(:delete, uri)
+    end
+  
+  private
+    def request(type, uri, params={}, payload=nil)
+      args = [type, "#{uri}#{to_query_string(params)}"]
+      args << payload.to_json if payload
+      
+      JSON.parse(RestClient.send(*args))
     rescue RestClient::ResourceNotFound
       raise DocumentNotFound
     rescue RestClient::RequestFailed => e
       rescue_from_failed_request(e)
     end
   
-  private
     def rescue_from_failed_request(e)
       case e.http_code
       when 409

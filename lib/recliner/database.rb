@@ -30,6 +30,18 @@ module Recliner
     def create!
       Recliner.put(uri)
     end
+    
+    def recreate!
+      delete! rescue nil
+      create!
+    end
+    
+    def clear!
+      docs = get("_all_docs")['rows']
+      post("_bulk_docs", {
+        :docs => docs.map { |doc| { '_id' => doc['id'], '_rev' => doc['value']['rev'], '_deleted' => true } }
+      })
+    end
 
   private
     def create_database_if_missing!
