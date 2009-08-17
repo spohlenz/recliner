@@ -96,6 +96,12 @@ describe "Save a Recliner::Document" do
       CouchDB.should have_document({ :class => 'BasicDocument', :_id => '1234' }).
                      at('http://localhost:5984/recliner-test/1234')
     end
+    
+    it "should update attributes" do
+      subject.update_attributes({ :id => '5678' }).should be_true
+      subject.id.should == '5678'
+      subject.should_not be_new_record
+    end
   end
   
   describe "an existing document with an out-of-date revision" do
@@ -116,6 +122,10 @@ describe "Save a Recliner::Document" do
         subject.save!
       }.should raise_error(Recliner::DocumentNotSaved)
     end
+    
+    it "should not update attributes" do
+      subject.update_attributes({}).should be_false
+    end
   end
   
   describe "an invalid document" do
@@ -133,6 +143,10 @@ describe "Save a Recliner::Document" do
       lambda {
         subject.save!
       }.should raise_error(Recliner::DocumentInvalid)
+    end
+    
+    it "should not update attributes" do
+      subject.update_attributes({}).should be_false
     end
   end
 end

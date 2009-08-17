@@ -26,7 +26,7 @@ module Recliner
   
     # Special case for id setter as old document needs to be deleted if the id is changed
     def id=(new_id)
-      @old_id = id unless new_record?
+      @old_id ||= id unless new_record?
       write_attribute(:id, new_id)
     end
   
@@ -43,6 +43,10 @@ module Recliner
     #
     def save!
       save || raise(DocumentNotSaved)
+    end
+    
+    def update_attributes(attrs)
+      self.attributes = attrs and save
     end
     
     #
@@ -84,7 +88,11 @@ module Recliner
     
     def save_to_database
       result = database.put(id, to_couch)
-      database.delete("#{@old_id}?rev=#{rev}") if id_changed?
+      
+      if id_changed?
+        database.delete("#{@old_id}?rev=#{rev}")
+        @old_id = nil
+      end
       
       self.id = result['id']
       self.rev = result['rev']
