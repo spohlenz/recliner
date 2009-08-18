@@ -12,7 +12,7 @@ class Array
     default_two_words_connector = I18n.translate(:'support.array.two_words_connector', :locale => options[:locale])
     default_last_word_connector = I18n.translate(:'support.array.last_word_connector', :locale => options[:locale])
 
-    # Try to emulate to_senteces previous to 2.3
+    # Try to emulate to_sentences previous to 2.3
     if options.has_key?(:connector) || options.has_key?(:skip_last_comma)
       ::ActiveSupport::Deprecation.warn(":connector has been deprecated. Use :words_connector instead", caller) if options.has_key? :connector
       ::ActiveSupport::Deprecation.warn(":skip_last_comma has been deprecated. Use :last_word_connector instead", caller) if options.has_key? :skip_last_comma
@@ -159,6 +159,7 @@ class Array
     raise "Not all elements respond to to_xml" unless all? { |e| e.respond_to? :to_xml }
     require 'builder' unless defined?(Builder)
 
+    options = options.dup
     options[:root]     ||= all? { |e| e.is_a?(first.class) && first.class.to_s != "Hash" } ? ActiveSupport::Inflector.pluralize(ActiveSupport::Inflector.underscore(first.class.name)) : "records"
     options[:children] ||= options[:root].singularize
     options[:indent]   ||= 2

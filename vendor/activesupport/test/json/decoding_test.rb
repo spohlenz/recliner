@@ -14,10 +14,10 @@ class TestJSONDecoding < ActiveSupport::TestCase
     %({"a": "a's, b's and c's", "b": "5,000"})   => {"a" => "a's, b's and c's", "b" => "5,000"},
     # multibyte
     %({"matzue": "松江", "asakusa": "浅草"}) => {"matzue" => "松江", "asakusa" => "浅草"},
-    %({"a": "2007-01-01"})                       => {'a' => Date.new(2007, 1, 1)}, 
-    %({"a": "2007-01-01 01:12:34 Z"})            => {'a' => Time.utc(2007, 1, 1, 1, 12, 34)}, 
+    %({"a": "2007-01-01"})                       => {'a' => Date.new(2007, 1, 1)},
+    %({"a": "2007-01-01 01:12:34 Z"})            => {'a' => Time.utc(2007, 1, 1, 1, 12, 34)},
     # no time zone
-    %({"a": "2007-01-01 01:12:34"})              => {'a' => "2007-01-01 01:12:34"}, 
+    %({"a": "2007-01-01 01:12:34"})              => {'a' => "2007-01-01 01:12:34"},
     # needs to be *exact*
     %({"a": " 2007-01-01 01:12:34 Z "})          => {'a' => " 2007-01-01 01:12:34 Z "},
     %({"a": "2007-01-01 : it's your birthday"})  => {'a' => "2007-01-01 : it's your birthday"},
@@ -29,11 +29,18 @@ class TestJSONDecoding < ActiveSupport::TestCase
     %({"a": null})  => {"a" => nil},
     %({"a": true})  => {"a" => true},
     %({"a": false}) => {"a" => false},
+    %q({"bad":"\\\\","trailing":""}) => {"bad" => "\\", "trailing" => ""},
     %q({"a": "http:\/\/test.host\/posts\/1"}) => {"a" => "http://test.host/posts/1"},
     %q({"a": "\u003cunicode\u0020escape\u003e"}) => {"a" => "<unicode escape>"},
     %q({"a": "\\\\u0020skip double backslashes"}) => {"a" => "\\u0020skip double backslashes"},
     %q({"a": "\u003cbr /\u003e"}) => {'a' => "<br />"},
-    %q({"b":["\u003ci\u003e","\u003cb\u003e","\u003cu\u003e"]}) => {'b' => ["<i>","<b>","<u>"]}
+    %q({"b":["\u003ci\u003e","\u003cb\u003e","\u003cu\u003e"]}) => {'b' => ["<i>","<b>","<u>"]},
+    # test combination of dates and escaped or unicode encoded data in arrays
+    %q([{"d":"1970-01-01", "s":"\u0020escape"},{"d":"1970-01-01", "s":"\u0020escape"}]) =>
+      [{'d' => Date.new(1970, 1, 1), 's' => ' escape'},{'d' => Date.new(1970, 1, 1), 's' => ' escape'}],
+    %q([{"d":"1970-01-01","s":"http:\/\/example.com"},{"d":"1970-01-01","s":"http:\/\/example.com"}]) =>
+      [{'d' => Date.new(1970, 1, 1), 's' => 'http://example.com'},
+       {'d' => Date.new(1970, 1, 1), 's' => 'http://example.com'}]
   }
 
   # load the default JSON backend
@@ -77,3 +84,4 @@ class TestJSONDecoding < ActiveSupport::TestCase
     assert_raise(ActiveSupport::JSON::ParseError) { ActiveSupport::JSON.decode(%({: 1})) }
   end
 end
+
