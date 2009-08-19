@@ -59,6 +59,10 @@ When /^I save the instance$/ do
   @instance.save
 end
 
+When /^I save! the instance$/ do
+  record_exception { @instance.save! }
+end
+
 Then /^the instance should not be a new record$/ do
   @instance.should_not be_new_record
 end

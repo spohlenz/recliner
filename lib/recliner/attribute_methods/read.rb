@@ -11,6 +11,10 @@ module Recliner
         attributes[property(name).as] if property(name)
       end
       
+      # def [](name)
+      #   read_attribute(name)
+      # end
+      
     private
       def attribute(attribute_name)
         read_attribute(attribute_name)

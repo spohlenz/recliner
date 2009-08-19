@@ -7,24 +7,23 @@ module Recliner
         alias_method_chain :initialize, :defaults
       end
       
-      module ClassMethods
-        def default_attributes(instance)
-          result = {}
-          
-          properties.each do |name, property|
-            result[name] = property.default_value(instance) unless name == :rev
-          end
-          
-          result.with_indifferent_access
-        end
-      end
-      
-      def initialize_with_defaults(attributes={})
-        self.class.default_attributes(self).each do |property, default|
+      def initialize_with_defaults(attributes={}, &block)
+        default_attributes.each do |property, default|
           write_attribute(property, default)
         end
         
-        initialize_without_defaults(attributes)
+        initialize_without_defaults(attributes, &block)
+      end
+    
+    private
+      def default_attributes
+        result = {}
+        
+        properties.each do |name, property|
+          result[name] = property.default_value(self) unless name == :rev
+        end
+        
+        result.with_indifferent_access
       end
     end
   end

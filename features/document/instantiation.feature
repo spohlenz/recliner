@@ -1,4 +1,5 @@
-Feature: Document instantiation
+@completed
+Feature: New document instantiation
   Recliner::Document models can be instantiated with or without attributes
   
   Background:

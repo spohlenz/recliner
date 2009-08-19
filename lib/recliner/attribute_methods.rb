@@ -11,11 +11,20 @@ module Recliner
     
     include ActiveModel::AttributeMethods
     
+    included do
+      undef_method :id
+    end
+    
     module ClassMethods
       # Generates all the attribute related methods for defined properties
       # accessors, mutators and query methods.
       def define_attribute_methods
         super(properties.keys)
+      end
+      
+      def property(*args)
+        super
+        undefine_attribute_methods
       end
     end
     
@@ -31,38 +40,28 @@ module Recliner
       end
     end
     
-    #
-    def [](name)
-      read_attribute(name)
-    end
-    
-    #
-    def []=(name, value)
-      write_attribute(name, value)
-    end
-    
-    def clone_attributes(reader_method = :read_attribute, attributes = {})
-      self.attribute_names.inject(attributes) do |attrs, name|
-        attrs[name] = clone_attribute_value(reader_method, name)
-        attrs
-      end
-    end
-
-    def clone_attribute_value(reader_method, attribute_name)
-      value = send(reader_method, attribute_name)
-      value.duplicable? ? value.clone : value
-    rescue TypeError, NoMethodError
-      value
-    end
+    # def clone_attributes(reader_method = :read_attribute, attributes = {})
+    #   self.attribute_names.inject(attributes) do |attrs, name|
+    #     attrs[name] = clone_attribute_value(reader_method, name)
+    #     attrs
+    #   end
+    # end
+    # 
+    # def clone_attribute_value(reader_method, attribute_name)
+    #   value = send(reader_method, attribute_name)
+    #   value.duplicable? ? value.clone : value
+    # rescue TypeError, NoMethodError
+    #   value
+    # end
     
     def method_missing(method_id, *args, &block)
       # If we haven't generated any methods yet, generate them, then
       # see if we've created the method we're looking for.
-      if !self.class.attribute_methods_generated?
+      unless self.class.attribute_methods_generated?
         self.class.define_attribute_methods
         method_name = method_id.to_s
         
-        guard_private_attribute_method!(method_name, args)
+        #guard_private_attribute_method!(method_name, args)
         
         if self.class.generated_attribute_methods.instance_methods.include?(method_name)
           return self.send(method_id, *args, &block)
@@ -70,6 +69,16 @@ module Recliner
       end
       
       super
+    end
+    
+    def respond_to?(*args)
+      self.class.define_attribute_methods
+      super
+    end
+  
+  protected
+    def attribute_method?(attr_name)
+      properties.include?(attr_name)
     end
     
   private

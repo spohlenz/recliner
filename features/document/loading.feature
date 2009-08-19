@@ -1,3 +1,4 @@
+@pending
 Feature: Document loading
   Recliner offers two ways of loading documents:
     load  => does not raise exceptions for missing documents

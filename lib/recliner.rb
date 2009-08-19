@@ -1,10 +1,10 @@
 activesupport_path = "#{File.dirname(__FILE__)}/../vendor/activesupport/lib"
 $:.unshift(activesupport_path) if File.directory?(activesupport_path)
 
-# activemodel_path = "#{File.dirname(__FILE__)}/../vendor/activemodel/lib"
-# $:.unshift(activemodel_path) if File.directory?(activemodel_path)
-# 
-require 'active_support/core_ext/object/blank'
+activemodel_path = "#{File.dirname(__FILE__)}/../vendor/activemodel/lib"
+$:.unshift(activemodel_path) if File.directory?(activemodel_path)
+
+require 'active_support/all'
 
 require 'json'
 require 'restclient'
@@ -13,20 +13,20 @@ require 'restclient'
 $:.unshift File.dirname(__FILE__) unless
   $:.include?(File.dirname(__FILE__)) ||
   $:.include?(File.expand_path(File.dirname(__FILE__)))
-# 
-# require 'core_ext'
-# 
+
+require 'core_ext'
+
 # require 'recliner/configuration'
 require 'recliner/exceptions'
 
 module Recliner
   VERSION = '0.0.1'
   
-  # autoload :Database,            'recliner/database'
-  # autoload :Document,            'recliner/document'
-  # 
-  # autoload :AttributeMethods,    'recliner/attribute_methods'
-  # autoload :Properties,          'recliner/properties'
+  autoload :Document,            'recliner/document'
+  autoload :Database,            'recliner/database'
+  
+  autoload :AttributeMethods,    'recliner/attribute_methods'
+  autoload :Properties,          'recliner/properties'
   # autoload :CompositeProperties, 'recliner/composite_properties'
   # autoload :Views,               'recliner/views'
   # autoload :ViewFunctions,       'recliner/view_functions'

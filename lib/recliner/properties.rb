@@ -1,5 +1,4 @@
 require 'uuid'
-require 'active_support/core_ext/hash/indifferent_access'
 
 module Recliner
   class Property < Struct.new(:name, :type, :as, :default)
@@ -30,19 +29,19 @@ module Recliner
         if type
           prop = Property.new(name.to_s, type, (options[:as] || name).to_s, options[:default])
           properties[name.to_sym] = prop
-        elsif block_given?
-          raise 'Not yet supported'
+      #   elsif block_given?
+      #     raise 'Not yet supported'
         else
-          raise 'Either a type or block must be provided'
+          raise ArgumentError.new('Either a type or block must be provided')
         end
       end
       
       #
       #
       #
-      def model_properties
-        properties.reject { |name, property| [:id, :rev].include?(name) }
-      end
+      # def model_properties
+      #   properties.reject { |name, property| [:id, :rev].include?(name) }
+      # end
       
     protected
       # Unique ID generation for new documents

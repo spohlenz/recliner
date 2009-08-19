@@ -13,6 +13,11 @@ module Recliner
         value
       end
       
+      # #
+      # def []=(name, value)
+      #   write_attribute(name, value)
+      # end
+      
     private
       # Handle *= for method_missing.
       def attribute=(attribute_name, value)

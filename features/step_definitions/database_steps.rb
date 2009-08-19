@@ -4,5 +4,5 @@ Given /^the database "([^\"]*)" exists$/ do |uri|
 end
 
 Given /^the default Recliner::Document database is set to "([^\"]*)"$/ do |uri|
-  Recliner::Document.database_uri = uri
+  Recliner::Document.use_database! uri
 end

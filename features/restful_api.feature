@@ -1,3 +1,4 @@
+@completed
 Feature: RESTful CouchDB access
   So that I can implement low-level functionality
   I want to bypass the Recliner::Document abstraction
