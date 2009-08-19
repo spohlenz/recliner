@@ -25,7 +25,7 @@ module Recliner
           subject.properties = {
             :foo => Recliner::Property.new('foo', String, 'internal', nil)
           }
-          subject.stub(:attributes).and_return('internal' => 'value of foo')
+          subject.stub(:attributes).and_return('foo' => 'value of foo')
         end
         
         it "should return the attribute value" do

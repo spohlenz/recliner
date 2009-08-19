@@ -13,10 +13,6 @@ module Recliner
   #     callback(:after_initialize) if respond_to?(:after_initialize)
     end
     
-    def to_couch
-      attributes_with_class.to_couch
-    end
-    
   #   # Special case for id setter as old document needs to be deleted if the id is changed
   #   def id=(new_id)
   #     @old_id ||= id unless new_record?

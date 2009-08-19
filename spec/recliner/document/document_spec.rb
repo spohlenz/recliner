@@ -71,34 +71,6 @@ module Recliner
       end
     end
     
-    describe "#to_couch" do
-      context "a model with no properties" do
-        subject { TestDocument.new(:id => 'abc-123') }
-        
-        it "should return a hash containing the document class and id" do
-          subject.to_couch.should == { 'class' => 'TestDocument', '_id' => 'abc-123' }
-        end
-      end
-      
-      context "a model with properties" do
-        define_recliner_document :TestDocument do
-          property :name, String
-          property :age, Integer
-        end
-        
-        subject { TestDocument.new(:id => 'abc-123', :name => 'My name', :age => 21 )}
-        
-        it "should return a hash containing the document class and the model attributes (excluding the id and rev)" do
-          subject.to_couch.should == {
-            'class' => 'TestDocument',
-            '_id' => 'abc-123',
-            'name' => 'My name',
-            'age' => 21
-          }
-        end
-      end
-    end
-    
     shared_examples_for "saving a new record successfully" do
       subject { TestDocument.new(:id => 'document-id') }
       

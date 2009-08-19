@@ -29,7 +29,7 @@ module Recliner
         
         it "should set the attribute hash" do
           subject.write_attribute(:foo, 'set foo')
-          subject.attributes['internal'].should == 'set foo'
+          subject.attributes['foo'].should == 'set foo'
         end
       end
     end

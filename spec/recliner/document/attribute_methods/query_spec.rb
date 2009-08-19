@@ -44,7 +44,7 @@ module Recliner
         
         context "attribute not blank" do
           before(:each) do
-            subject.stub(:attributes).and_return('internal' => 'not blank')
+            subject.stub(:attributes).and_return('foo' => 'not blank')
           end
           
           it "should return true" do
@@ -54,7 +54,7 @@ module Recliner
         
         context "attribute blank" do
           before(:each) do
-            subject.stub(:attributes).and_return('internal' => '')
+            subject.stub(:attributes).and_return('foo' => '')
           end
           
           it "should return false" do

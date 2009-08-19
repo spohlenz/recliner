@@ -9,7 +9,7 @@ module Recliner
       
       #
       def write_attribute(name, value)
-        attributes[property(name).as] = value if property(name)
+        attributes[name.to_s] = value
         value
       end
       

@@ -75,6 +75,18 @@ module Recliner
       self.class.define_attribute_methods
       super
     end
+    
+    def to_couch
+      attributes_with_class.inject({}) { |result, (attr_name, value)|
+        if p = property(attr_name)
+          result[p.as] = value
+        else
+          result[attr_name] = value
+        end
+        
+        result
+      }.to_couch
+    end
   
   protected
     def attribute_method?(attr_name)
