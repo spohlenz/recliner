@@ -20,8 +20,6 @@ module Recliner
     
     module ClassMethods
       #
-      #
-      #
       def property(name, *args, &block)
         options = args.extract_options!
         type = args.first
@@ -36,12 +34,10 @@ module Recliner
         end
       end
       
-      #
-      #
-      #
-      # def model_properties
-      #   properties.reject { |name, property| [:id, :rev].include?(name) }
-      # end
+      # Returns all defined properties except for id and rev
+      def model_properties
+        properties.reject { |name, property| [:id, :rev].include?(name) }
+      end
       
     protected
       # Unique ID generation for new documents

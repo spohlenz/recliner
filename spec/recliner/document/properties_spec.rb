@@ -38,6 +38,18 @@ module Recliner
       end
     end
     
+    describe "#model_properties" do
+      it "should return all defined properties except for id and rev" do
+        TestDocument.properties = {
+          :id => Recliner::Property.new(:id, String, '_id', nil),
+          :rev => Recliner::Property.new(:rev, String, '_rev', nil),
+          :foo => Recliner::Property.new(:foo, String, 'foo', nil),
+          :bar => Recliner::Property.new(:bar, Integer, 'internal', nil)
+        }
+        TestDocument.model_properties.should == TestDocument.properties.slice(:foo, :bar)
+      end
+    end
+    
     describe "defining properties" do
       context "basic property types" do
         BasicTypes = [ String, Integer, Float, Boolean, Time, Date ]

@@ -274,7 +274,7 @@ module Recliner
   #   include Callbacks
   #   include Associations
   #   include Timestamps
-  #   include PrettyInspect
+    include PrettyInspect
   #   
   #   include ActiveModel::Conversion
   end

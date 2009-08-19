@@ -35,7 +35,7 @@ module Recliner
   # autoload :Validations,         'recliner/validations'
   # autoload :Associations,        'recliner/associations'
   # autoload :Timestamps,          'recliner/timestamps'
-  # autoload :PrettyInspect,       'recliner/pretty_inspect'
+  autoload :PrettyInspect,       'recliner/pretty_inspect'
   
   class << self
     def get(uri, params={})
