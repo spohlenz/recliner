@@ -73,5 +73,11 @@ describe "Core extensions" do
         "goodbye".to_couch.should == "goodbye"
       end
     end
+    
+    context "on nil" do
+      it "should return nil" do
+        nil.to_couch.should == nil
+      end
+    end
   end
 end

@@ -97,16 +97,16 @@ module Recliner
     end
   
     class << self
-  #     #
-  #     def load(*ids)
-  #       load_ids(ids, false)
-  #     end
-  #     
-  #     #
-  #     def load!(*ids)
-  #       load_ids(ids, true)
-  #     end
-  #     
+      #
+      def load(*ids)
+        load_ids(ids, false)
+      end
+      
+      #
+      def load!(*ids)
+        load_ids(ids, true)
+      end
+  
   #     #
   #     def first
   #       all(:limit => 1).first
@@ -173,20 +173,22 @@ module Recliner
   #     ensure
   #       Thread.current["#{name}_database"] = nil
   #     end
-  #     
-  #     def instantiate_from_database(attrs)
-  #       klass = attrs['class'].constantize
-  #     
-  #       returning(klass.new) do |record|
-  #         klass.properties.each do |name, property|
-  #           record[property.name] = property.type.from_couch(attrs[property.as])
-  #         end
-  #       
-  #         record.instance_variable_set("@new_record", false)
-  #         record.send(:callback, :after_load) if record.respond_to?(:after_load)
-  #       end
-  #     end
-  #     
+
+      def instantiate_from_database(attrs)
+        raise DocumentNotFound if attrs['class'] != name
+        
+        klass = attrs['class'].constantize
+        
+        returning(klass.new) do |record|
+          klass.properties.each do |name, property|
+            record.write_attribute(property.name, property.type.from_couch(attrs[property.as]))
+          end
+          
+          record.instance_variable_set("@new_record", false)
+          #record.send(:callback, :after_load) if record.respond_to?(:after_load)
+        end
+      end
+
   #     def self_and_descendants_from_recliner#nodoc:
   #       klass = self
   #       classes = [klass]
@@ -226,34 +228,34 @@ module Recliner
   #       I18n.translate(defaults.shift, {:scope => [:recliner, :models], :count => 1, :default => defaults}.merge(options))
   #     end
   #   
-  #   private
-  #     def load_ids(ids, raise_exceptions=false)
-  #       if ids.size == 1
-  #         load_single(ids.first, raise_exceptions)
-  #       else
-  #         load_multiple(ids, raise_exceptions)
-  #       end
-  #     end
-  #     
-  #     def load_single(id, raise_exceptions=false)
-  #       attrs = database.get(id)
-  #       instantiate_from_database(attrs)
-  #     rescue Recliner::DocumentNotFound => e
-  #       raise e if raise_exceptions
-  #       nil
-  #     end
-  #   
-  #     def load_multiple(ids, raise_exceptions=false)
-  #       result = database.post('_all_docs?include_docs=true', { :keys => ids })
-  #       result['rows'].map { |row|
-  #         if row['doc'] && row['doc']['class'] == name
-  #           instantiate_from_database(row['doc'])
-  #         else
-  #           raise Recliner::DocumentNotFound if raise_exceptions
-  #           nil
-  #         end
-  #       }
-  #     end
+    private
+      def load_ids(ids, raise_exceptions=false)
+        if ids.size == 1
+          load_single(ids.first, raise_exceptions)
+        else
+          load_multiple(ids, raise_exceptions)
+        end
+      end
+
+      def load_single(id, raise_exceptions=false)
+        attrs = database.get(id)
+        instantiate_from_database(attrs)
+      rescue Recliner::DocumentNotFound => e
+        raise e if raise_exceptions
+        nil
+      end
+  
+      def load_multiple(ids, raise_exceptions=false)
+        result = database.post('_all_docs', { :keys => ids }, { :include_docs => true })
+        result['rows'].map { |row|
+          if row['doc'] && row['doc']['class'] == name
+            instantiate_from_database(row['doc'])
+          else
+            raise Recliner::DocumentNotFound if raise_exceptions
+            nil
+          end
+        }
+      end
     end
   end
   

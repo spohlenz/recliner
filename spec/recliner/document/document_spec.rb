@@ -186,5 +186,232 @@ module Recliner
         end
       end
     end
+    
+    shared_examples_for "loading a document successfully" do
+      before(:each) do
+        TestDocument.database.stub!(:get).and_return({
+          'class' => 'TestDocument',
+          '_id' => 'document-id',
+          '_rev' => '1-12345',
+          'name' => 'Document Name'
+        })
+      end
+      
+      it "should perform a GET on the database" do
+        TestDocument.database.should_receive(:get).with('document-id').and_return({
+          'class' => 'TestDocument',
+          '_id' => 'document-id',
+          '_rev' => '1-12345',
+          'name' => 'Document Name'
+        })
+        do_load
+      end
+      
+      it "should return a TestDocument instance with properties set" do
+        doc = do_load
+        
+        doc.should be_an_instance_of(TestDocument)
+        doc.id.should == 'document-id'
+        doc.rev.should == '1-12345'
+        doc.name.should == 'Document Name'
+      end
+      
+      it "should not be a new record" do
+        do_load.should_not be_a_new_record
+      end
+    end
+    
+    shared_examples_for "loading multiple documents successfully" do
+      before(:each) do
+        @result = {
+          'total_rows' => 3,
+          'offset' => 0,
+          'rows' => [
+            { 'id' => 'document-1', 'key' => 'document-1', 'doc' => { 'class' => 'TestDocument', '_id' => 'document-1', '_rev' => '1-12345', 'name' => 'First Document' } },
+            { 'id' => 'document-2', 'key' => 'document-2', 'doc' => { 'class' => 'TestDocument', '_id' => 'document-2', '_rev' => '1-12345', 'name' => 'Second Document' } },
+            { 'id' => 'document-3', 'key' => 'document-3', 'doc' => { 'class' => 'TestDocument', '_id' => 'document-3', '_rev' => '1-12345', 'name' => 'Third Document' } }
+          ]
+        }
+        
+        TestDocument.database.stub!(:post).and_return(@result)
+      end
+      
+      it "should POST to _all_docs" do
+        TestDocument.database.should_receive(:post).
+                              with('_all_docs', { :keys => ['document-1', 'document-2', 'document-3'] }, { :include_docs => true }).
+                              and_return(@result)
+        do_load
+      end
+      
+      it "should return instances of each document with properties set" do
+        result = do_load
+        
+        result[0].id.should == 'document-1'
+        result[1].id.should == 'document-2'
+        result[2].id.should == 'document-3'
+        
+        result[0].name.should == 'First Document'
+        result[1].name.should == 'Second Document'
+        result[2].name.should == 'Third Document'
+      end
+      
+      specify "each document should not be a new record" do
+        do_load.each { |doc| doc.should_not be_a_new_record }
+      end
+    end
+    
+    describe "#load" do
+      define_recliner_document :TestDocument do
+        property :name, String
+      end
+      
+      context "an individual document" do
+        def do_load
+          TestDocument.load('document-id')
+        end
+        
+        context "document exists" do
+          it_should_behave_like "loading a document successfully"
+        end
+        
+        shared_examples_for "document does not exist (for #load)" do
+          it "should return nil" do
+            do_load.should be_nil
+          end
+        end
+        
+        context "document does not exist" do
+          before(:each) do
+            TestDocument.database.stub!(:get).and_raise(Recliner::DocumentNotFound)
+          end
+          
+          it_should_behave_like "document does not exist (for #load)"
+        end
+        
+        context "document has incorrect class" do
+          before(:each) do
+            TestDocument.database.stub!(:get).and_return({
+              'class' => 'WrongClass',
+              '_id' => 'document-id',
+              '_rev' => '1-12345'
+            })
+          end
+          
+          it_should_behave_like "document does not exist (for #load)"
+        end
+      end
+      
+      context "multiple documents" do
+        def do_load
+          TestDocument.load('document-1', 'document-2', 'document-3')
+        end
+        
+        context "all documents exist" do
+          it_should_behave_like "loading multiple documents successfully"
+        end
+        
+        context "some documents do not exist or have incorrect class" do
+          before(:each) do
+            @result = {
+              'total_rows' => 3,
+              'offset' => 0,
+              'rows' => [
+                { 'id' => 'document-1', 'key' => 'document-1', 'doc' => { 'class' => 'TestDocument', '_id' => 'document-1', '_rev' => '1-12345', 'name' => 'First Document' } },
+                { 'error' => 'not_found', 'key' => 'document-2' },
+                { 'id' => 'document-3', 'key' => 'document-3', 'doc' => { 'class' => 'WrongClass', '_id' => 'document-3', '_rev' => '1-12345' } }
+              ]
+            }
+
+            TestDocument.database.stub!(:post).and_return(@result)
+          end
+          
+          it "should return an array containing the existing documents and nil values" do
+            result = do_load
+            
+            doc = result[0]
+            doc.should be_an_instance_of(TestDocument)
+            doc.id.should == 'document-1'
+            doc.rev.should == '1-12345'
+            doc.name.should == 'First Document'
+            doc.should_not be_a_new_record
+            
+            result[1].should be_nil
+            result[2].should be_nil
+          end
+        end
+      end
+    end
+    
+    describe "#load!" do
+      define_recliner_document :TestDocument do
+        property :name, String
+      end
+      
+      context "an individual document" do
+        def do_load
+          TestDocument.load!('document-id')
+        end
+        
+        context "document exists" do
+          it_should_behave_like "loading a document successfully"
+        end
+        
+        shared_examples_for "document does not exist (for #load!)" do
+          it "should raise a Recliner::DocumentNotFound exception" do
+            lambda { do_load }.should raise_error(Recliner::DocumentNotFound)
+          end
+        end
+        
+        context "document does not exist" do
+          before(:each) do
+            TestDocument.database.stub!(:get).and_raise(Recliner::DocumentNotFound)
+          end
+          
+          it_should_behave_like "document does not exist (for #load!)"
+        end
+        
+        context "document has incorrect class" do
+          before(:each) do
+            TestDocument.database.stub!(:get).and_return({
+              'class' => 'WrongClass',
+              '_id' => 'document-id',
+              '_rev' => '1-12345'
+            })
+          end
+          
+          it_should_behave_like "document does not exist (for #load!)"
+        end
+      end
+      
+      context "multiple documents" do
+        def do_load
+          TestDocument.load!('document-1', 'document-2', 'document-3')
+        end
+        
+        context "all documents exist" do
+          it_should_behave_like "loading multiple documents successfully"
+        end
+        
+        context "some documents do not exist or have incorrect class" do
+          before(:each) do
+            @result = {
+              'total_rows' => 3,
+              'offset' => 0,
+              'rows' => [
+                { 'id' => 'document-1', 'key' => 'document-1', 'doc' => { 'class' => 'TestDocument', '_id' => 'document-1', '_rev' => '1-12345', 'name' => 'First Document' } },
+                { 'error' => 'not_found', 'key' => 'document-2' },
+                { 'id' => 'document-3', 'key' => 'document-3', 'doc' => { 'class' => 'WrongClass', '_id' => 'document-3', '_rev' => '1-12345' } }
+              ]
+            }
+
+            TestDocument.database.stub!(:post).and_return(@result)
+          end
+          
+          it "should raise a Recliner::DocumentNotFound exception" do
+            lambda { do_load }.should raise_error(Recliner::DocumentNotFound)
+          end
+        end
+      end
+    end
   end
 end
