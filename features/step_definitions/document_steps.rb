@@ -25,6 +25,23 @@ Given /^the following document definition:$/ do |code|
   eval(code)
 end
 
+Given /^I have an unsaved instance of "([^\"]*)"$/ do |klass|
+  @instance = klass.constantize.new
+end
+
+Given /^I have a saved instance of "([^\"]*)" with id "([^\"]*)"$/ do |klass, id|
+  @instance = klass.constantize.new(:id => id)
+  @instance.save
+  @instance.should_not be_a_new_record
+end
+
+Given /^I have a saved instance of "([^\"]*)" with:$/ do |klass, table|
+  attributes = table.rows_hash
+  @instance = klass.constantize.new(attributes)
+  @instance.save
+  @instance.should_not be_a_new_record
+end
+
 When /^I create an instance of "([^\"]*)"$/ do |klass|
   @instance = klass.constantize.new
 end
@@ -67,12 +84,13 @@ Then /^the instance should not be a new record$/ do
   @instance.should_not be_new_record
 end
 
-When /^I set its id to "([^\"]*)"$/ do |id|
-  @instance.id = id
+When /^I set its (\w+) to "([^\"]*)"$/ do |field, value|
+  field = "rev" if field == "revision"
+  @instance.send("#{field}=", value)
 end
 
-Then /^the instance should have id "([^\"]*)"$/ do |id|
-  @instance.id.should == id
+Then /^the instance should have (\w+) "([^\"]*)"$/ do |field, value|
+  @instance.send(field).should == value
 end
 
 Then /^there should be a document at "([^\"]*)" with:$/ do |uri, hash|

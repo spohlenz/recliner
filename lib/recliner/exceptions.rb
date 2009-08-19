@@ -22,10 +22,10 @@ module Recliner
 #   end
 #   
   class DocumentNotFound < StandardError; end
-#   
-#   class DocumentNotSaved < StandardError; end
-#   
+  
+  class DocumentNotSaved < StandardError; end
+  
   class StaleRevisionError < StandardError; end
-#   
+
 #   class AssociationTypeMismatch < StandardError; end
 end

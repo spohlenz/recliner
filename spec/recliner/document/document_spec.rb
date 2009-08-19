@@ -99,7 +99,7 @@ module Recliner
       end
     end
     
-    shared_examples_for "saving succesfully" do
+    shared_examples_for "saving a new record successfully" do
       subject { TestDocument.new(:id => 'document-id') }
       
       before(:each) do
@@ -130,16 +130,89 @@ module Recliner
       end
     end
     
+    shared_examples_for "saving an existing record successfully" do
+      subject { TestDocument.new(:id => 'document-id') }
+      
+      before(:each) do
+        save_with_stubbed_database(subject)
+        @database.stub!(:put).and_return({ 'id' => 'document-id', 'rev' => '2-23456' })
+      end
+      
+      it "should return true" do
+        do_save.should be_true
+      end
+      
+      it "should PUT the document to the database" do
+        @database.should_receive(:put).
+                  with('document-id', { 'class' => 'TestDocument', '_id' => 'document-id', '_rev' => '1-12345' }).
+                  and_return({ 'id' => 'document-id', 'rev' => '2-23456' })
+        
+        do_save
+      end
+      
+      context "after saving" do
+        before(:each) { do_save }
+        
+        it { should_not be_a_new_record }
+        
+        it "should update the document revision" do
+          subject.rev.should == '2-23456'
+        end
+      end
+    end
+    
     describe "#save" do
       def do_save; subject.save; end
       
-      it_should_behave_like "saving succesfully"
+      context "a new record" do
+        it_should_behave_like "saving a new record successfully"
+      end
+      
+      context "an existing record" do
+        context "with the correct revision" do
+          it_should_behave_like "saving an existing record successfully"
+        end
+        
+        context "with an invalid revision" do
+          subject { TestDocument.new(:id => 'document-id') }
+          
+          before(:each) do
+            save_with_stubbed_database(subject)
+            @database.stub!(:put).and_raise(Recliner::StaleRevisionError)
+          end
+          
+          it "should return false" do
+            do_save.should be_false
+          end
+        end
+      end
     end
     
     describe "#save!" do
       def do_save; subject.save!; end
       
-      it_should_behave_like "saving succesfully"
+      context "a new record" do
+        it_should_behave_like "saving a new record successfully"
+      end
+      
+      context "an existing record" do
+        context "with the correct revision" do
+          it_should_behave_like "saving an existing record successfully"
+        end
+        
+        context "with an invalid revision" do
+          subject { TestDocument.new(:id => 'document-id') }
+          
+          before(:each) do
+            save_with_stubbed_database(subject)
+            @database.stub!(:put).and_raise(Recliner::StaleRevisionError)
+          end
+          
+          it "should raise a DocumentNotSaved exception" do
+            lambda { do_save }.should raise_error(Recliner::DocumentNotSaved)
+          end
+        end
+      end
     end
   end
 end

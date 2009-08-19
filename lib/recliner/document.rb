@@ -96,10 +96,10 @@ module Recliner
       @new_record = false
       
       true
-    # rescue StaleRevisionError
-    #   false
+    rescue StaleRevisionError
+      false
     end
-  #   
+  
     class << self
   #     #
   #     def load(*ids)
