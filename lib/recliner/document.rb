@@ -280,16 +280,18 @@ module Recliner
     use_database! 'http://localhost:5984/recliner-default'
     
     include Properties
+  #   include CompositeProperties
 
     include AttributeMethods
     include AttributeMethods::Read, AttributeMethods::Write, AttributeMethods::Query
     include AttributeMethods::Defaults, AttributeMethods::Protected, AttributeMethods::Dirty
 
-  #   include CompositeProperties
-  #   include Views
   #   include Validations
   #   include Callbacks
+
+  #   include Views
   #   include Associations
+  
   #   include Timestamps
     include PrettyInspect
 

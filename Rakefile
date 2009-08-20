@@ -27,3 +27,10 @@ namespace :features do
     t.cucumber_opts = ['--format', (ENV['CUCUMBER_FORMAT'] || 'pretty'), '-r features', '--tags ~@pending']
   end
 end
+
+desc "Report code statistics (KLOCs, etc)"
+task :stats do
+  require 'vendor/code_statistics'
+  CodeStatistics::TEST_TYPES.replace ['Specs']
+  CodeStatistics.new(['Recliner Library', 'lib'], ['Specs', 'spec']).to_s
+end
