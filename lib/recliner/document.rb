@@ -27,10 +27,12 @@ module Recliner
   #   #
     def save
       create_or_update
+    rescue StaleRevisionError
+      false
     end
     
     def save!
-      save || raise(DocumentNotSaved)
+      create_or_update
     end
     
   #   def update_attributes(attrs)
@@ -108,8 +110,6 @@ module Recliner
       @new_record = false
       
       true
-    rescue StaleRevisionError
-      false
     end
   
     class << self

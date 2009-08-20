@@ -197,8 +197,8 @@ module Recliner
             @database.stub!(:put).and_raise(Recliner::StaleRevisionError)
           end
           
-          it "should raise a DocumentNotSaved exception" do
-            lambda { do_save }.should raise_error(Recliner::DocumentNotSaved)
+          it "should raise a StaleRevisionError exception" do
+            lambda { do_save }.should raise_error(Recliner::StaleRevisionError)
           end
         end
       end

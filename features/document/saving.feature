@@ -78,7 +78,7 @@ Feature: Saving documents
     And I set its revision to "4-123456"
     And I set its title to "New title"
     When I save! the instance
-    Then a "Recliner::DocumentNotSaved" exception should be raised
+    Then a "Recliner::StaleRevisionError" exception should be raised
     And there should be a document at "http://localhost:5984/recliner-features/article-1" with:
       """
       {
