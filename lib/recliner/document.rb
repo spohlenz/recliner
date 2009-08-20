@@ -165,7 +165,7 @@ module Recliner
   #         load(id).delete
   #       end
   #     end
-  #     
+
       #
       def use_database!(uri)
         @default_database = nil
@@ -283,7 +283,7 @@ module Recliner
 
     include AttributeMethods
     include AttributeMethods::Read, AttributeMethods::Write, AttributeMethods::Query
-    include AttributeMethods::Defaults#, AttributeMethods::Protected, AttributeMethods::Dirty
+    include AttributeMethods::Defaults, AttributeMethods::Protected#, AttributeMethods::Dirty
 
   #   include CompositeProperties
   #   include Views

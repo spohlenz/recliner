@@ -3,10 +3,6 @@ module Recliner
     module Protected
       extend ActiveSupport::Concern
       
-      included do
-        attr_protected :class
-      end
-      
       module ClassMethods
         def property(name, *args, &block)
           options = args.extract_options!
@@ -20,10 +16,10 @@ module Recliner
         def attr_protected(*attrs)
           write_inheritable_attribute(:attr_protected, attrs.map { |a| a.to_s } + (protected_attributes || []))
         end
-
+        
         #
         def protected_attributes
-          read_inheritable_attribute(:attr_protected)
+          read_inheritable_attribute(:attr_protected) || write_inheritable_attribute(:attr_protected, [])
         end
       end
       
