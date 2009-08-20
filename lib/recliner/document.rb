@@ -286,7 +286,7 @@ module Recliner
     include AttributeMethods::Read, AttributeMethods::Write, AttributeMethods::Query
     include AttributeMethods::Defaults, AttributeMethods::Protected, AttributeMethods::Dirty
 
-  #   include Validations
+    include Validations
   #   include Callbacks
 
   #   include Views

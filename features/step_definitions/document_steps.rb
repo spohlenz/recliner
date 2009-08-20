@@ -156,3 +156,19 @@ Given /^the "([^\"]*)" with id "([^\"]*)" is updated elsewhere$/ do |klass, id|
   instance = klass.constantize.load(id)
   instance.save
 end
+
+Then /^the instance should be valid$/ do
+  @instance.should be_valid
+end
+
+Then /^the instance should save$/ do
+  @instance.save.should be_true
+end
+
+Then /^the instance should not be valid$/ do
+  @instance.should_not be_valid
+end
+
+Then /^the instance should not save$/ do
+  @instance.save.should be_false
+end
