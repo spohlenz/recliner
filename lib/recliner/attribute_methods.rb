@@ -46,13 +46,13 @@ module Recliner
     #     attrs
     #   end
     # end
-    # 
-    # def clone_attribute_value(reader_method, attribute_name)
-    #   value = send(reader_method, attribute_name)
-    #   value.duplicable? ? value.clone : value
-    # rescue TypeError, NoMethodError
-    #   value
-    # end
+    
+    def clone_attribute_value(attribute_name)
+      value = read_attribute(attribute_name)
+      value.duplicable? ? value.clone : value
+    rescue TypeError, NoMethodError
+      value
+    end
     
     def method_missing(method_id, *args, &block)
       # If we haven't generated any methods yet, generate them, then

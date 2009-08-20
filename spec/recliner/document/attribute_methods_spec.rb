@@ -43,6 +43,38 @@ module Recliner
       end
     end
     
+    describe "#clone_attribute_value" do
+      define_recliner_document :TestDocument do
+        property :duplicable, String
+        property :non_duplicable, Integer
+      end
+      
+      subject { TestDocument.new }
+      
+      context "on a duplicable object" do
+        before(:each) do
+          @duplicable_value = 'hello'
+          subject.duplicable = @duplicable_value
+        end
+        
+        it "should return a cloned object" do
+          subject.clone_attribute_value(:duplicable).should == @duplicable_value
+          subject.clone_attribute_value(:duplicable).should_not equal(@duplicable_value)
+        end
+      end
+      
+      context "on a non-duplicable object" do
+        before(:each) do
+          @non_duplicable_value = 99
+          subject.non_duplicable = @non_duplicable_value
+        end
+        
+        it "should return the same object" do
+          subject.clone_attribute_value(:non_duplicable).should equal(@non_duplicable_value)
+        end
+      end
+    end
+    
     describe "generating attribute methods" do
       subject { TestDocument.new }
       
