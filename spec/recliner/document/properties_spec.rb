@@ -18,7 +18,7 @@ module Recliner
     
     describe "#properties" do
       it "should be a hash" do
-        TestDocument.properties.should be_an_instance_of(Hash)
+        TestDocument.properties.should be_a_kind_of(Hash)
       end
       
       it "should be accessible from instance" do

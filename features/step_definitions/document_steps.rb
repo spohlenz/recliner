@@ -4,7 +4,8 @@ end
 
 Given /^no document exists at "([^\"]*)"$/ do |uri|
   begin
-    RestClient.delete(uri)
+    result = JSON.parse(RestClient.get(uri))
+    RestClient.delete("#{uri}?rev=#{result['_rev']}")
   rescue RestClient::ResourceNotFound
     # The document is already missing
   end
@@ -30,15 +31,17 @@ Given /^I have an unsaved instance of "([^\"]*)"$/ do |klass|
 end
 
 Given /^I have a saved instance of "([^\"]*)" with id "([^\"]*)"$/ do |klass, id|
+  Given "no document exists at \"#{klass.constantize.database.uri}/#{id}\""
+  
   @instance = klass.constantize.new(:id => id)
-  @instance.save
+  @instance.save!
   @instance.should_not be_a_new_record
 end
 
 Given /^I have a saved instance of "([^\"]*)" with:$/ do |klass, table|
   attributes = table.rows_hash
   @instance = klass.constantize.new(attributes)
-  @instance.save
+  @instance.save!
   @instance.should_not be_a_new_record
 end
 
@@ -80,8 +83,20 @@ When /^I save! the instance$/ do
   record_exception { @instance.save! }
 end
 
+When /^I delete the instance$/ do
+  record_exception { @instance.delete }
+end
+
+When /^I destroy the instance$/ do
+  record_exception { @instance.destroy }
+end
+
 Then /^the instance should not be a new record$/ do
   @instance.should_not be_new_record
+end
+
+Then /^the instance should be read only$/ do
+  @instance.should be_read_only
 end
 
 When /^I set its (\w+) to "([^\"]*)"$/ do |field, value|
@@ -135,4 +150,9 @@ end
 Then /^instance (\d+) (.*)$/ do |instance, expectation|
   @instance = @instances[instance.to_i-1]
   Then "the instance #{expectation}"
+end
+
+Given /^the "([^\"]*)" with id "([^\"]*)" is updated elsewhere$/ do |klass, id|
+  instance = klass.constantize.load(id)
+  instance.save
 end

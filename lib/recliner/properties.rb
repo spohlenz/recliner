@@ -12,7 +12,7 @@ module Recliner
     
     included do
       class_inheritable_accessor :properties
-      self.properties = {}
+      self.properties = ActiveSupport::OrderedHash.new
       
       property :id,  String, :as => '_id', :default => lambda { generate_guid }
       property :rev, String, :as => '_rev'

@@ -5,8 +5,8 @@ Feature: Saving documents
     save! => raises exception if document cannot be saved
   
   Background:
-    Given the default Recliner::Document database is set to "http://localhost:5984/recliner-test"
-    And the database "http://localhost:5984/recliner-test" exists
+    Given the default Recliner::Document database is set to "http://localhost:5984/recliner-features"
+    And the database "http://localhost:5984/recliner-features" exists
     And the following document definition:
       """
       class Article < Recliner::Document
@@ -22,7 +22,7 @@ Feature: Saving documents
     And I save the instance
     Then the instance should not be a new record
     And the instance should have a revision matching "^1-"
-    And there should be a document at "http://localhost:5984/recliner-test/article-1" with:
+    And there should be a document at "http://localhost:5984/recliner-features/article-1" with:
       """
       {
         '_id'   => 'article-1',
@@ -38,7 +38,7 @@ Feature: Saving documents
     And I save! the instance
     Then the instance should not be a new record
     And the instance should have a revision matching "^1-"
-    And there should be a document at "http://localhost:5984/recliner-test/article-1" with:
+    And there should be a document at "http://localhost:5984/recliner-features/article-1" with:
       """
       {
         '_id'   => 'article-1',
@@ -64,7 +64,7 @@ Feature: Saving documents
     And I set its revision to "4-123456"
     And I set its title to "New title"
     When I save the instance
-    Then there should be a document at "http://localhost:5984/recliner-test/article-1" with:
+    Then there should be a document at "http://localhost:5984/recliner-features/article-1" with:
       """
       {
         'title' => 'Article title'
@@ -79,7 +79,7 @@ Feature: Saving documents
     And I set its title to "New title"
     When I save! the instance
     Then a "Recliner::DocumentNotSaved" exception should be raised
-    And there should be a document at "http://localhost:5984/recliner-test/article-1" with:
+    And there should be a document at "http://localhost:5984/recliner-features/article-1" with:
       """
       {
         'title' => 'Article title'

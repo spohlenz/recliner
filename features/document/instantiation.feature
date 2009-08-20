@@ -3,8 +3,8 @@ Feature: New document instantiation
   Recliner::Document models can be instantiated with or without attributes
   
   Background:
-    Given the default Recliner::Document database is set to "http://localhost:5984/recliner-test"
-    And the database "http://localhost:5984/recliner-test" exists
+    Given the default Recliner::Document database is set to "http://localhost:5984/recliner-features"
+    And the database "http://localhost:5984/recliner-features" exists
     And the following document definition:
       """
       class Article < Recliner::Document

@@ -50,3 +50,7 @@ Then /^a "([^\"]*)" exception should be raised$/ do |exception_class|
   @exception.should_not be_nil
   @exception.class.to_s.should == exception_class
 end
+
+Then /^no exception should be raised$/ do
+  @exception.should be_nil
+end

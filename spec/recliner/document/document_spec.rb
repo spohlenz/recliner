@@ -26,6 +26,7 @@ module Recliner
     
     shared_examples_for "a newly instantiated document" do
       it { should be_a_new_record }
+      it { should_not be_read_only }
       
       it "should not have a revision" do
         subject.rev.should be_nil
@@ -68,6 +69,22 @@ module Recliner
       
       it "should not be equal to another document of a different class with a different id" do
         FirstType.new(:id => 'abc').should_not == SecondType.new(:id => '123')
+      end
+    end
+    
+    describe "#read_only!" do
+      subject { TestDocument.new }
+      
+      before(:each) do
+        subject.read_only!
+      end
+      
+      it "should mark the document as read only" do
+        subject.should be_read_only
+      end
+      
+      it "should freeze the attributes hash" do
+        subject.attributes.should be_frozen
       end
     end
     
@@ -410,6 +427,156 @@ module Recliner
           it "should raise a Recliner::DocumentNotFound exception" do
             lambda { do_load }.should raise_error(Recliner::DocumentNotFound)
           end
+        end
+      end
+    end
+    
+    describe "#delete" do
+      subject { TestDocument.new(:id => 'document-id') }
+      
+      shared_examples_for "deleting successfully" do
+        it "should mark the document as read only" do
+          subject.delete
+          subject.should be_read_only
+        end
+        
+        it "should return itself" do
+          subject.delete.should == subject
+        end
+      end
+      
+      context "on a new document" do
+        it_should_behave_like "deleting successfully"
+        
+        it "should not perform a DELETE on the database" do
+          subject.database.should_not_receive(:delete)
+          subject.delete
+        end
+      end
+      
+      context "on an existing document" do
+        before(:each) do
+          save_with_stubbed_database(subject)
+          
+          @result = { 'ok' => true, 'id' => 'document-id', 'rev' => '1-12345' }
+          subject.database.stub!(:delete).and_return(@result)
+        end
+        
+        it "should perform a DELETE on the database" do
+          subject.database.should_receive(:delete).with('document-id?rev=1-12345').and_return(@result)
+          subject.delete
+        end
+        
+        it_should_behave_like "deleting successfully"
+      end
+      
+      context "on an already deleted document" do
+        before(:each) do
+          save_with_stubbed_database(subject)
+          subject.database.stub!(:delete).and_raise(Recliner::DocumentNotFound)
+        end
+        
+        it "should perform a DELETE on the database" do
+          subject.database.should_receive(:delete).with('document-id?rev=1-12345').and_raise(Recliner::DocumentNotFound)
+          subject.delete
+        end
+        
+        it_should_behave_like "deleting successfully"
+      end
+      
+      context "on a document with an invalid revision" do
+        before(:each) do
+          save_with_stubbed_database(subject)
+          subject.database.stub!(:delete).and_raise(Recliner::StaleRevisionError)
+        end
+        
+        it "should perform a DELETE on the database" do
+          subject.database.should_receive(:delete).with('document-id?rev=1-12345').and_raise(Recliner::StaleRevisionError)
+          subject.delete rescue nil
+        end
+        
+        it "should raise a Recliner::StaleRevisionError exception" do
+          lambda { subject.delete }.should raise_error(Recliner::StaleRevisionError)
+        end
+        
+        it "should not mark the document as read only" do
+          subject.delete rescue nil
+          subject.should_not be_read_only
+        end
+      end
+    end
+    
+    describe "#destroy" do
+      subject { TestDocument.new(:id => 'document-id') }
+      
+      shared_examples_for "destroying successfully" do
+        it "should mark the document as read only" do
+          subject.destroy
+          subject.should be_read_only
+        end
+        
+        it "should return itself" do
+          subject.destroy.should == subject
+        end
+      end
+      
+      context "on a new document" do
+        it_should_behave_like "deleting successfully"
+        
+        it "should not perform a DELETE on the database" do
+          subject.database.should_not_receive(:delete)
+          subject.destroy
+        end
+      end
+      
+      context "on an existing document" do
+        before(:each) do
+          save_with_stubbed_database(subject)
+          
+          @result = { 'ok' => true, 'id' => 'document-id', 'rev' => '1-12345' }
+          subject.database.stub!(:delete).and_return(@result)
+        end
+        
+        it "should perform a DELETE on the database" do
+          subject.database.should_receive(:delete).with('document-id?rev=1-12345').and_return(@result)
+          subject.destroy
+        end
+        
+        it_should_behave_like "destroying successfully"
+      end
+      
+      context "on an already deleted document" do
+        before(:each) do
+          save_with_stubbed_database(subject)
+          subject.database.stub!(:delete).and_raise(Recliner::DocumentNotFound)
+        end
+        
+        it "should perform a DELETE on the database" do
+          subject.database.should_receive(:delete).with('document-id?rev=1-12345').and_raise(Recliner::DocumentNotFound)
+          subject.destroy
+        end
+        
+        it_should_behave_like "destroying successfully"
+      end
+      
+      context "on a document with an invalid revision" do
+        before(:each) do
+          save_with_stubbed_database(subject)
+          subject.database.stub!(:delete).and_raise(Recliner::StaleRevisionError)
+        end
+        
+        it "should perform a DELETE on the database" do
+          subject.database.should_receive(:delete).with('document-id?rev=1-12345').and_raise(Recliner::StaleRevisionError)
+          subject.destroy rescue nil
+        end
+        
+        it "should raise a Recliner::StaleRevisionError exception" do
+          lambda { subject.destroy }.should raise_error(Recliner::StaleRevisionError)
+        end
+        
+        it "should not mark the document as read only" do
+          subject.destroy rescue nil
+          subject.should_not be_read_only
         end
       end
     end

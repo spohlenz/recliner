@@ -36,24 +36,40 @@ module Recliner
   #   def update_attributes(attrs)
   #     self.attributes = attrs and save
   #   end
-  #   
-  #   #
-  #   def destroy
-  #     delete
-  #   end
-  #   
-  #   #
-  #   def delete
-  #     database.delete("#{id}?rev=#{rev}")
-  #     self
-  #   end
-  #   
+
+    #
+    def destroy
+      delete
+    end
+
+    #
+    def delete
+      begin
+        database.delete("#{id}?rev=#{rev}") unless new_record?
+      rescue DocumentNotFound
+        # OK - document is already deleted
+      end
+      
+      read_only!
+      self
+    end
+    
     # Returns true if this object hasn't been saved yet -- that is, a record for the object doesn't exist yet; otherwise, returns false.
     def new_record?
       @new_record || false
     end
+    
+    # Marks this document as read only.
+    def read_only!
+      attributes.freeze
+    end
+    
+    # Returns true if this document is read only.
+    def read_only?
+      attributes.frozen?
+    end
   
-    # Two documents are considered equal if they share the same document id and class
+    # Two documents are considered equal if they share the same document id and class.
     def ==(other)
       other.class == self.class && other.id == self.id
     end
@@ -145,6 +161,7 @@ module Recliner
   #       if id.is_a?(Array)
   #         id.map { |i| delete(i) }
   #       else
+  #         # We have to instantiate the document to know its revision
   #         load(id).delete
   #       end
   #     end
