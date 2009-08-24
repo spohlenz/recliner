@@ -9,7 +9,12 @@ module Recliner
       
       #
       def write_attribute(name, value)
-        attributes[name.to_s] = value
+        if prop = property(name)
+          attributes[prop.as] = prop.type_cast(value)
+        else
+          attributes[name.to_s] = value
+        end
+        
         value
       end
       

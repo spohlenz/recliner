@@ -8,7 +8,11 @@ module Recliner
       end
       
       def read_attribute(name)
-        attributes[name.to_s]
+        if prop = property(name)
+          attributes[prop.as]
+        else
+          attributes[name.to_s]
+        end
       end
       
       # def [](name)

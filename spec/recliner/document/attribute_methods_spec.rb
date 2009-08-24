@@ -9,7 +9,7 @@ module Recliner
     before(:each) do
       TestDocument.properties = {
         :foo => Recliner::Property.new(:foo, String, 'foo', nil),
-        :bar => Recliner::Property.new(:bar, Integer, 'internal', nil)
+        :bar => Recliner::Property.new(:bar, Integer, '_internal', nil)
       }
     end
     
@@ -24,10 +24,10 @@ module Recliner
       
       it "should store attributes using their name" do
         subject.foo = 'value of foo'
-        subject.bar = 'value of bar'
+        subject.bar = 99
         
         subject.attributes['foo'].should == 'value of foo'
-        subject.attributes['bar'].should == 'value of bar'
+        subject.attributes['_internal'].should == 99
       end
     end
     
@@ -86,7 +86,7 @@ module Recliner
         it "should create a reader method for each property" do
           subject.stub(:attributes).and_return({
             'foo' => 'value for foo',
-            'bar' => 99
+            '_internal' => 99
           })
         
           subject.foo.should == 'value for foo'
@@ -98,13 +98,13 @@ module Recliner
           subject.bar = 67
         
           subject.attributes['foo'].should == 'set foo'
-          subject.attributes['bar'].should == 67
+          subject.attributes['_internal'].should == 67
         end
       
         it "should create a query method for each property" do
           subject.stub(:attributes).and_return({
             'foo' => 'value for foo',
-            'bar' => nil
+            '_internal' => nil
           })
         
           subject.foo?.should be_true
@@ -112,7 +112,7 @@ module Recliner
         
           subject.stub(:attributes).and_return({
             'foo' => '',
-            'bar' => 14
+            '_internal' => 14
           })
         
           subject.foo?.should be_false
