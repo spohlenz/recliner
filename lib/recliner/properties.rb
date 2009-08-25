@@ -10,6 +10,8 @@ module Recliner
     end
     
     def type_cast(value)
+      return nil if value.nil?
+      
       if type == Date
         convert_to_date(value)
       elsif type == Time
@@ -22,8 +24,10 @@ module Recliner
         convert_to_integer(value)
       elsif type == Float
         convert_to_float(value)
-      else
+      elsif value.kind_of?(type)
         value
+      elsif type.respond_to?(:parse)
+        type.parse(value)
       end
     end
   

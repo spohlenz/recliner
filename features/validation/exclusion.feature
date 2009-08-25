@@ -1,3 +1,4 @@
+@completed
 Feature: Validation: validates_exclusion_of
   The validates_inclusion_of validation specifies that an
   attribute must not be one of a predefined set

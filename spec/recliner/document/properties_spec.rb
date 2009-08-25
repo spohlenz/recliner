@@ -326,6 +326,38 @@ module Recliner
           subject.type_cast(nil).should be_nil
         end
       end
+      
+      context "custom property type" do
+        class CustomType
+          attr_reader :name
+          
+          def initialize(name="John")
+            @name = name
+          end
+          
+          def self.parse(str)
+            new(str)
+          end
+        end
+        
+        subject { Property.new(:custom, CustomType, :custom, nil) }
+        
+        it "should not alter instances of custom type" do
+          obj = CustomType.new
+          subject.type_cast(obj).should equal(obj)
+        end
+        
+        it "should convert a String to a custom type instance" do
+          result = subject.type_cast("Fred")
+          
+          result.should be_an_instance_of(CustomType)
+          result.name.should == "Fred"
+        end
+        
+        it "should return nil when nil given" do
+          subject.type_cast(nil).should be_nil
+        end
+      end
     end
   end
 end
