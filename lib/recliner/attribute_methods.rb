@@ -1,11 +1,12 @@
 module Recliner
   module AttributeMethods
-    autoload :Read,      'recliner/attribute_methods/read'
-    autoload :Write,     'recliner/attribute_methods/write'
-    autoload :Query,     'recliner/attribute_methods/query'
-    autoload :Dirty,     'recliner/attribute_methods/dirty'
-    autoload :Defaults,  'recliner/attribute_methods/defaults'
-    autoload :Protected, 'recliner/attribute_methods/protected'
+    autoload :Read,           'recliner/attribute_methods/read'
+    autoload :Write,          'recliner/attribute_methods/write'
+    autoload :Query,          'recliner/attribute_methods/query'
+    autoload :BeforeTypeCast, 'recliner/attribute_methods/before_type_cast'
+    autoload :Dirty,          'recliner/attribute_methods/dirty'
+    autoload :Defaults,       'recliner/attribute_methods/defaults'
+    autoload :Protected,      'recliner/attribute_methods/protected'
     
     extend ActiveSupport::Concern
     

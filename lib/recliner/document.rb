@@ -283,8 +283,13 @@ module Recliner
   #   include CompositeProperties
 
     include AttributeMethods
-    include AttributeMethods::Read, AttributeMethods::Write, AttributeMethods::Query
-    include AttributeMethods::Defaults, AttributeMethods::Protected, AttributeMethods::Dirty
+    include AttributeMethods::Read
+    include AttributeMethods::Write
+    include AttributeMethods::Query
+    include AttributeMethods::BeforeTypeCast
+    include AttributeMethods::Defaults
+    include AttributeMethods::Protected
+    include AttributeMethods::Dirty
 
     include Validations
   #   include Callbacks

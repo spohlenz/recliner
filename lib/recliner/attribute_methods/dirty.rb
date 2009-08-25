@@ -44,7 +44,7 @@ module Recliner
         end
           
         # Carry on.
-        super(attr, value)
+        super
       end
     end
   end
