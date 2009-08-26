@@ -6,23 +6,33 @@ Feature: Validation: validates_exclusion_of
   Background:
     Given the following document definition:
       """
-      class User < Recliner::Document
-        property :age, Integer
-        validates_exclusion_of :age, :in => 13..18
+      class Account < Recliner::Document
+        property :subdomain, String
+        validates_exclusion_of :subdomain, :in => [ 'www', 'mail', 'ftp' ]
       end
       """
   
-  Scenario: validation requirements met
-    When I create an instance of "User"
-    And I set its age to "42"
+  Scenario Outline: validation requirements met
+    When I create an instance of "Account"
+    And I set its subdomain to "<subdomain>"
     Then the instance should be valid
     And the instance should save
-  
-  Scenario: validation requirements failing
-    When I create an instance of "User"
-    And I set its age to "16"
-    Then the instance should not be valid
-    And the instance should not save
     
-    When I save! the instance
-    Then a "Recliner::DocumentInvalid" exception should be raised
+    Examples:
+      | subdomain |
+      | myaccount |
+      | www1      |
+      | ftpabc    |
+  
+  Scenario Outline: validation requirements failing
+    When I create an instance of "Account"
+    And I set its subdomain to "<subdomain>"
+    Then the instance should not be valid
+    And its errors should include "Subdomain is reserved"
+    
+    Examples:
+      | subdomain |
+      | www       |
+      | mail      |
+      | ftp       |
+      

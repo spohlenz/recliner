@@ -7,6 +7,7 @@ module ActiveSupport
   autoload :Callbacks, 'active_support/callbacks'
   autoload :Concern, 'active_support/concern'
   autoload :ConcurrentHash, 'active_support/concurrent_hash'
+  autoload :Dependencies, 'active_support/dependencies'
   autoload :DependencyModule, 'active_support/dependency_module'
   autoload :Deprecation, 'active_support/deprecation'
   autoload :Gzip, 'active_support/gzip'

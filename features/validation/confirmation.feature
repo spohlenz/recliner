@@ -12,19 +12,33 @@ Feature: Validation: validates_confirmation_of
       end
       """
   
-  Scenario: validation requirements met
+  Scenario Outline: validation requirements met
     When I create an instance of "User"
-    And I set its email to "me@example.com"
-    And I set its email_confirmation to "me@example.com"
+    And I set its email to "<email>"
+    And I set its email_confirmation to "<confirmation>"
     Then the instance should be valid
-    And the instance should save
-  
-  Scenario: validation requirements failing
-    When I create an instance of "User"
-    And I set its email to "me@example.com"
-    And I set its email_confirmation to "me@asmallbutsignificanttypo.com"
-    Then the instance should not be valid
-    And the instance should not save
     
-    When I save! the instance
-    Then a "Recliner::DocumentInvalid" exception should be raised
+    Examples:
+      | email          | confirmation   |
+      | me@example.com | me@example.com |
+      | test@test.com  | test@test.com  |
+      | abc            | abc            |
+  
+  Scenario Outline: validation requirements failing
+    When I create an instance of "User"
+    And I set its email to "<email>"
+    And I set its email_confirmation to "<confirmation>"
+    Then the instance should not be valid
+    And its errors should include "Email doesn't match confirmation"
+    
+    Examples:
+      | email           | confirmation    |
+      | me1@example.com | me2@example.com |
+      | test@test.com   | test@testt.com  |
+      | abc             | def             |
+  
+  Scenario: confirmation not provided
+    When I create an instance of "User"
+    And I set its email to "myemail"
+    Then the instance should be valid
+    

@@ -19,6 +19,18 @@ module ReclinerWorld
     h = hash.dup
     h.each { |k, v| h[k] = eval(v) rescue v }
   end
+  
+  def remove_defined_constants
+    if @defined_constants
+      @defined_constants.each do |const|
+        Object.send(:remove_const, const)
+      end
+      
+      @defined_constants = nil
+    end
+  end
 end
 
 World(ReclinerWorld)
+
+After { remove_defined_constants }

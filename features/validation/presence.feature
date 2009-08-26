@@ -16,13 +16,10 @@ Feature: Validation: validates_presence_of
     When I create an instance of "Article"
     And I set its title to "Article title"
     Then the instance should be valid
-    And the instance should save
   
   Scenario: validation requirements failing
     When I create an instance of "Article"
+    And I set its title to ""
     Then the instance should not be valid
-    And the instance should not save
-    
-    When I save! the instance
-    Then a "Recliner::DocumentInvalid" exception should be raised
+    And its errors should include "Title can't be blank"
     

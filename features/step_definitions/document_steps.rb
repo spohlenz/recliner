@@ -23,7 +23,8 @@ Given /^the document at "([^\"]*)" has (\d+) previous revisions?$/ do |uri, coun
 end
 
 Given /^the following document definition:$/ do |code|
-  eval(code)
+  @defined_constants ||= []
+  @defined_constants += ActiveSupport::Dependencies.new_constants_in(Object) { eval(code) }
 end
 
 Given /^I have an unsaved instance of "([^\"]*)"$/ do |klass|
@@ -171,4 +172,19 @@ end
 
 Then /^the instance should not save$/ do
   @instance.save.should be_false
+end
+
+Then /^its errors should be empty$/ do
+  @instance.valid?
+  @instance.errors.should be_empty
+end
+
+Then /^its errors should include "([^\"]*)"$/ do |error|
+  @instance.valid?
+  @instance.errors.full_messages.should include(error)
+end
+
+Then /^it should have (\d+) error$/ do |num_errors|
+  @instance.valid?
+  @instance.errors.size.should == num_errors.to_i
 end

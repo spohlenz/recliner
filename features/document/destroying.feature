@@ -1,5 +1,5 @@
 @completed
-Scenario: Destroying documents
+Feature: Destroying documents
   Destroying a Recliner::Document removes it from the database
   It also runs any before/after_destroy callbacks that are defined
   
