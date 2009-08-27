@@ -27,11 +27,14 @@ module Recliner
       
       context "when saved" do
         before(:each) do
+          @now = Time.now
+          Time.stub!(:now).and_return(@now)
+          
           save_with_stubbed_database(subject)
         end
         
         it "should set the updated_at property to the current time" do
-          subject.updated_at.should be_close(Time.now, 1)
+          subject.updated_at.should == @now
         end
       end
     end
@@ -62,21 +65,32 @@ module Recliner
       subject { TestDocument.new }
       
       context "when created" do
+        before(:each) do
+          @now = Time.now
+          Time.stub!(:now).and_return(@now)
+        end
+        
         it "should set the created_at property to the current time" do
           save_with_stubbed_database(subject)
-          subject.created_at.should be_close(Time.now, 1)
+          subject.created_at.should == @now
         end
       end
       
       context "when updated" do
         before(:each) do
+          @now = Time.now
+          @next = 1.day.from_now
+          
+          Time.stub!(:now).and_return(@now)
+          
           save_with_stubbed_database(subject)
-          @old_time = subject.created_at
+          
+          Time.stub!(:now).and_return(@next)
         end
         
         it "should not change the created_at property" do
           save_with_stubbed_database(subject)
-          subject.created_at.should == @old_time
+          subject.created_at.should == @now
         end
       end
     end
