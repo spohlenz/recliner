@@ -92,21 +92,21 @@ module Recliner
       alias_method_chain :save, :validation
       alias_method_chain :save!, :validation
     
-    #   define_callbacks :validate_on_create, :validate_on_update
+      define_callbacks :validate_on_create, :validate_on_update
     end
     
-    # module ClassMethods
-    #   def validation_method(on)
-    #     case on
-    #     when :create
-    #       :validate_on_create
-    #     when :update
-    #       :validate_on_update
-    #     else
-    #       :validate
-    #     end
-    #   end
-    # end
+    module ClassMethods
+      def validation_method(on)
+        case on
+        when :create
+          :validate_on_create
+        when :update
+          :validate_on_update
+        else
+          :validate
+        end
+      end
+    end
     
     def save_with_validation
       if valid?
@@ -124,20 +124,20 @@ module Recliner
       end
     end
     
-    # # Runs all the specified validations and returns true if no errors were added otherwise false.
-    # def valid?
-    #   errors.clear
-    # 
-    #   run_callbacks(:validate)
-    # 
-    #   if new_record?
-    #     run_callbacks(:validate_on_create)
-    #   else
-    #     run_callbacks(:validate_on_update)
-    #   end
-    # 
-    #   errors.empty?
-    # end
+    # Runs all the specified validations and returns true if no errors were added otherwise false.
+    def valid?
+      errors.clear
+    
+      run_callbacks(:validate)
+    
+      if new_record?
+        run_callbacks(:validate_on_create)
+      else
+        run_callbacks(:validate_on_update)
+      end
+    
+      errors.empty?
+    end
     
     # # Returns the Errors object that holds all information about attribute error messages.
     # def errors

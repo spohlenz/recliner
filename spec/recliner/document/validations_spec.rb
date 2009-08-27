@@ -28,5 +28,51 @@ module Recliner
         end
       end
     end
+    
+    describe "validation on create" do
+      define_recliner_document :TestDocument do
+        property :title, String
+        validates_presence_of :title, :on => :create
+      end
+      
+      subject { TestDocument.new }
+      
+      context "new document" do
+        it { should_not be_valid }
+      end
+      
+      context "existing document" do
+        before(:each) do
+          subject.title = 'A title'
+          save_with_stubbed_database(subject)
+          subject.title = nil
+        end
+        
+        it { should be_valid }
+      end
+    end
+    
+    describe "validation on update" do
+      define_recliner_document :TestDocument do
+        property :title, String
+        validates_presence_of :title, :on => :update
+      end
+      
+      subject { TestDocument.new }
+      
+      context "new document" do
+        it { should be_valid }
+      end
+      
+      context "existing document" do
+        before(:each) do
+          subject.title = 'A title'
+          save_with_stubbed_database(subject)
+          subject.title = nil
+        end
+        
+        it { should_not be_valid }
+      end
+    end
   end
 end
