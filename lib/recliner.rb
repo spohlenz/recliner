@@ -37,7 +37,7 @@ module Recliner
   autoload :Validations,         'recliner/validations'
   autoload :Callbacks,           'recliner/callbacks'
   
-  # autoload :Timestamps,          'recliner/timestamps'
+  autoload :Timestamps,          'recliner/timestamps'
   autoload :PrettyInspect,       'recliner/pretty_inspect'
   
   class << self
