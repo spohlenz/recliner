@@ -4,13 +4,13 @@ module Recliner
   class Document
     def initialize(attributes={})
       self.attributes = attributes
-  #     
-  #     @database = self.class.database
+
+      # @database = self.class.database
       @new_record = true
-  #     
+
       yield self if block_given?
-  #     
-  #     callback(:after_initialize) if respond_to?(:after_initialize)
+
+      callback(:after_initialize) if respond_to?(:after_initialize)
     end
     
   #   # Special case for id setter as old document needs to be deleted if the id is changed
@@ -104,7 +104,6 @@ module Recliner
       #   @old_id = nil
       # end
       
-      # self.id = result['id']
       self.rev = result['rev']
       
       @new_record = false
@@ -132,21 +131,23 @@ module Recliner
   #     def last
   #       all(:limit => 1, :descending => true).first
   #     end
-  #     
-  #     #
-  #     def create(attributes={})
-  #       returning new(attributes) do |doc|
-  #         doc.save
-  #       end
-  #     end
-  #     
-  #     #
-  #     def create!(attributes={})
-  #       returning new(attributes) do |doc|
-  #         doc.save!
-  #       end
-  #     end
-  #     
+
+      #
+      def create(attributes={})
+        returning new(attributes) do |doc|
+          yield doc if block_given?
+          doc.save
+        end
+      end
+
+      #
+      def create!(attributes={})
+        returning new(attributes) do |doc|
+          yield doc if block_given?
+          doc.save!
+        end
+      end
+
   #     #
   #     def destroy(id)
   #       if id.is_a?(Array)
@@ -196,13 +197,13 @@ module Recliner
         
         klass = attrs['class'].constantize
         
-        returning(klass.new) do |record|
+        returning(klass.new) do |doc|
           klass.properties.each do |name, property|
-            record.write_attribute(property.name, property.type.from_couch(attrs[property.as]))
+            doc.write_attribute(property.name, property.type.from_couch(attrs[property.as]))
           end
           
-          record.instance_variable_set("@new_record", false)
-          #record.send(:callback, :after_load) if record.respond_to?(:after_load)
+          doc.instance_variable_set("@new_record", false)
+          doc.send(:callback, :after_load) if doc.respond_to?(:after_load)
         end
       end
 
@@ -244,7 +245,7 @@ module Recliner
   #       defaults << self.name.underscore.humanize
   #       I18n.translate(defaults.shift, {:scope => [:recliner, :models], :count => 1, :default => defaults}.merge(options))
   #     end
-  #   
+
     private
       def load_ids(ids, raise_exceptions=false)
         if ids.size == 1
@@ -292,7 +293,7 @@ module Recliner
     include AttributeMethods::Dirty
 
     include Validations
-  #   include Callbacks
+    include Callbacks
 
   #   include Views
   #   include Associations

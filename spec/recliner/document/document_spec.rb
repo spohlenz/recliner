@@ -204,6 +204,137 @@ module Recliner
       end
     end
     
+    describe "#create" do
+      shared_examples_for "creating a document with create" do
+        it "should save the instance" do
+          @instance.should_receive(:save)
+          TestDocument.create
+        end
+        
+        it "should return the instance" do
+          TestDocument.create.should == @instance
+        end
+      end
+      
+      context "with no attributes" do
+        before(:each) do
+          @instance = TestDocument.new
+          @instance.stub!(:save)
+          TestDocument.stub!(:new).and_return(@instance)
+        end
+        
+        it_should_behave_like "creating a document with create"
+        
+        it "should create an instance with no attributes" do
+          TestDocument.should_receive(:new)
+          TestDocument.create
+        end
+      end
+      
+      context "with attributes" do
+        before(:each) do
+          @instance = TestDocument.new
+          @instance.stub!(:save)
+          TestDocument.stub!(:new).and_return(@instance)
+        end
+        
+        it_should_behave_like "creating a document with create"
+        
+        it "should create an instance with the given attributes" do
+          TestDocument.should_receive(:new).with({ :id => 'abc-123' })
+          TestDocument.create({ :id => 'abc-123' })
+        end
+      end
+      
+      context "with a block" do
+        before(:each) do
+          @instance = TestDocument.new
+          @instance.stub!(:save)
+          TestDocument.stub!(:new).and_return(@instance)
+        end
+        
+        it_should_behave_like "creating a document with create"
+        
+        it "should yield the instance to the block before saving" do
+          block_called = false
+          TestDocument.create do |doc|
+            block_called = true
+            doc.should == @instance
+            doc.should be_a_new_record
+          end
+          block_called.should be_true
+        end
+      end
+    end
+    
+    describe "#create!" do
+      shared_examples_for "creating a document with create!" do
+        it "should save the instance" do
+          @instance.should_receive(:save!)
+          TestDocument.create!
+        end
+        
+        it "should return the instance" do
+          TestDocument.create!.should == @instance
+        end
+        
+        it "should not catch exceptions" do
+          @instance.stub!(:save!).and_raise(StaleRevisionError)
+          lambda { TestDocument.create! }.should raise_error(StaleRevisionError)
+        end
+      end
+      
+      context "with no attributes" do
+        before(:each) do
+          @instance = TestDocument.new
+          @instance.stub!(:save!)
+          TestDocument.stub!(:new).and_return(@instance)
+        end
+        
+        it_should_behave_like "creating a document with create!"
+        
+        it "should create an instance with no attributes" do
+          TestDocument.should_receive(:new)
+          TestDocument.create!
+        end
+      end
+      
+      context "with attributes" do
+        before(:each) do
+          @instance = TestDocument.new
+          @instance.stub!(:save!)
+          TestDocument.stub!(:new).and_return(@instance)
+        end
+        
+        it_should_behave_like "creating a document with create!"
+        
+        it "should create an instance with the given attributes" do
+          TestDocument.should_receive(:new).with({ :id => 'abc-123' })
+          TestDocument.create!({ :id => 'abc-123' })
+        end
+      end
+      
+      context "with a block" do
+        before(:each) do
+          @instance = TestDocument.new
+          @instance.stub!(:save!)
+          TestDocument.stub!(:new).and_return(@instance)
+        end
+        
+        it_should_behave_like "creating a document with create!"
+        
+        it "should yield the instance to the block before saving" do
+          block_called = false
+          TestDocument.create! do |doc|
+            block_called = true
+            doc.should == @instance
+            doc.should be_a_new_record
+          end
+          block_called.should be_true
+        end
+      end
+    end
+    
     shared_examples_for "loading a document successfully" do
       before(:each) do
         TestDocument.database.stub!(:get).and_return({

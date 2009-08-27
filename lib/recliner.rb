@@ -34,8 +34,8 @@ module Recliner
   # autoload :ViewGenerator,       'recliner/view_generator'
   # autoload :Associations,        'recliner/associations'
   
-  # autoload :Callbacks,           'recliner/callbacks'
   autoload :Validations,         'recliner/validations'
+  autoload :Callbacks,           'recliner/callbacks'
   
   # autoload :Timestamps,          'recliner/timestamps'
   autoload :PrettyInspect,       'recliner/pretty_inspect'

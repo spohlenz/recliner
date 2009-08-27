@@ -1,3 +1,4 @@
+@completed
 Feature: Common validation options
   Every validation supports a number of options:
     :on      => specifies when the validation should run (either :update, :create or :save [default])
