@@ -15,7 +15,7 @@ module Recliner
     
     describe "#attributes" do
       it "should be a hash" do
-        subject.attributes.should be_an_instance_of(HashWithIndifferentAccess)
+        subject.attributes.should be_an_instance_of(Hash)
       end
       
       it "should memoize the hash" do

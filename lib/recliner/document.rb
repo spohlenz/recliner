@@ -279,9 +279,9 @@ module Recliner
   
   Document.class_eval do
     use_database! 'http://localhost:5984/recliner-default'
-    
+
     include Properties
-  #   include CompositeProperties
+    include Properties::Map
 
     include AttributeMethods
     include AttributeMethods::Read
@@ -295,7 +295,7 @@ module Recliner
     include Validations
     include Callbacks
 
-  #   include Views
+    include Views
   #   include Associations
   
     include Timestamps

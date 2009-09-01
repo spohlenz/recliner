@@ -31,7 +31,7 @@ module Recliner
     
     #
     def attributes
-      @attributes ||= {}.with_indifferent_access
+      @attributes ||= {}
     end
     
     #

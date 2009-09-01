@@ -9,7 +9,7 @@ require 'active_support/all'
 require 'json'
 require 'restclient'
 # require 'uri'
-# 
+
 $:.unshift File.dirname(__FILE__) unless
   $:.include?(File.dirname(__FILE__)) ||
   $:.include?(File.expand_path(File.dirname(__FILE__)))
@@ -26,11 +26,16 @@ module Recliner
   autoload :Database,            'recliner/database'
   
   autoload :AttributeMethods,    'recliner/attribute_methods'
+  
   autoload :Properties,          'recliner/properties'
+  autoload :Property,            'recliner/properties/property'
+  autoload :Map,                 'recliner/properties/map'
   # autoload :CompositeProperties, 'recliner/composite_properties'
   
-  # autoload :Views,               'recliner/views'
-  # autoload :ViewFunctions,       'recliner/view_functions'
+  autoload :Views,               'recliner/views'
+  autoload :View,                'recliner/views/view'
+  autoload :ViewDocument,        'recliner/views/document'
+  autoload :ViewFunction,        'recliner/views/function'
   # autoload :ViewGenerator,       'recliner/view_generator'
   # autoload :Associations,        'recliner/associations'
   

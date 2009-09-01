@@ -23,7 +23,7 @@ module Recliner
           result[name] = property.default_value(self) unless name == :rev
         end
         
-        result.with_indifferent_access
+        result
       end
     end
   end
