@@ -8,6 +8,10 @@ module Recliner
       save! if changed?
     end
     
+    def invoke(view, *args)
+      views[view].invoke(database, "#{id}/_view/#{view}", *args)
+    end
+    
   #   def invoke(view, *keys)
   #     options = keys.extract_options!
   #     fetch(view, keys, options)

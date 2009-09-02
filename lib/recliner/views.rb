@@ -39,7 +39,7 @@ module Recliner
         class_eval <<-END_RUBY
           def self.#{name}(*args)                     # def self.by_name(*args)
             initialize_views!                         #   initialize_views!
-            # view_document.invoke('#{name}', *args)  #   view_document.invoke('by_name', *args)
+            view_document.invoke('#{name}', *args)    #   view_document.invoke('by_name', *args)
           end                                         # end
         END_RUBY
       end

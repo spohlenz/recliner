@@ -193,7 +193,9 @@ module Recliner
   #     end
 
       def instantiate_from_database(attrs)
-        raise DocumentNotFound if attrs['class'] != name
+        unless attrs['class'] && (self == Document || attrs['class'] == name)
+          raise DocumentNotFound
+        end
         
         klass = attrs['class'].constantize
         

@@ -711,5 +711,91 @@ module Recliner
         end
       end
     end
+    
+    describe "#instantiate_from_database" do
+      context "on Recliner::Document base class" do
+        context "document can be instantiated" do
+          def instantiate
+            Recliner::Document.instantiate_from_database({
+              'class' => 'TestDocument',
+              '_id' => 'abc-123',
+              '_rev' => '1-1234'
+            })
+          end
+          
+          it "should return an instance of the correct type" do
+            instantiate.should be_an_instance_of(TestDocument)
+          end
+          
+          it "should set the class's attributes" do
+            instance = instantiate
+            instance.id.should == 'abc-123'
+            instance.rev.should == '1-1234'
+          end
+        end
+        
+        context "document class is not defined" do
+          def instantiate
+            Recliner::Document.instantiate_from_database({
+              '_id' => 'abc-123',
+              '_rev' => '1-1234'
+            })
+          end
+          
+          it "should raise a DocumentNotFound error" do
+            lambda { instantiate }.should raise_error(DocumentNotFound)
+          end
+        end
+      end
+      
+      context "on a subclass of Recliner::Document" do
+        context "document can be instantiated" do
+          def instantiate
+            TestDocument.instantiate_from_database({
+              'class' => 'TestDocument',
+              '_id' => 'abc-123',
+              '_rev' => '1-1234'
+            })
+          end
+          
+          it "should return an instance of the correct type" do
+            instantiate.should be_an_instance_of(TestDocument)
+          end
+          
+          it "should set the class's attributes" do
+            instance = instantiate
+            instance.id.should == 'abc-123'
+            instance.rev.should == '1-1234'
+          end
+        end
+        
+        context "document class is not defined" do
+          def instantiate
+            TestDocument.instantiate_from_database({
+              '_id' => 'abc-123',
+              '_rev' => '1-1234'
+            })
+          end
+          
+          it "should raise a DocumentNotFound error" do
+            lambda { instantiate }.should raise_error(DocumentNotFound)
+          end
+        end
+        
+        context "document class is different from subclass name" do
+          def instantiate
+            TestDocument.instantiate_from_database({
+              'class' => 'NotATestDocument',
+              '_id' => 'abc-123',
+              '_rev' => '1-1234'
+            })
+          end
+          
+          it "should raise a DocumentNotFound error" do
+            lambda { instantiate }.should raise_error(DocumentNotFound)
+          end
+        end
+      end
+    end
   end
 end

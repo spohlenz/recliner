@@ -144,11 +144,28 @@ module Recliner
       before(:each) do
         TestDocument.view :foo, :map => 'my map function'
         TestDocument.stub!(:initialize_views!)
+        @view_document = mock('view document')
+        @view_document.stub!(:invoke).and_return('view result')
+        TestDocument.stub!(:view_document).and_return(@view_document)
       end
       
       it "should initialize views" do
         TestDocument.should_receive(:initialize_views!)
         TestDocument.foo
+      end
+      
+      it "should invoke the view on the view document" do
+        @view_document.should_receive(:invoke).with('foo')
+        TestDocument.foo
+      end
+      
+      it "should pass the view arguements onto the view document invocation" do
+        @view_document.should_receive(:invoke).with('foo', 1, 2, 3, :foo => 'bar')
+        TestDocument.foo(1, 2, 3, :foo => 'bar')
+      end
+      
+      it "should return the result of the view invocation" do
+        TestDocument.foo.should == 'view result'
       end
     end
   end

@@ -41,7 +41,7 @@ module Recliner
         
         before(:each) do
           subject.views[:view1] = View.new(:map => 'old view 1')
-          save_with_stubbed_database(subject)
+          save_with_stubbed_database!(subject)
         end
         
         it_should_behave_like "#update_views update required"
@@ -51,13 +51,41 @@ module Recliner
         before(:each) do
           subject.views[:view1] = View.new(:map => 'view 1')
           subject.views[:view2] = View.new(:map => 'view 2 (map)', :reduce => 'view 2 (reduce)')
-          save_with_stubbed_database(subject)
+          save_with_stubbed_database!(subject)
         end
         
         it "should not resave the document" do
           subject.should_not_receive(:save!)
           do_update
         end
+      end
+    end
+    
+    describe "#invoke" do
+      before(:each) do
+        @view1 = View.new(:map => 'view 1')
+        @view2 = View.new(:map => 'view 2 (map)', :reduce => 'view 2 (reduce)')
+        subject.views.replace(:view1 => @view1, :view2 => @view2)
+        subject.id = '_design/TestDocument'
+        save_with_stubbed_database!(subject)
+        
+        @database = mock('database')
+        subject.stub!(:database).and_return(@database)
+      end
+      
+      it "should invoke the correct view" do
+        @view1.should_receive(:invoke).with(@database, "_design/TestDocument/_view/view1")
+        subject.invoke('view1')
+      end
+      
+      it "should pass the view arguments to the view" do
+        @view2.should_receive(:invoke).with(@database, "_design/TestDocument/_view/view2", 1, 2, 3, :foo => 'bar')
+        subject.invoke('view2', 1, 2, 3, :foo => 'bar')
+      end
+      
+      it "should return the result of the view invocation" do
+        @view1.stub!(:invoke).and_return('view result')
+        subject.invoke('view1').should == 'view result'
       end
     end
   end
