@@ -18,8 +18,8 @@ module Recliner
     extend ActiveSupport::Concern
     
     included do
-      # view :all
-      # 
+      view :all
+      
       # default_order :id
       # default_conditions :class => '#{name}'
     end
@@ -45,8 +45,6 @@ module Recliner
       end
 
       # #
-      # #
-      # #
       # def default_order(property=nil)
       #   if property
       #     write_inheritable_attribute(:default_order, properties[property].as)
@@ -55,7 +53,8 @@ module Recliner
       #   
       #   read_inheritable_attribute(:default_order)
       # end
-      # 
+      #
+      # #
       # def default_conditions(conditions=nil)
       #   if conditions
       #     write_inheritable_attribute(:default_conditions, conditions)

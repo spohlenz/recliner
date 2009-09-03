@@ -4,6 +4,16 @@ module Recliner
   describe Document do
     define_recliner_document :TestDocument
     
+    it "should have a default :all view" do
+      TestDocument.views[:all].should == {}
+    end
+    
+    describe "#default_order" do
+      describe "setting a new order"
+      
+      describe "getting the current order"
+    end
+    
     describe "#views" do
       it "should be a hash" do
         TestDocument.views.should be_an_instance_of(Hash)

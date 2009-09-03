@@ -10,14 +10,9 @@ require 'json'
 require 'restclient'
 # require 'uri'
 
-$:.unshift File.dirname(__FILE__) unless
-  $:.include?(File.dirname(__FILE__)) ||
-  $:.include?(File.expand_path(File.dirname(__FILE__)))
-
-require 'core_ext'
-
-# require 'recliner/configuration'
+require 'recliner/core_ext'
 require 'recliner/exceptions'
+# require 'recliner/configuration'
 
 module Recliner
   VERSION = '0.0.1'
