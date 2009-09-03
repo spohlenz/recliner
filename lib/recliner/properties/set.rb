@@ -57,6 +57,10 @@ module Recliner
           "#<Set[#{type}]>"
         end
       end
+      
+      def [](*values)
+        super(*values.map { |i| convert_value(i) })
+      end
     end
     
     def []=(index, value)
@@ -64,7 +68,7 @@ module Recliner
     end
     
     def +(other_array)
-      super(other_array.map { |i| convert_value(i) })
+      self.class[*super(other_array.map { |i| convert_value(i) })]
     end
     
     def <<(obj)
@@ -101,10 +105,16 @@ module Recliner
   
   private
     def convert_value(value)
+      self.class.convert_value(value)
+    end
+    
+    def self.convert_value(value)
       if type == String
         value.to_s
       elsif type == Integer
         value.to_i
+      elsif type == Float
+        value.to_f
       elsif value.kind_of?(type)
         value
       else

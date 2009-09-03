@@ -35,159 +35,112 @@ module Recliner
       end
     end
     
-    context "with type String" do
-      subject { set_class(String).new }
-      
-      it "should load from couch representation" do
-        couch = [ 'foo', 'def', 'baz' ]
-        
-        result = set_class(String).from_couch(couch)
-        result.should be_an_instance_of(set_class(String))
-        result.should == couch
-      end
-      
-      it "should serialize to couch representation" do
-        subject.concat(['abc', 'def', 'foo', '123'])
-        subject.to_couch.should == ['abc', 'def', 'foo', '123']
-      end
-      
-      it "should convert values to strings when assigning by index" do
-        subject[0] = :foo
-        subject[1] = 124
-        subject.should == ['foo', '124']
-      end
-      
-      it "should convert values to strings when adding" do
-        (subject + [:foo, 124]).should == ['foo', '124']
-      end
-      
-      it "should convert values to strings when appending" do
-        subject << :foo
-        subject << 124
-        subject.should == ['foo', '124']
-      end
-      
-      it "should convert values to strings when concatenating" do
-        subject.concat([:foo, 124])
-        subject.should == ['foo', '124']
-      end
-      
-      it "should convert values to strings when deleting" do
-        subject.concat(['abc', 'def', 'abc', 'foo', '123'])
-        subject.delete(:abc)
-        subject.delete(123)
-        subject.should == ['def', 'foo']
-      end
-      
-      it "should convert values to strings when getting index" do
-        subject.concat(['abc', 'def', 'foo', '123'])
-        subject.index(:abc).should == 0
-        subject.index(123).should == 3
-        subject.index('missing').should be_nil
-      end
-      
-      it "should convert values to strings when getting rindex" do
-        subject.concat(['abc', 'def', 'abc', 'foo', '123'])
-        subject.rindex(:abc).should == 2
-      end
-      
-      it "should convert values to strings when inserting" do
-        subject.concat(['abc', 'def', 'foo', '123'])
-        subject.insert(1, 999)
-        subject.should == ['abc', '999', 'def', 'foo', '123']
-      end
-      
-      it "should convert values to strings when pushing" do
-        subject.push(:abc, 123, 'foo')
-        subject.should == ['abc', '123', 'foo']
-      end
-      
-      it "should convert values to strings when unshifting" do
-        subject.unshift(:abc, 123, 'foo')
-        subject.should == ['abc', '123', 'foo']
-      end
-      
-      it "should inspect like an Array" do
-        subject.concat(['abc', 'def', 'foo', '123'])
-        subject.inspect.should == '["abc", "def", "foo", "123"]'
-      end
-    end
+    Examples = {
+      String => { :abc => 'abc', 'Some string' => 'Some string', 123 => '123', 54.94 => '54.94' },
+      Integer => { '35' => 35, '46.4' => 46, 123.5 => 123, 99 => 99 },
+      Float => { '35.5' => 35.5, '0' => 0.0, 12 => 12.0, 45.55 => 45.55 }
+    }
     
-    context "with type Integer" do
-      subject { set_class(Integer).new }
-      
-      it "should load from couch representation" do
-        couch = [ 7, 0, 99 ]
+    Examples.each do |type, conversions|      
+      context "with type #{type}" do
+        subject { set_class(type) }
         
-        result = set_class(Integer).from_couch(couch)
-        result.should be_an_instance_of(set_class(Integer))
-        result.should == couch
-      end
+        it "should convert values when creating" do
+          set = subject[*conversions.keys]
+          set.should be_an_instance_of(subject)
+          conversions.values.each_with_index do |value, i|
+            set[i].should == value
+          end
+        end
+        
+        it "should load from couch representation" do
+          result = subject.from_couch(conversions.values)
+          result.should be_an_instance_of(subject)
+          result.should == conversions.values
+        end
+        
+        it "should serialize to couch representation" do
+          set = subject[*conversions.values]
+          set.to_couch.should == conversions.values
+        end
+        
+        it "should convert values when assigning by index" do
+          set = subject.new
+          expected = []
+          conversions.each_with_index do |(key, value), i|
+            set[i] = key
+            expected << value
+          end
+          
+          set.should == expected
+        end
+        
+        it "should convert values when adding" do
+          set = subject.new
+          result = (set + conversions.keys)
+          
+          result.should be_an_instance_of(subject)
+          result.should == conversions.values
+        end
+        
+        it "should convert values when appending" do
+          set = subject.new
+          conversions.keys.each do |key|
+            set << key
+          end
+          set.should == conversions.values
+        end
+        
+        it "should convert values when concatenating" do
+          set = subject.new
+          set.concat(conversions.keys)
+          set.should == conversions.values
+        end
+        
+        it "should convert values when deleting" do
+          set = subject[*conversions.values]
+          set.delete(conversions.keys.first)
+          set.should == conversions.values - [conversions.values.first]
+        end
+        
+        it "should convert values when getting index" do
+          set = subject[*conversions.values]
+          conversions.each do |key, value|
+            set.index(key).should == conversions.values.index(value)
+          end
+        end
+        
+        it "should convert values when getting rindex" do
+          set = subject[*conversions.values]
+          conversions.each do |key, value|
+            set.rindex(key).should == conversions.values.rindex(value)
+          end
+        end
+        
+        it "should convert values when inserting" do
+          set = subject.new
+          conversions.keys.each do |key|
+            set.insert(0, key)
+          end
+          set.should == conversions.values.reverse
+        end
+        
+        it "should convert values when pushing" do
+          set = subject.new
+          set.push(*conversions.keys)
+          set.should == conversions.values
+        end
       
-      it "should serialize to couch representation" do
-        subject.concat([7, 0, 99, 14])
-        subject.to_couch.should == [7, 0, 99, 14]
-      end
+        it "should convert values when unshifting" do
+          set = subject.new
+          set.unshift(*conversions.keys)
+          set.should == conversions.values
+        end
       
-      it "should convert values to integers when assigning by index" do
-        subject[0] = '37'
-        subject[1] = 124.5
-        subject.should == [37, 124]
-      end
-      
-      it "should convert values to integers when adding" do
-        (subject + ['37', 124.5]).should == [37, 124]
-      end
-      
-      it "should convert values to integers when appending" do
-        subject << '37'
-        subject << 124.5
-        subject.should == [37, 124]
-      end
-      
-      it "should convert values to integers when concatenating" do
-        subject.concat(['37', 124.5])
-        subject.should == [37, 124]
-      end
-      
-      it "should convert values to integers when deleting" do
-        subject.concat([99, 7, 0, 99, 14])
-        subject.delete('99')
-        subject.delete(7.5)
-        subject.should == [0, 14]
-      end
-      
-      it "should convert values to integers when getting index" do
-        subject.concat([7, 0, 99, 14])
-        subject.index('7').should == 0
-        subject.index(99.5).should == 2
-        subject.index(35).should be_nil
-      end
-      
-      it "should convert values to integers when getting rindex" do
-        subject.concat([99, 7, 0, 99, 14])
-        subject.rindex(99.5).should == 3
-      end
-      
-      it "should convert values to integers when inserting" do
-        subject.concat([7, 0, 99, 14])
-        subject.insert(1, 36.4)
-        subject.should == [7, 36, 0, 99, 14]
-      end
-      
-      it "should convert values to integers when pushing" do
-        subject.push('35', 123.5, 99)
-        subject.should == [35, 123, 99]
-      end
-      
-      it "should convert values to integers when unshifting" do
-        subject.unshift('35', 123.5, 99)
-        subject.should == [35, 123, 99]
-      end
-      
-      it "should inspect like an Array" do
-        subject.concat([1, 2, 3, 4])
-        subject.inspect.should == '[1, 2, 3, 4]'
+        it "should inspect like an Array" do
+          set = subject[*conversions.keys]
+          set.inspect.should == conversions.values.inspect
+        end
       end
     end
     
