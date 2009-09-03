@@ -8,11 +8,11 @@ require 'active_support/all'
 
 require 'json'
 require 'restclient'
-# require 'uri'
+require 'uri'
 
 require 'recliner/core_ext'
 require 'recliner/exceptions'
-# require 'recliner/configuration'
+require 'recliner/configuration'
 
 module Recliner
   VERSION = '0.0.1'

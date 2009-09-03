@@ -43,6 +43,32 @@ module Recliner
   end
 end
 
+describe Recliner, ' configuration' do
+  context "with String" do
+    it "should directly set the Recliner::Document database" do
+      Recliner::Document.should_receive(:use_database!).with('http://localhost:5984/database-from-string')
+      Recliner.configuration = 'http://localhost:5984/database-from-string'
+    end
+  end
+  
+  context "with Hash" do
+    it "should set the Recliner::Document database to a URI" do
+      Recliner::Document.should_receive(:use_database!).with('http://localhost:5984/database-from-hash')
+      Recliner.configuration = {
+        'host'     => 'localhost',
+        'port'     => 5984,
+        'database' => 'database-from-hash'
+      }
+    end
+  end
+  
+  context "with a non String/Hash" do
+    it "should raise an ArgumentError" do
+      lambda { Recliner.configuration = [1,2,3] }.should raise_error(ArgumentError, 'String or Hash expected')
+    end
+  end
+end
+
 describe Recliner, ' RESTful API' do
   include Recliner::RestfulHelpers
   

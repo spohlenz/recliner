@@ -7,7 +7,7 @@ module Recliner
       when Hash
         "http://#{config['host']}:#{config['port']}/#{config['database']}"
       else
-        raise ArgumentError, "string or hash expected"
+        raise ArgumentError, "String or Hash expected"
       end
     )
   end
