@@ -174,6 +174,22 @@ module Recliner
             do_save.should be_false
           end
         end
+        
+        context "with a changed id" do
+          subject { TestDocument.new(:id => 'document-id') }
+          
+          before(:each) do
+            save_with_stubbed_database(subject)
+            subject.id = 'new-document-id'
+            @database.stub!(:put).and_return({ 'id' => 'new-document-id', 'rev' => '1-23456' })
+            @database.stub!(:delete).and_return({ 'result' => 'ok' })
+          end
+          
+          it "should delete the old document" do
+            @database.should_receive(:delete).with('document-id?rev=1-12345').and_return({ 'result' => 'ok' })
+            subject.save
+          end
+        end
       end
     end
     
@@ -201,6 +217,8 @@ module Recliner
             lambda { do_save }.should raise_error(Recliner::StaleRevisionError)
           end
         end
+        
+        context "with a changed id"
       end
     end
     

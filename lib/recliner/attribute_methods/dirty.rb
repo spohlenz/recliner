@@ -9,7 +9,7 @@ module Recliner
         alias_method_chain :save,  :dirty
         alias_method_chain :save!, :dirty
       end
-    
+      
       # Attempts to +save+ the record and clears changed attributes if successful.
       def save_with_dirty(*args) #:nodoc:
         if status = save_without_dirty(*args)

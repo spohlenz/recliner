@@ -66,10 +66,6 @@ module Recliner
         read_inheritable_attribute(:default_conditions)
       end
       
-      # def count
-      #   all.size
-      # end
-      
       def view_document
         @_view_document ||=
           ViewDocument.with_database(database) do
@@ -95,6 +91,21 @@ module Recliner
         view_document.update_views(views)
         
         views_initialized!
+      end
+      
+      #
+      def first
+        all(:limit => 1).first
+      end
+      
+      #
+      def last
+        all(:limit => 1, :descending => true).first
+      end
+      
+      #
+      def count
+        all.size
       end
     
     private

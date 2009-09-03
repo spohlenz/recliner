@@ -9,12 +9,9 @@ module Recliner
     
     subject { TestDocument.new(:foo => 'original foo') }
     
-    before(:each) do
-      save_with_stubbed_database(subject)
-    end
-    
     describe "#write_attribute" do
       before(:each) do
+        save_with_stubbed_database(subject)
         subject.write_attribute(:foo, 'new foo')
       end
       
@@ -43,6 +40,7 @@ module Recliner
     
     context "when saved" do
       before(:each) do
+        save_with_stubbed_database(subject)
         subject.foo = 'changed foo'
       end
       
@@ -62,10 +60,40 @@ module Recliner
     end
     
     context "without changed attributes" do
+      before(:each) do
+        save_with_stubbed_database(subject)
+      end
+      
       it { should_not be_changed }
     end
     
+    context "when loaded" do
+      before(:each) do
+        Recliner.stub!(:get).and_return({
+          'class' => 'TestDocument',
+          '_id' => '123',
+          '_rev' => '1-12345',
+          'foo' => 'value of foo',
+          'bar' => 'value of bar'
+        })
+      end
+      
+      it "should not be changed via load" do
+        instance = TestDocument.load('123')
+        instance.should_not be_changed
+      end
+      
+      it "should not be changed via load!" do
+        instance = TestDocument.load!('123')
+        instance.should_not be_changed
+      end
+    end
+    
     context "with changed attributes" do
+      before(:each) do
+        save_with_stubbed_database(subject)
+      end
+      
       context "attribute set to a new value" do
         before(:each) do
           subject.foo = 'foo changed'
@@ -84,6 +112,10 @@ module Recliner
     end
     
     context "#original_attributes" do
+      before(:each) do
+        save_with_stubbed_database(subject)
+      end
+      
       context "with changes" do
         before(:each) do
           subject.foo = 'changed foo'

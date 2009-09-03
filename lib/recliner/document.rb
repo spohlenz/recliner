@@ -12,19 +12,8 @@ module Recliner
 
       callback(:after_initialize) if respond_to?(:after_initialize)
     end
-    
-  #   # Special case for id setter as old document needs to be deleted if the id is changed
-  #   def id=(new_id)
-  #     @old_id ||= id unless new_record?
-  #     write_attribute(:id, new_id)
-  #   end
-  # 
-  #   # If the doc id has changed, we need to delete the old document when saving
-  #   def id_changed?
-  #     !new_record? && @old_id && @old_id != id
-  #   end
-  # 
-  #   #
+
+    #
     def save
       create_or_update
     rescue StaleRevisionError
@@ -99,10 +88,9 @@ module Recliner
     def save_to_database
       result = database.put(id, to_couch)
       
-      # if id_changed?
-      #   database.delete("#{@old_id}?rev=#{rev}")
-      #   @old_id = nil
-      # end
+      if id_changed? && !new_record?
+        database.delete("#{id_was}?rev=#{rev}")
+      end
       
       self.rev = result['rev']
       
@@ -121,16 +109,6 @@ module Recliner
       def load!(*ids)
         load_ids(ids, true)
       end
-  
-  #     #
-  #     def first
-  #       all(:limit => 1).first
-  #     end
-  #     
-  #     #
-  #     def last
-  #       all(:limit => 1, :descending => true).first
-  #     end
 
       #
       def create(attributes={})
@@ -204,6 +182,7 @@ module Recliner
           end
           
           doc.instance_variable_set("@new_record", false)
+          doc.send(:changed_attributes).clear
           doc.send(:callback, :after_load) if doc.respond_to?(:after_load)
         end
       end
