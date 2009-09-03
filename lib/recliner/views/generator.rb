@@ -4,24 +4,24 @@ module Recliner
     
     attr_reader :options
     
-    def initialize(options)
-      @options = options
+    def initialize(options={})
+      @options = { :conditions! => {}, :order => :_id }.merge(options)
     end
     
     def generate
       map = ""
       
-      map << "if (#{conditions}) {" unless conditions.blank?
-      map << "  emit(#{key}, #{value});"
-      map << "}" unless conditions.blank?
+      map << "if (#{conditions}) {\n" unless conditions.blank?
+      map << "  emit(#{key}, #{value});\n"
+      map << "}\n" unless conditions.blank?
       
-      [Recliner::MapViewFunction.new(map), nil]
+      [ViewFunction::Map.new(map), nil]
     end
-  
+    
   private
     def key
       key = options[:key] || options[:order]
-      
+
       if key.is_a?(Array)
         '[' + key.map { |k| "doc.#{k}" }.join(', ') + ']'
       else
@@ -33,7 +33,7 @@ module Recliner
       if options[:select]
         "{" + Array(options[:select]).map { |field|
           "\"#{field}\": doc.#{field}"
-        }.join(",") + "}"
+        }.join(", ") + "}"
       else
         'doc'
       end

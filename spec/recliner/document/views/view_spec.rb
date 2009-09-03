@@ -74,10 +74,34 @@ module Recliner
       end
     end
     
+    context "without map option" do
+      before(:each) do
+        @generator = mock('ViewGenerator instance')
+        @generator.stub(:generate).and_return([ 'map function', 'reduce function' ])
+        ViewGenerator.stub!(:new).and_return(@generator)
+      end
+      
+      def create_view
+        View.new(:order => 'name', :conditions => { :class => 'TestDocument' })
+      end
+      
+      it "should generate a view function" do
+        ViewGenerator.should_receive(:new).with(:order => 'name', :conditions => { :class => 'TestDocument' }).and_return(@generator)
+        create_view
+      end
+      
+      it "should assign map and reduce functions from the generator" do
+        view = create_view
+        
+        view.map.should == 'map function'
+        view.reduce.should == 'reduce function'
+      end
+    end
+    
     describe "#invoke" do
       define_recliner_document :TestDocument
       
-      subject { View.new }
+      subject { View.new(:map => 'map function') }
       
       before(:each) do
         @database = mock('database')

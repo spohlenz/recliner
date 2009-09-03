@@ -1,5 +1,3 @@
-require 'rubygems'
-
 require 'spec/rake/spectask'
 require 'cucumber/rake/task'
 

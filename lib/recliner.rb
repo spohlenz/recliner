@@ -36,7 +36,8 @@ module Recliner
   autoload :View,                'recliner/views/view'
   autoload :ViewDocument,        'recliner/views/document'
   autoload :ViewFunction,        'recliner/views/function'
-  # autoload :ViewGenerator,       'recliner/view_generator'
+  autoload :ViewGenerator,       'recliner/views/generator'
+  
   # autoload :Associations,        'recliner/associations'
   
   autoload :Validations,         'recliner/validations'

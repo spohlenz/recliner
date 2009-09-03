@@ -3,12 +3,12 @@ module Recliner
     attr_reader :map, :reduce
 
     def initialize(options={})
-  #     if options[:map]
+      if options[:map]
         @map    = Recliner::ViewFunction::Map.new(options[:map])
         @reduce = Recliner::ViewFunction::Reduce.new(options[:reduce]) if options[:reduce]
-  #     else
-  #       @map, @reduce = Recliner::ViewGenerator.new(options).generate
-  #     end
+      else
+        @map, @reduce = Recliner::ViewGenerator.new(options).generate
+      end
     end
 
     def to_couch
