@@ -20,8 +20,8 @@ module Recliner
     included do
       view :all
       
-      # default_order :id
-      # default_conditions :class => '#{name}'
+      default_order :id
+      default_conditions :class => '#{name}'
     end
     
     module ClassMethods
@@ -44,26 +44,28 @@ module Recliner
         END_RUBY
       end
 
-      # #
-      # def default_order(property=nil)
-      #   if property
-      #     write_inheritable_attribute(:default_order, properties[property].as)
-      #     reset_views!
-      #   end
-      #   
-      #   read_inheritable_attribute(:default_order)
-      # end
       #
-      # #
-      # def default_conditions(conditions=nil)
-      #   if conditions
-      #     write_inheritable_attribute(:default_conditions, conditions)
-      #     reset_views!
-      #   end
-      #   
-      #   read_inheritable_attribute(:default_conditions)
-      # end
-      # 
+      def default_order(attribute=nil)
+        if attribute
+          property = properties[attribute.to_sym]
+          
+          write_inheritable_attribute(:default_order, property ? property.as : attribute)
+          reset_views!
+        end
+        
+        read_inheritable_attribute(:default_order)
+      end
+      
+      #
+      def default_conditions(conditions=nil)
+        if conditions
+          write_inheritable_attribute(:default_conditions, conditions)
+          reset_views!
+        end
+        
+        read_inheritable_attribute(:default_conditions)
+      end
+      
       # def count
       #   all.size
       # end

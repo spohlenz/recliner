@@ -9,9 +9,99 @@ module Recliner
     end
     
     describe "#default_order" do
-      describe "setting a new order"
+      it "should default to _id" do
+        TestDocument.default_order.should == '_id'
+      end
       
-      describe "getting the current order"
+      describe "setting a new default order" do
+        context "no property" do
+          it "should return the new order" do
+            TestDocument.default_order(:age).should == :age
+          end
+        
+          it "should set the new order" do
+            TestDocument.default_order(:age)
+            TestDocument.read_inheritable_attribute(:default_order).should == :age
+          end
+          
+          it "should reset views" do
+            TestDocument.should_receive(:reset_views!)
+            TestDocument.default_order(:age)
+          end
+        end
+        
+        context "property defined" do
+          before(:each) do
+            TestDocument.property :age, Integer, :as => '_age'
+          end
+          
+          it "should return the new order" do
+            TestDocument.default_order(:age).should == '_age'
+          end
+        
+          it "should set the new order to the property's internal name" do
+            TestDocument.default_order(:age)
+            TestDocument.read_inheritable_attribute(:default_order).should == '_age'
+          end
+          
+          it "should reset views" do
+            TestDocument.should_receive(:reset_views!)
+            TestDocument.default_order(:age)
+          end
+        end
+      end
+      
+      describe "getting the default order" do
+        before(:each) do
+          TestDocument.write_inheritable_attribute(:default_order, :name)
+        end
+        
+        it "should return the current order" do
+          TestDocument.default_order.should == :name
+        end
+        
+        it "should not reset views" do
+          TestDocument.should_not_receive(:reset_views!)
+          TestDocument.default_order
+        end
+      end
+    end
+    
+    describe "#default_conditions" do
+      it "should default to :class => '#{name}'" do
+        TestDocument.default_conditions.should == { :class => '#{name}' }
+      end
+      
+      describe "setting new default conditions" do
+        it "should return the new conditions" do
+          TestDocument.default_conditions(:baz => '123').should == { :baz => '123' }
+        end
+        
+        it "should set the new conditions" do
+          TestDocument.default_conditions(:baz => '123')
+          TestDocument.read_inheritable_attribute(:default_conditions).should == { :baz => '123' }
+        end
+        
+        it "should reset views" do
+          TestDocument.should_receive(:reset_views!)
+          TestDocument.default_conditions(:baz => '123')
+        end
+      end
+      
+      describe "getting current default conditions" do
+        before(:each) do
+          TestDocument.write_inheritable_attribute(:default_conditions, { :foo => 'bar' })
+        end
+        
+        it "should return the current conditions" do
+          TestDocument.default_conditions.should == { :foo => 'bar' }
+        end
+        
+        it "should not reset views" do
+          TestDocument.should_not_receive(:reset_views!)
+          TestDocument.default_conditions
+        end
+      end
     end
     
     describe "#views" do

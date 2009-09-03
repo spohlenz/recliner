@@ -1,4 +1,3 @@
-require 'rubygems'
 require 'spec'
 
 # Require Recliner library

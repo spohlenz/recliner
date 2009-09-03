@@ -56,7 +56,13 @@ module Recliner
       end
 
       context "with Hash :conditions option" do
-        subject { ViewGenerator.new(:conditions => { :baz => true, :foo => 'abc' }) }
+        subject {
+          conditions = ActiveSupport::OrderedHash.new
+          conditions[:baz] = true
+          conditions[:foo] = 'abc'
+          
+          ViewGenerator.new(:conditions => conditions)
+        }
         
         it "should create a map function that scopes to the given conditions" do
           subject.generate[0].should be_equivalent_to(
