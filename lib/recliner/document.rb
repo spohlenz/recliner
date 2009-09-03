@@ -262,6 +262,7 @@ module Recliner
 
     include Properties
     include Properties::Map
+    include Properties::Set
 
     include AttributeMethods
     include AttributeMethods::Read

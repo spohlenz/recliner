@@ -56,10 +56,6 @@ module Recliner
         result
       end
       
-      def ==(other)
-        superclass == other.superclass && from == other.from && to == other.to
-      end
-    
       def inspect
         if self == Map
           super

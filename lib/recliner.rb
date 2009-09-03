@@ -25,7 +25,7 @@ module Recliner
   autoload :Properties,          'recliner/properties'
   autoload :Property,            'recliner/properties/property'
   autoload :Map,                 'recliner/properties/map'
-  # autoload :CompositeProperties, 'recliner/composite_properties'
+  autoload :Set,                 'recliner/properties/set'
   
   autoload :Views,               'recliner/views'
   autoload :View,                'recliner/views/view'

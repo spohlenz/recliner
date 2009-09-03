@@ -3,6 +3,7 @@ require 'uuid'
 module Recliner
   module Properties
     autoload :Map, 'recliner/properties/map'
+    autoload :Set, 'recliner/properties/set'
     
     extend ActiveSupport::Concern
     

@@ -44,8 +44,10 @@ module Recliner
       it "should load from couch representation" do
         couch    = { 'Foo' => '12345', 'Abc' => 'abcde' }
         expected = { 'Foo' => '12345', 'Abc' => 'abcde' }
-         
-        subject.from_couch(couch).should == expected
+        
+        result = subject.from_couch(couch)
+        result.should be_an_instance_of(subject)
+        result.should == expected
       end
       
       it "should convert keys to strings when assigned using []=" do
@@ -131,7 +133,9 @@ module Recliner
         couch    = { '12' => '12345', '99' => 'abcde' }
         expected = { 12 => '12345', 99 => 'abcde'}
         
-        subject.from_couch(couch).should == expected
+        result = subject.from_couch(couch)
+        result.should be_an_instance_of(subject)
+        result.should == expected
       end
       
       it "should convert keys to integers when assigned using []=" do
@@ -244,7 +248,9 @@ module Recliner
         couch    = { 'abc' => 'string for abc', 'def' => 'string for def' }
         expected = { CustomKeyClass.new('abc') => 'string for abc', CustomKeyClass.new('def') => 'string for def' }
         
-        subject.from_couch(couch).should == expected
+        result = subject.from_couch(couch)
+        result.should be_an_instance_of(subject)
+        result.should == expected
       end
       
       it "should convert keys to strings when serializing to couch" do
@@ -336,7 +342,9 @@ module Recliner
         couch    = { 'abc' => { 'name' => 'abc' }, 'def' => { 'name' => 'def' } }
         expected = { 'abc' => CustomValueClass.new('abc'), 'def' => CustomValueClass.new('def') }
         
-        subject.from_couch(couch).should == expected
+        result = subject.from_couch(couch)
+        result.should be_an_instance_of(subject)
+        result.should == expected
       end
       
       it "should convert values to couch representation when serializing to couch" do
@@ -361,7 +369,7 @@ module Recliner
       context "with no default value" do
         subject { Property.new(:map, map_class(String, Integer), :map, nil) }
         
-        it "should default to a new Map of the same type" do
+        it "should default to a Map of the same type" do
           subject.default_value(nil).should be_an_instance_of(map_class(String, Integer))
         end
       end
@@ -369,11 +377,11 @@ module Recliner
       context "with a default value" do
         subject { Property.new(:map, map_class(String, String), :map, { :foo => 'bar' }) }
         
-        it "should default to a new Map of the same type" do
+        it "should default to a Map of the same type" do
           subject.default_value(nil).should be_an_instance_of(map_class(String, String))
         end
         
-        it "should default to a new Map built from the given default" do
+        it "should default to a Map built from the given default" do
           subject.default_value(nil)['foo'].should == 'bar'
         end
       end
