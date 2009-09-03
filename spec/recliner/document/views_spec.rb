@@ -206,6 +206,24 @@ module Recliner
           TestDocument.stub!(:view_document).and_return(@view_document)
           TestDocument.stub!(:views).and_return({})
         end
+        
+        it "should add the default order and conditions to the view options" do
+          TestDocument.stub!(:default_order).and_return(:bar)
+          TestDocument.stub!(:default_conditions).and_return({ :abc => '123' })
+          TestDocument.stub!(:views).and_return({
+            :view1 => {},
+            :view2 => { :order => :foo, :conditions => { :foo => true } },
+            :view3 => { :order => :foo, :conditions! => { :foo => true } },
+          })
+          
+          @view_document.should_receive(:update_views).with({
+            :view1 => View.new(:order => :bar, :conditions! => { :abc => '123' }),
+            :view2 => View.new(:order => :foo, :conditions! => { :abc => '123' }, :conditions => { :foo => true }),
+            :view3 => View.new(:order => :foo, :conditions! => { :foo => true })
+          })
+          
+          TestDocument.initialize_views!
+        end
       
         it "should update the view document" do
           TestDocument.stub!(:views).and_return({
@@ -259,7 +277,7 @@ module Recliner
         TestDocument.foo
       end
       
-      it "should pass the view arguements onto the view document invocation" do
+      it "should pass the view arguments onto the view document invocation" do
         @view_document.should_receive(:invoke).with('foo', 1, 2, 3, :foo => 'bar')
         TestDocument.foo(1, 2, 3, :foo => 'bar')
       end

@@ -86,7 +86,7 @@ module Recliner
         return if views_initialized?
         
         views = self.views.inject({}) do |result, (name, options)|
-          #options = { :order => default_order, :conditions! => default_conditions }.merge(options)
+          options = { :order => default_order, :conditions! => default_conditions }.merge(options)
           
           result[name] = View.new(interpolate_hash_values(options))
           result
