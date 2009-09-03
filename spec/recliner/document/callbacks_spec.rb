@@ -3,6 +3,20 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 module Recliner
   describe Document do
     describe "callbacks" do
+      before(:each) do
+        Recliner.stub!(:get).and_return({
+          '_id' => '123',
+          '_rev' => '1-12345',
+          'class' => 'CallbackTestDocument'
+        })
+        
+        Recliner.stub!(:put).and_return({
+          'result' => 'ok',
+          'id' => '123',
+          'rev' => '1-12345'
+        })
+      end
+      
       define_recliner_document :CallbackTestDocument do
         class << self
           def callback_string(callback_method)
@@ -37,7 +51,7 @@ module Recliner
           send(callback_method, callback_object(callback_method_sym))
           send(callback_method) { |model| model.history << [callback_method_sym, :block] }
         end
-
+        
         def history
           @history ||= []
         end
@@ -49,7 +63,6 @@ module Recliner
         def after_load
         end
       end
-  
   
       it "should run each type of callback when initializing" do
         instance = CallbackTestDocument.new

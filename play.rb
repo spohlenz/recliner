@@ -1,4 +1,4 @@
-require 'lib/recliner'
+require 'recliner'
 require 'faker'
 
 class User < Recliner::Document
@@ -9,7 +9,6 @@ class User < Recliner::Document
   default_order :name
 end
 
-User.database.delete!
-User.database.create!
+User.database.recreate!
 
 20.times { User.new(:name => Faker::Name.name).save }

@@ -95,7 +95,7 @@ describe Recliner, ' RESTful API' do
   describe "GET a missing document" do
     it "should raise a Recliner::DocumentNotFound exception" do
       RestClient.stub!(:get).and_raise(RestClient::ResourceNotFound)
-      lambda { do_get }.should raise_error(Recliner::DocumentNotFound)
+      lambda { do_get }.should raise_error(Recliner::DocumentNotFound, "Could not find document at http://127.0.0.1:5984/recliner-spec/some-document")
     end
   end
   
@@ -147,7 +147,7 @@ describe Recliner, ' RESTful API' do
   describe "POST to a missing resource" do
     it "should raise a Recliner::DocumentNotFound exception" do
       RestClient.stub!(:post).and_raise(RestClient::ResourceNotFound)
-      lambda { do_post }.should raise_error(Recliner::DocumentNotFound)
+      lambda { do_post }.should raise_error(Recliner::DocumentNotFound, "Could not find document at http://127.0.0.1:5984/recliner-spec/some-document")
     end
   end
   
@@ -181,7 +181,7 @@ describe Recliner, ' RESTful API' do
   describe "DELETE a missing document" do
     it "should raise a Recliner::DocumentNotFound exception" do
       RestClient.stub!(:delete).and_raise(RestClient::ResourceNotFound)
-      lambda { do_delete }.should raise_error(Recliner::DocumentNotFound)
+      lambda { do_delete }.should raise_error(Recliner::DocumentNotFound, "Could not find document at http://127.0.0.1:5984/recliner-spec/some-document?rev=12-12345")
     end
   end
 end

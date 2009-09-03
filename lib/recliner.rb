@@ -65,7 +65,7 @@ module Recliner
       
       JSON.parse(RestClient.send(*args))
     rescue RestClient::ResourceNotFound
-      raise DocumentNotFound
+      raise DocumentNotFound, "Could not find document at #{uri}"
     rescue RestClient::RequestFailed => e
       rescue_from_failed_request(e)
     end
