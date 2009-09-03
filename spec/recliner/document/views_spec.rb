@@ -146,6 +146,16 @@ module Recliner
     end
     
     describe "#view_document" do
+      context "parent class uses an alternate database" do
+        before(:each) do
+          TestDocument.use_database! 'http://localhost:5984/recliner-alternate'
+        end
+        
+        it "should use the same database as the parent" do
+          TestDocument.view_document.database.should == TestDocument.database
+        end
+      end
+      
       context "view document does not yet exist" do
         before(:each) do
           Recliner.stub!(:get).and_raise(DocumentNotFound)

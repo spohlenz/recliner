@@ -72,9 +72,9 @@ module Recliner
       
       def view_document
         @_view_document ||=
-          #ViewDocument.with_database(database) do
+          ViewDocument.with_database(database) do
             ViewDocument.load(view_document_id) || ViewDocument.new(:id => view_document_id)
-          #end
+          end
       end
       
       def views_initialized?

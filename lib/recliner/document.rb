@@ -5,7 +5,7 @@ module Recliner
     def initialize(attributes={})
       self.attributes = attributes
 
-      # @database = self.class.database
+      @database = self.class.database
       @new_record = true
 
       yield self if block_given?
@@ -77,7 +77,7 @@ module Recliner
     end
   
     def database
-      self.class.database
+      @database
     end
   
   private
@@ -175,22 +175,21 @@ module Recliner
   
       # Access the Recliner::Database object in use by this class
       def database
-        #Thread.current["#{name}_database"] || default_database
-        default_database
+        Thread.current["#{name}_database"] || default_database
       end
       
       def default_database
         @default_database ||= Database.new(read_inheritable_attribute(:database_uri))
       end
   
-  #     #
-  #     def with_database(db)
-  #       Thread.current["#{name}_database"] = db
-  #       
-  #       yield
-  #     ensure
-  #       Thread.current["#{name}_database"] = nil
-  #     end
+      #
+      def with_database(db)
+        Thread.current["#{name}_database"] = db
+        
+        yield
+      ensure
+        Thread.current["#{name}_database"] = nil
+      end
 
       def instantiate_from_database(attrs)
         unless attrs['class'] && (self == Document || attrs['class'] == name)

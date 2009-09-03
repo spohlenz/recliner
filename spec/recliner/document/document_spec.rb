@@ -797,5 +797,44 @@ module Recliner
         end
       end
     end
+    
+    describe "#with_database" do
+      define_recliner_document :TestDocument1
+      define_recliner_document :TestDocument2
+      
+      before(:each) do
+        @database = mock('database')
+      end
+      
+      it "should use the given database for all new documents within the block with the same class" do
+        TestDocument1.with_database(@database) do
+          TestDocument1.new.database.should == @database
+          TestDocument2.new.database.should_not == @database
+        end
+      end
+      
+      specify "instances created within the block should continue to use the database" do
+        instance = nil
+        TestDocument1.with_database(@database) do
+          instance = TestDocument1.new
+        end
+        instance.database.should == @database
+      end
+      
+      specify "instances loaded within the block should continue to use the database" do
+        @database.stub!(:get).and_return({ 'class' => 'TestDocument1', '_id' => '123', '_rev' => '1-12345' })
+        
+        instance = nil
+        TestDocument1.with_database(@database) do
+          instance = TestDocument1.load('123')
+        end
+        instance.database.should == @database
+      end
+      
+      it "should not use the given database for documents created after the block" do
+        TestDocument1.with_database(@database) {}
+        TestDocument1.new.database.should_not == @database
+      end
+    end
   end
 end
