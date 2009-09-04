@@ -730,6 +730,30 @@ module Recliner
       end
     end
     
+    describe "#update_attributes" do
+      subject { TestDocument.new }
+      
+      before(:each) do
+        subject.stub!(:attributes=)
+        subject.stub!(:save).and_return(true)
+      end
+      
+      it "should update the document attributes" do
+        subject.should_receive(:attributes=).with('new attributes')
+        subject.update_attributes('new attributes')
+      end
+      
+      it "should save the document" do
+        subject.should_receive(:save)
+        subject.update_attributes('new attributes')
+      end
+      
+      it "should return the result of #save" do
+        subject.should_receive(:save).and_return(true)
+        subject.update_attributes('new attributes').should be_true
+      end
+    end
+    
     describe "#instantiate_from_database" do
       context "on Recliner::Document base class" do
         context "document can be instantiated" do

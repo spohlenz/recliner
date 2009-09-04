@@ -24,9 +24,9 @@ module Recliner
       create_or_update
     end
     
-  #   def update_attributes(attrs)
-  #     self.attributes = attrs and save
-  #   end
+    def update_attributes(attrs)
+      self.attributes = attrs and save
+    end
 
     #
     def destroy
