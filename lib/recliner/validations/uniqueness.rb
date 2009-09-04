@@ -3,9 +3,9 @@ module Recliner
     module ClassMethods
       def validates_uniqueness_of(*attr_names)
         configuration = attr_names.extract_options!
-        
+
         keys = {}
-        
+
         attr_names.each do |attr_name|
           if configuration[:view]
             keys[attr_name] = views[configuration[:view]][:key]
@@ -15,7 +15,7 @@ module Recliner
             view _validates_uniqueness_of_view_name(keys[attr_name]), :key => keys[attr_name], :select => :_id
           end
         end
-        
+
         validates_each(attr_names, configuration) do |document, attr_name, value|
           view = configuration[:view] ? configuration[:view] : _validates_uniqueness_of_view_name(keys[attr_name])
           
