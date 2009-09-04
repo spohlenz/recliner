@@ -41,105 +41,105 @@ module Recliner
       Float => { '35.5' => 35.5, '0' => 0.0, 12 => 12.0, 45.55 => 45.55 }
     }
     
-    Examples.each do |type, conversions|      
+    Examples.each do |type, conversions|
+      before_type_cast = conversions.keys
+      after_type_cast = conversions.values
+      
       context "with type #{type}" do
         subject { set_class(type) }
         
         it "should convert values when creating" do
-          set = subject[*conversions.keys]
+          set = subject[*before_type_cast]
           set.should be_an_instance_of(subject)
-          conversions.values.each_with_index do |value, i|
+          after_type_cast.each_with_index do |value, i|
             set[i].should == value
           end
         end
         
         it "should load from couch representation" do
-          result = subject.from_couch(conversions.values)
+          result = subject.from_couch(after_type_cast)
           result.should be_an_instance_of(subject)
-          result.should == conversions.values
+          result.should == after_type_cast
         end
         
         it "should serialize to couch representation" do
-          set = subject[*conversions.values]
-          set.to_couch.should == conversions.values
+          set = subject[*after_type_cast]
+          set.to_couch.should == after_type_cast
         end
         
         it "should convert values when assigning by index" do
           set = subject.new
-          expected = []
-          conversions.each_with_index do |(key, value), i|
-            set[i] = key
-            expected << value
+          before_type_cast.each_with_index do |value, i|
+            set[i] = value
           end
-          
-          set.should == expected
+          set.should == after_type_cast
         end
         
         it "should convert values when adding" do
           set = subject.new
-          result = (set + conversions.keys)
+          result = (set + before_type_cast)
           
           result.should be_an_instance_of(subject)
-          result.should == conversions.values
+          result.should == after_type_cast
         end
         
         it "should convert values when appending" do
           set = subject.new
-          conversions.keys.each do |key|
+          before_type_cast.each do |key|
             set << key
           end
-          set.should == conversions.values
+          set.should == after_type_cast
         end
         
         it "should convert values when concatenating" do
           set = subject.new
-          set.concat(conversions.keys)
-          set.should == conversions.values
+          set.concat(before_type_cast)
+          set.should == after_type_cast
         end
         
         it "should convert values when deleting" do
-          set = subject[*conversions.values]
-          set.delete(conversions.keys.first)
-          set.should == conversions.values - [conversions.values.first]
+          set = subject[*after_type_cast]
+          set.delete(before_type_cast.first)
+          set.should == after_type_cast - [after_type_cast.first]
         end
         
         it "should convert values when getting index" do
-          set = subject[*conversions.values]
+          set = subject[*after_type_cast]
           conversions.each do |key, value|
-            set.index(key).should == conversions.values.index(value)
+            set.index(key).should == after_type_cast.index(value)
           end
         end
         
         it "should convert values when getting rindex" do
-          set = subject[*conversions.values]
+          set = subject[*after_type_cast]
           conversions.each do |key, value|
-            set.rindex(key).should == conversions.values.rindex(value)
+            set.rindex(key).should == after_type_cast.rindex(value)
           end
         end
         
         it "should convert values when inserting" do
           set = subject.new
-          conversions.keys.each do |key|
+          before_type_cast.each do |key|
             set.insert(0, key)
           end
-          set.should == conversions.values.reverse
+          set.should == after_type_cast.reverse
         end
         
         it "should convert values when pushing" do
           set = subject.new
-          set.push(*conversions.keys)
-          set.should == conversions.values
+          set.push(*before_type_cast)
+          set.should == after_type_cast
         end
       
         it "should convert values when unshifting" do
           set = subject.new
-          set.unshift(*conversions.keys)
-          set.should == conversions.values
+          set.unshift(*before_type_cast)
+          set.should == after_type_cast
         end
       
         it "should inspect like an Array" do
           set = subject[*conversions.keys]
-          set.inspect.should == conversions.values.inspect
+          set.inspect.should == after_type_cast.inspect
         end
       end
     end

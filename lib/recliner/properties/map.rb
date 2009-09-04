@@ -128,24 +128,24 @@ module Recliner
     
   private
     def convert_key(key)
-      if from == Integer
-        key.to_i
-      elsif from == String
-        key.to_s
-      elsif key.kind_of?(from)
-        key
-      else
-        raise TypeError, "expected #{from} but got #{key.class}"
-      end
+      convert(key, from)
     end
     
     def convert_value(value)
-      if to == String
+      convert(value, to)
+    end
+    
+    def convert(value, type)
+      if type == String
         value.to_s
-      elsif value.kind_of?(to)
+      elsif type == Integer
+        value.to_i
+      elsif type == Float
+        value.to_f
+      elsif value.kind_of?(type)
         value
       else
-        raise TypeError, "expected #{to} but got #{value.class}"
+        raise TypeError, "expected #{type} but got #{value.class}"
       end
     end
   end

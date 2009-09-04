@@ -37,180 +37,103 @@ module Recliner
       end
     end
     
+    KeyExamples = {
+      String => {
+        :before_type_cast => { 'string' => 'string value', :symbol => 'symbol value', 123 => 'int value', 45.5 => 'float value' },
+        :after_type_cast => { 'string' => 'string value', 'symbol' => 'symbol value', '123' => 'int value', '45.5' => 'float value' },
+        :couch => { 'string' => 'string value', 'symbol' => 'symbol value', '123' => 'int value', '45.5' => 'float value' }
+      },
+        
+      Integer => {
+        :before_type_cast => { 123 => 'int value', '88' => 'string value', '94.5' => 'string float value', 0.123 => 'float value' },
+        :after_type_cast => { 123 => 'int value', 88 => 'string value', 94 => 'string float value', 0 => 'float value' },
+        :couch => { '123' => 'int value', '88' => 'string value', '94' => 'string float value', '0' => 'float value' }
+      }
+    }
     
-    context "keyed by String" do
-      subject { map_class(String, String) }
+    KeyExamples.each do |type, conversions|
+      couch = conversions[:couch]
+      before_type_cast = conversions[:before_type_cast]
+      after_type_cast = conversions[:after_type_cast]
       
-      it "should load from couch representation" do
-        couch    = { 'Foo' => '12345', 'Abc' => 'abcde' }
-        expected = { 'Foo' => '12345', 'Abc' => 'abcde' }
+      context "keyed by #{type}" do
+        subject { map_class(type, String) }
         
-        result = subject.from_couch(couch)
-        result.should be_an_instance_of(subject)
-        result.should == expected
-      end
-      
-      it "should convert keys to strings when assigned using []=" do
-        map = subject.new
-        map['str'] = 'assigned str'
-        map[:foo] = 'assigned foo'
-        map[123] = 'assigned 123'
+        it "should load from couch representation" do
+          result = subject.from_couch(couch)
+          result.should be_an_instance_of(subject)
+          result.should == after_type_cast
+        end
         
-        map.should == { 'str' => 'assigned str', 'foo' => 'assigned foo', '123' => 'assigned 123' }
-      end
-      
-      it "should convert keys to strings when assigned using store" do
-        map = subject.new
-        map.store('str', 'assigned str')
-        map.store(:foo, 'assigned foo')
-        map.store(123, 'assigned 123')
+        it "should serialize to couch representation" do
+          map = subject[after_type_cast]
+          map.to_couch.should == couch
+        end
         
-        map.should == { 'str' => 'assigned str', 'foo' => 'assigned foo', '123' => 'assigned 123' }
-      end
-      
-      it "should convert keys to strings when fetched using []" do
-        map = subject['str' => 'assigned str', 'foo' => 'assigned foo', '123' => 'assigned 123']
+        it "should convert keys when creating from hash" do
+          map = subject[before_type_cast]
+          map.should be_an_instance_of(subject)
+          map.should == after_type_cast
+        end
         
-        map['str'].should == 'assigned str'
-        map[:foo].should == 'assigned foo'
-        map[123].should == 'assigned 123'
-      end
-      
-      it "should convert keys to strings when fetched using fetch" do
-        map = subject['str' => 'assigned str', 'foo' => 'assigned foo', '123' => 'assigned 123']
+        it "should convert keys when assigned using []=" do
+          map = subject.new
+          before_type_cast.each do |key, value|
+            map[key] = value
+          end
+          map.should == after_type_cast
+        end
         
-        map.fetch('str').should == 'assigned str'
-        map.fetch(:foo).should == 'assigned foo'
-        map.fetch(123).should == 'assigned 123'
-      end
-      
-      it "should convert keys to strings when queried" do
-        map = subject['str' => 'assigned str', 'foo' => 'assigned foo', '123' => 'assigned 123']
+        it "should convert keys when assigned using store" do
+          map = subject.new
+          before_type_cast.each do |key, value|
+            map.store(key, value)
+          end
+          map.should == after_type_cast
+        end
+        
+        it "should convert keys when fetched using []" do
+          map = subject[after_type_cast]
+          before_type_cast.each do |key, value|
+            map[key].should == value
+          end
+        end
+        
+        it "should convert keys when fetched using fetch" do
+          map = subject[after_type_cast]
+          before_type_cast.each do |key, value|
+            map.fetch(key).should == value
+          end
+        end
         
         [ :has_key?, :include?, :key?, :member? ].each do |query_method|
-          map.send(query_method, 'str').should be_true
-          map.send(query_method, :foo).should be_true
-          map.send(query_method, 123).should be_true
-          
-          map.send(query_method, 'strabc').should be_false
-          map.send(query_method, :baz).should be_false
-          map.send(query_method, 99).should be_false
+          it "should convert keys when queried using #{query_method}" do
+            map = subject[after_type_cast]
+            before_type_cast.keys.each do |key, value|
+              map.send(query_method, key).should be_true
+            end
+          end
         end
-      end
-      
-      it "should convert keys to strings when updating" do
-        map = subject['str' => 'assigned str', 'foo' => 'assigned foo']
-        map.update(:foo => 'changed foo', 123 => 'assigned 123')
         
-        map.should == { 'str' => 'assigned str', 'foo' => 'changed foo', '123' => 'assigned 123' }
-      end
-      
-      it "should convert keys to strings when replacing" do
-        map = subject['str' => 'assigned str', 'foo' => 'assigned foo']
-        map.replace(:foo => 'new foo', 123 => 'assigned 123', 'string' => 'the string')
-        
-        map.should == { 'string' => 'the string', 'foo' => 'new foo', '123' => 'assigned 123' }
-      end
-      
-      it "should inspect like a hash" do
-        map = subject['str' => 'assigned str', 'foo' => 'assigned foo', '123' => 'assigned 123']
-        map.inspect.should == '{"str"=>"assigned str", "foo"=>"assigned foo", "123"=>"assigned 123"}'
-      end
-      
-      it "should duplicate to another Map with the same mapping" do
-        map = subject['str' => 'assigned str', 'foo' => 'assigned foo', '123' => 'assigned 123']
-        
-        copy = map.dup
-        copy.should be_an_instance_of(subject)
-        copy.should == { 'str' => 'assigned str', 'foo' => 'assigned foo', '123' => 'assigned 123' }
-      end
-    end
-    
-    context "keyed by Integer" do
-      subject { map_class(Integer, String) }
-      
-      it "should load from couch representation" do
-        couch    = { '12' => '12345', '99' => 'abcde' }
-        expected = { 12 => '12345', 99 => 'abcde'}
-        
-        result = subject.from_couch(couch)
-        result.should be_an_instance_of(subject)
-        result.should == expected
-      end
-      
-      it "should convert keys to integers when assigned using []=" do
-        map = subject.new
-        map['99'] = 'assigned str'
-        map[123] = 'assigned 123'
-        map[0.5] = 'assigned 0.5'
-        
-        map.should == { 0 => 'assigned 0.5', 99 => 'assigned str', 123 => 'assigned 123' }
-      end
-      
-      it "should convert keys to integers when assigned using store" do
-        map = subject.new
-        map.store('99', 'assigned str')
-        map.store(123, 'assigned 123')
-        map.store(0.5, 'assigned 0.5')
-        
-        map.should == { 0 => 'assigned 0.5', 99 => 'assigned str', 123 => 'assigned 123' }
-      end
-      
-      it "should convert keys to integers when fetched using []" do
-        map = subject[0 => 'assigned 0.5', 99 => 'assigned str', 123 => 'assigned 123']
-        
-        map[0.5].should == 'assigned 0.5'
-        map['99'].should == 'assigned str'
-        map[123].should == 'assigned 123'
-      end
-      
-      it "should convert keys to integers when fetched using fetch" do
-        map = subject[0 => 'assigned 0.5', 99 => 'assigned str', 123 => 'assigned 123']
-        
-        map.fetch(0.5).should == 'assigned 0.5'
-        map.fetch('99').should == 'assigned str'
-        map.fetch(123).should == 'assigned 123'
-      end
-      
-      it "should convert keys to integers when queried" do
-        map = subject[0 => 'assigned 0.5', 99 => 'assigned str', 123 => 'assigned 123']
-        
-        [ :has_key?, :include?, :key?, :member? ].each do |query_method|
-          map.send(query_method, 0.5).should be_true
-          map.send(query_method, '99').should be_true
-          map.send(query_method, 123).should be_true
-          
-          map.send(query_method, '1.2').should be_false
-          map.send(query_method, '50').should be_false
-          map.send(query_method, 999).should be_false
+        it "should convert keys when updating" do
+          map = subject.new
+          map.update(before_type_cast)
+          map.should == after_type_cast
         end
-      end
-      
-      it "should convert keys to integers when updating" do
-        map = subject[123 => 'assigned 123', 99 => 'assigned str']
-        map.update('99' => 'updated str', 0.5 => 'assigned 0.5')
         
-        map.should == { 0 => 'assigned 0.5', 99 => 'updated str', 123 => 'assigned 123' }
-      end
-      
-      it "should convert keys to integers when replacing" do
-        map = subject[123 => 'assigned 123', 99 => 'assigned str']
-        map.replace('99' => 'updated str', 0.5 => 'assigned 0.5')
+        it "should convert keys when replacing" do
+          map = subject.new
+          map.replace(before_type_cast)
+          map.should == after_type_cast
+        end
         
-        map.should == { 0 => 'assigned 0.5', 99 => 'updated str' }
-      end
-      
-      it "should inspect like a hash" do
-        map = subject[0 => 'assigned 0.5', 99 => 'assigned str', 123 => 'assigned 123']
-        map.inspect.should == '{0=>"assigned 0.5", 99=>"assigned str", 123=>"assigned 123"}'
-      end
-      
-      it "should duplicate to another Map with the same mapping" do
-        map = subject[0 => 'assigned 0.5', 99 => 'assigned str', 123 => 'assigned 123']
-        
-        copy = map.dup
-        copy.should be_an_instance_of(subject)
-        copy.should == { 0 => 'assigned 0.5', 99 => 'assigned str', 123 => 'assigned 123' }
+        it "should duplicate to another Map with the same mapping" do
+          map = subject[after_type_cast]
+          
+          copy = map.dup
+          copy.should be_an_instance_of(subject)
+          copy.should == after_type_cast
+        end
       end
     end
     
@@ -268,39 +191,72 @@ module Recliner
     end
     
     
-    context "mapping to String" do
-      subject { map_class(String, String) }
+    MapExamples = {
+      String => {
+        :before_type_cast => { 'string' => 'string value', 'integer' => 99, 'float' => 10.55 },
+        :after_type_cast => { 'string' => 'string value', 'integer' => '99', 'float' => '10.55' },
+        :couch => { 'string' => 'string value', 'integer' => '99', 'float' => '10.55' }
+      },
       
-      it "should convert values to strings when assigning using []=" do
-        map = subject.new
-        map['abc'] = 'string'
-        map['foo'] = 99
-        map['bar'] = 10.5
-        
-        map.should == { 'abc' => 'string', 'foo' => '99', 'bar' => '10.5' }
-      end
+      Integer => {
+        :before_type_cast => { 'string' => '99', 'float' => 45.5, 'string float' => '12.45', 'integer' => 123 },
+        :after_type_cast => { 'string' => 99, 'float' => 45, 'string float' => 12, 'integer' => 123 },
+        :couch => { 'string' => 99, 'float' => 45, 'string float' => 12, 'integer' => 123 },
+      },
       
-      it "should convert values to strings when assigning using store" do
-        map = subject.new
-        map.store('abc', 'string')
-        map.store('foo', 99)
-        map.store('bar', 10.5)
-        
-        map.should == { 'abc' => 'string', 'foo' => '99', 'bar' => '10.5' }
-      end
+      Float => {
+        :before_type_cast => { 'string' => '99.123', 'float' => 45.5, 'integer' => 123 },
+        :after_type_cast => { 'string' => 99.123, 'float' => 45.5, 'integer' => 123 },
+        :couch => { 'string' => 99.123, 'float' => 45.5, 'integer' => 123 },
+      }
+    }
+    
+    MapExamples.each do |type, conversions|
+      couch = conversions[:couch]
+      before_type_cast = conversions[:before_type_cast]
+      after_type_cast = conversions[:after_type_cast]
       
-      it "should convert values to strings when updating" do
-        map = subject['abc' => 'assigned abc', 'foo' => 'assigned foo']
-        map.update('foo' => 99, 'bar' => 10.5)
+      context "mapping to #{type}" do
+        subject { map_class(String, type) }
         
-        map.should == { 'abc' => 'assigned abc', 'foo' => '99', 'bar' => '10.5' }
-      end
-      
-      it "should convert values to strings when replacing" do
-        map = subject['abc' => 'assigned abc', 'foo' => 'assigned foo']
-        map.replace('foo' => 99, 'bar' => 10.5)
+        it "should load from couch representation" do
+          result = subject.from_couch(couch)
+          result.should be_an_instance_of(subject)
+          result.should == after_type_cast
+        end
         
-        map.should == { 'foo' => '99', 'bar' => '10.5' }
+        it "should serialize to couch representation" do
+          map = subject[after_type_cast]
+          map.to_couch.should == couch
+        end
+        
+        it "should convert values when assigning using []=" do
+          map = subject.new
+          before_type_cast.each do |key, value|
+            map[key] = value
+          end
+          map.should == after_type_cast
+        end
+        
+        it "should convert values when assigning using store" do
+          map = subject.new
+          before_type_cast.each do |key, value|
+            map.store(key, value)
+          end
+          map.should == after_type_cast
+        end
+        
+        it "should convert values when updating" do
+          map = subject.new
+          map.update(before_type_cast)
+          map.should == after_type_cast
+        end
+        
+        it "should convert values when replacing" do
+          map = subject.new
+          map.replace(before_type_cast)
+          map.should == after_type_cast
+        end
       end
     end
     
