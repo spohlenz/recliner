@@ -878,5 +878,46 @@ module Recliner
         TestDocument1.new.database.should_not == @database
       end
     end
+    
+    describe "#self_and_descendants_from_recliner" do
+      context "Recliner::Document" do
+        it "should include itself only" do
+          Recliner::Document.self_and_descendants_from_recliner.should == [Recliner::Document]
+        end
+      end
+      
+      context "direct subclass of Recliner::Document" do
+        define_recliner_document :User
+        
+        it "should include itself only" do
+          User.self_and_descendants_from_recliner.should == [User]
+        end
+      end
+      
+      context "subsubclass of Recliner::Document" do
+        define_recliner_document :User
+        define_recliner_document :Admin, 'User'
+        
+        it "should include itself and its parent class" do
+          Admin.self_and_descendants_from_recliner.should == [Admin, User]
+        end
+      end
+    end
+    
+    describe "#human_name" do
+      define_recliner_document :User
+      
+      it "should return the humanized name of the class" do
+        User.human_name.should == 'User'
+        TestDocument.human_name.should == 'Test document'
+      end
+    end
+    
+    describe "#human_attribute_name" do
+      it "should return the humanized name of the attribute" do
+        TestDocument.human_attribute_name('title').should == 'Title'
+        TestDocument.human_attribute_name('post_title').should == 'Post title'
+      end
+    end
   end
 end

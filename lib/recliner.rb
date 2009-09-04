@@ -86,4 +86,4 @@ module Recliner
   end
 end
 
-# I18n.load_path << File.dirname(__FILE__) + '/recliner/locale/en.yml'
+I18n.load_path << File.dirname(__FILE__) + '/recliner/locale/en.yml'

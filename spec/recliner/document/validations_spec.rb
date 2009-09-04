@@ -74,5 +74,12 @@ module Recliner
         it { should_not be_valid }
       end
     end
+    
+    describe "#errors" do
+      subject { TestDocument.new.errors }
+      
+      it { should be_a_kind_of(ActiveModel::Errors) }
+      it { should be_an_instance_of(Recliner::Errors) }
+    end
   end
 end
