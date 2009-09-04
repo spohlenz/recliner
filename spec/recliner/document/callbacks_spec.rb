@@ -15,6 +15,8 @@ module Recliner
           'id' => '123',
           'rev' => '1-12345'
         })
+        
+        Recliner.stub!(:delete).and_return({ 'result' => 'ok' })
       end
       
       define_recliner_document :CallbackTestDocument do

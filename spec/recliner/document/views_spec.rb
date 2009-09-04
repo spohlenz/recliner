@@ -148,6 +148,14 @@ module Recliner
     describe "#view_document" do
       context "parent class uses an alternate database" do
         before(:each) do
+          Recliner.stub!(:get).and_return({
+            '_id' => '_design/TestDocument',
+            '_rev' => '1-12345',
+            'class' => 'Recliner::ViewDocument',
+            'language' => 'javascript',
+            'views' => {}
+          })
+          
           TestDocument.use_database! 'http://localhost:5984/recliner-alternate'
         end
         
