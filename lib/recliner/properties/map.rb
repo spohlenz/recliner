@@ -136,6 +136,8 @@ module Recliner
     end
     
     def convert(value, type)
+      return nil if value.nil?
+      
       if type == String
         value.to_s
       elsif type == Integer

@@ -193,21 +193,21 @@ module Recliner
     
     MapExamples = {
       String => {
-        :before_type_cast => { 'string' => 'string value', 'integer' => 99, 'float' => 10.55 },
-        :after_type_cast => { 'string' => 'string value', 'integer' => '99', 'float' => '10.55' },
-        :couch => { 'string' => 'string value', 'integer' => '99', 'float' => '10.55' }
+        :before_type_cast => { 'string' => 'string value', 'integer' => 99, 'float' => 10.55, 'nil' => nil },
+        :after_type_cast => { 'string' => 'string value', 'integer' => '99', 'float' => '10.55', 'nil' => nil },
+        :couch => { 'string' => 'string value', 'integer' => '99', 'float' => '10.55', 'nil' => nil }
       },
       
       Integer => {
-        :before_type_cast => { 'string' => '99', 'float' => 45.5, 'string float' => '12.45', 'integer' => 123 },
-        :after_type_cast => { 'string' => 99, 'float' => 45, 'string float' => 12, 'integer' => 123 },
-        :couch => { 'string' => 99, 'float' => 45, 'string float' => 12, 'integer' => 123 },
+        :before_type_cast => { 'string' => '99', 'float' => 45.5, 'string float' => '12.45', 'integer' => 123, 'nil' => nil },
+        :after_type_cast => { 'string' => 99, 'float' => 45, 'string float' => 12, 'integer' => 123, 'nil' => nil },
+        :couch => { 'string' => 99, 'float' => 45, 'string float' => 12, 'integer' => 123, 'nil' => nil },
       },
       
       Float => {
-        :before_type_cast => { 'string' => '99.123', 'float' => 45.5, 'integer' => 123 },
-        :after_type_cast => { 'string' => 99.123, 'float' => 45.5, 'integer' => 123 },
-        :couch => { 'string' => 99.123, 'float' => 45.5, 'integer' => 123 },
+        :before_type_cast => { 'string' => '99.123', 'float' => 45.5, 'integer' => 123, 'nil' => nil },
+        :after_type_cast => { 'string' => 99.123, 'float' => 45.5, 'integer' => 123, 'nil' => nil },
+        :couch => { 'string' => 99.123, 'float' => 45.5, 'integer' => 123, 'nil' => nil },
       }
     }
     

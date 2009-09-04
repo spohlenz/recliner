@@ -109,6 +109,8 @@ module Recliner
     end
     
     def self.convert_value(value)
+      return nil if value.nil?
+      
       if type == String
         value.to_s
       elsif type == Integer

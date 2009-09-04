@@ -36,9 +36,9 @@ module Recliner
     end
     
     Examples = {
-      String => { :abc => 'abc', 'Some string' => 'Some string', 123 => '123', 54.94 => '54.94' },
-      Integer => { '35' => 35, '46.4' => 46, 123.5 => 123, 99 => 99 },
-      Float => { '35.5' => 35.5, '0' => 0.0, 12 => 12.0, 45.55 => 45.55 }
+      String => { :abc => 'abc', 'Some string' => 'Some string', 123 => '123', 54.94 => '54.94', nil => nil },
+      Integer => { '35' => 35, '46.4' => 46, 123.5 => 123, 99 => 99, nil => nil },
+      Float => { '35.5' => 35.5, '0' => 0.0, 12 => 12.0, 45.55 => 45.55, nil => nil }
     }
     
     Examples.each do |type, conversions|
