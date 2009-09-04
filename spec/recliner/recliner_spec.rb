@@ -76,6 +76,21 @@ describe Recliner, ' RESTful API' do
     it "should convert the result to a hash" do
       do_request.should == { 'result' => 'ok' }
     end
+    
+    context "when CouchDB returns an error" do
+      before(:each) do
+        @response = mock('response', :code => '400', :body => '{"error":"query_parse_error","reason":"Bad URL query key:foo"}', :[] => 'application/json')
+        @exception = RestClient::RequestFailed.new(@response)
+        
+        [ :get, :post, :put, :delete ].each do |http_method|
+          RestClient.stub!(http_method).and_raise(@exception)
+        end
+      end
+      
+      it "should raise a CouchDB error" do
+        lambda { do_request }.should raise_error(Recliner::CouchDBError, 'CouchDB error: query_parse_error (Bad URL query key:foo)')
+      end
+    end
   end
   
   shared_examples_for "all requests with parameters" do
