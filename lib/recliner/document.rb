@@ -13,16 +13,44 @@ module Recliner
       callback(:after_initialize) if respond_to?(:after_initialize)
     end
 
+    # :call-seq:
+    #   save(perform_validation = true)
     #
+    # Saves the document instance.
+    #
+    # If the document is new a document gets created in the database, otherwise
+    # the existing document gets updated.
+    #
+    # If +perform_validation+ is true validations run. If any of them fail
+    # the action is cancelled and +save+ returns +false+. If the flag is
+    # false validations are bypassed altogether. See
+    # Recliner::Validations for more information. 
+    #
+    # There's a series of callbacks associated with +save+. If any of the
+    # <tt>before_*</tt> callbacks return +false+ the action is cancelled and
+    # +save+ returns +false+. See Recliner::Callbacks for further
+    # details.
     def save
       create_or_update
-    rescue StaleRevisionError
+    rescue DocumentNotSaved
       false
     end
     
+    # Saves the model.
     #
+    # If the model is new a document gets created in the database, otherwise
+    # the existing document gets updated.
+    #
+    # With <tt>save!</tt> validations always run. If any of them fail
+    # Recliner::DocumentInvalid gets raised. See Recliner::Validations
+    # for more information. 
+    #
+    # There's a series of callbacks associated with <tt>save!</tt>. If any of
+    # the <tt>before_*</tt> callbacks return +false+ the action is cancelled
+    # and <tt>save!</tt> raises Recliner::DocumentNotSaved. See
+    # Recliner::Callbacks for further details.
     def save!
-      create_or_update
+      create_or_update || raise(DocumentNotSaved)
     end
     
     #

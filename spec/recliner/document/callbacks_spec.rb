@@ -284,6 +284,28 @@ module Recliner
           [ :after_load,                  :block  ]
         ]
       end
+      
+      [ :before_save, :before_create ].each do |callback|
+        context "#{callback} callback return false" do
+          define_recliner_document :CallbackTestDocument do
+            send(callback) { false }
+          end
+        
+          subject { CallbackTestDocument.new }
+        
+          describe "#save" do
+            it "should return false" do
+              subject.save.should be_false
+            end
+          end
+        
+          describe "#save!" do
+            it "should raise a Recliner::DocumentNotSaved exception" do
+              lambda { subject.save! }.should raise_error(Recliner::DocumentNotSaved)
+            end
+          end
+        end
+      end
     end
   end
 end

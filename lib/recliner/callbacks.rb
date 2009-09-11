@@ -115,8 +115,8 @@ module Recliner
 
     # Is called _after_ <tt>Document.destroy</tt> (and all the attributes have been frozen).
     #
-    #  class Contact < ActiveRecord::Base
-    #    after_destroy { |record| logger.info( "Contact #{record.id} was destroyed." ) }
+    #  class Contact < Recliner::Document
+    #    after_destroy { |doc| logger.info( "Contact #{doc.id} was destroyed." ) }
     #  end
     def after_destroy()  end
     def destroy_with_callbacks #:nodoc:
@@ -128,7 +128,13 @@ module Recliner
   
   private
     def callback(method)
-      run_callbacks(method)
+      result = run_callbacks(method) { |result, object| false == result }
+      
+      if result != false && respond_to_without_attributes?(method)
+        result = send(method)
+      end
+      
+      return result
     end
   end
 end
