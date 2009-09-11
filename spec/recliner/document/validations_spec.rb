@@ -81,5 +81,27 @@ module Recliner
       it { should be_a_kind_of(ActiveModel::Errors) }
       it { should be_an_instance_of(Recliner::Errors) }
     end
+    
+    describe "skipping validation when saving" do
+      before(:each) do
+        subject.stub!(:save_without_validation).and_return(true)
+      end
+      
+      subject { TestDocument.new }
+      
+      it "should not validate the document" do
+        subject.should_not_receive(:valid?)
+        subject.save(false)
+      end
+      
+      it "should save the document" do
+        subject.should_receive(:save_without_validation).and_return(true)
+        subject.save(false)
+      end
+      
+      it "should return true" do
+        subject.save(false).should be_true
+      end
+    end
   end
 end

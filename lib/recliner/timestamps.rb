@@ -14,11 +14,11 @@ module Recliner
       end
     end
     
-    def save_with_timestamps
+    def save_with_timestamps(*args)
       write_attribute(:updated_at, Time.now) if properties.include?(:updated_at)
       write_attribute(:updated_on, Time.now) if properties.include?(:updated_on)
       
-      save_without_timestamps
+      save_without_timestamps(*args)
     end
     
     def create_with_timestamps

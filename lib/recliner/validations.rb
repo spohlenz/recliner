@@ -1,4 +1,11 @@
 module Recliner
+  # Raised by <tt>save!</tt> and <tt>create!</tt> when the document is invalid.  Use the
+  # +document+ method to retrieve the document which did not validate.
+  #   begin
+  #     complex_operation_that_calls_save!_internally
+  #   rescue Recliner::DocumentInvalid => invalid
+  #     puts invalid.document.errors
+  #   end
   class DocumentInvalid < StandardError
     attr_reader :document
     
@@ -86,6 +93,7 @@ module Recliner
   module Validations
     extend ActiveSupport::Concern
     
+    include ActiveSupport::Callbacks
     include ActiveModel::Validations
     
     included do
@@ -108,40 +116,46 @@ module Recliner
       end
     end
     
-    def save_with_validation
-      if valid?
-        save_without_validation
-      else
-        false
+    module InstanceMethods
+      # The validation process on save can be skipped by passing false. The regular Document#save method is
+      # replaced with this when the validations module is mixed in, which it is by default.
+      def save_with_validation(perform_validation = true)
+        if (perform_validation && valid?) || !perform_validation
+          save_without_validation
+        else
+          false
+        end
       end
-    end
-    
-    def save_with_validation!
-      if valid?
-        save_without_validation!
-      else
-        raise DocumentInvalid.new(self)
-      end
-    end
-    
-    # Runs all the specified validations and returns true if no errors were added otherwise false.
-    def valid?
-      errors.clear
-    
-      run_callbacks(:validate)
-    
-      if new_record?
-        run_callbacks(:validate_on_create)
-      else
-        run_callbacks(:validate_on_update)
+      
+      # Attempts to save the document just like Document#save but will raise a DocumentInvalid exception
+      # instead of returning false if the document is not valid.
+      def save_with_validation!
+        if valid?
+          save_without_validation!
+        else
+          raise DocumentInvalid.new(self)
+        end
       end
     
-      errors.empty?
-    end
+      # Runs all the specified validations and returns true if no errors were added otherwise false.
+      def valid?
+        errors.clear
     
-    # Returns the Errors object that holds all information about attribute error messages.
-    def errors
-      @errors ||= Errors.new(self)
+        run_callbacks(:validate)
+    
+        if new_record?
+          run_callbacks(:validate_on_create)
+        else
+          run_callbacks(:validate_on_update)
+        end
+    
+        errors.empty?
+      end
+    
+      # Returns the Errors object that holds all information about attribute error messages.
+      def errors
+        @errors ||= Errors.new(self)
+      end
     end
   end
 end

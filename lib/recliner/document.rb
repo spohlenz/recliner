@@ -20,10 +20,12 @@ module Recliner
       false
     end
     
+    #
     def save!
       create_or_update
     end
     
+    #
     def update_attributes(attrs)
       self.attributes = attrs and save
     end
@@ -55,11 +57,12 @@ module Recliner
       attributes.freeze
     end
     
-    # Returns true if this document is read only.
+    # Returns true if this document has been marked as read only; otherwise, returns false.
     def read_only?
       attributes.frozen?
     end
   
+    # Compares documents for equality.
     # Two documents are considered equal if they share the same document id and class.
     def ==(other)
       other.class == self.class && other.id == self.id
@@ -216,7 +219,7 @@ module Recliner
 
       # Transform the modelname into a more humane format, using I18n.
       # By default, it will underscore then humanize the class name (BlogPost.human_name #=> "Blog post").
-      # Default scope of the translation is activerecord.models
+      # Default scope of the translation is recliner.models
       # Specify +options+ with additional translating options.
       def human_name(options = {})
         defaults = self_and_descendants_from_recliner.map do |klass|
