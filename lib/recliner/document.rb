@@ -53,17 +53,19 @@ module Recliner
       create_or_update || raise(DocumentNotSaved)
     end
     
-    #
+    # Updates all the attributes from the passed-in Hash and saves the document. If the object is invalid, the saving will
+    # fail and false will be returned.
     def update_attributes(attrs)
       self.attributes = attrs and save
     end
 
+    # Deletes the document in the database and marks the instance as
+    # read-only to reflect that no changes should be made (since they
+    # can't be persisted). Returns the deleted instance.
     #
-    def destroy
-      delete
-    end
-
-    #
+    # To enforce the object's +before_destroy+ and +after_destroy+
+    # callbacks, Observer methods, or any <tt>:dependent</tt> association
+    # options, use <tt>#destroy</tt>.
     def delete
       begin
         database.delete("#{id}?rev=#{rev}") unless new_record?
@@ -73,6 +75,13 @@ module Recliner
       
       read_only!
       self
+    end
+    
+    # Deletes the document in the database and marks the instance as
+    # read-only to reflect that no changes should be made (since they
+    # can't be persisted).
+    def destroy
+      delete
     end
     
     # Returns true if this object hasn't been saved yet -- that is, a record for the object doesn't exist yet; otherwise, returns false.
@@ -187,6 +196,7 @@ module Recliner
         Thread.current["#{name}_database"] || default_database
       end
       
+      #
       def default_database
         @default_database ||= Database.new(read_inheritable_attribute(:database_uri))
       end
@@ -199,7 +209,8 @@ module Recliner
       ensure
         Thread.current["#{name}_database"] = nil
       end
-
+      
+      #
       def instantiate_from_database(attrs)
         unless attrs['class'] && (self == Document || attrs['class'] == name)
           raise DocumentNotFound
@@ -218,7 +229,7 @@ module Recliner
         end
       end
 
-      def self_and_descendants_from_recliner#nodoc:
+      def self_and_descendants_from_recliner#:nodoc:
         klass = self
         classes = [klass]
         while klass.superclass != Document
