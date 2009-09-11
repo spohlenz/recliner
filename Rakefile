@@ -1,5 +1,6 @@
 require 'spec/rake/spectask'
 require 'cucumber/rake/task'
+require 'rake/rdoctask'
 
 task :default => :spec
 
@@ -26,6 +27,13 @@ namespace :features do
     t.fork = true
     t.cucumber_opts = ['--format', (ENV['CUCUMBER_FORMAT'] || 'pretty'), '-r features', '--tags ~@pending']
   end
+end
+
+desc "Generate documentation"
+Rake::RDocTask.new(:doc) do |rdoc|
+  rdoc.rdoc_dir = 'doc'
+  rdoc.options << '--line-numbers' << '--inline-source'
+  rdoc.rdoc_files.include('lib')
 end
 
 desc "Report code statistics (KLOCs, etc)"
