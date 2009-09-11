@@ -7,7 +7,7 @@ module Recliner
         alias_method_chain :initialize, :defaults
       end
       
-      def initialize_with_defaults(attributes={}, &block)
+      def initialize_with_defaults(attributes={}, &block)#:nodoc:
         default_attributes.each do |property, default|
           write_attribute(property, default)
         end

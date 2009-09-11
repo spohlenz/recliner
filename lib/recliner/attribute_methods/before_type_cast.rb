@@ -15,7 +15,7 @@ module Recliner
         end
       end
       
-      def write_attribute(name, value)
+      def write_attribute(name, value)#:nodoc:
         if prop = property(name)
           attributes_before_type_cast[prop.as] = value
         else
@@ -25,6 +25,7 @@ module Recliner
         super
       end
       
+      # Returns a hash of attributes before typecasting.
       def attributes_before_type_cast
         @attributes_before_type_cast ||= {}.with_indifferent_access
       end

@@ -7,7 +7,8 @@ module Recliner
         attribute_method_suffix "="
       end
       
-      #
+      # Updates the attribute identified by <tt>name</tt> with the specified +value+.
+      # Values are typecast to the appropriate type determined by the property.
       def write_attribute(name, value)
         if prop = property(name)
           attributes[prop.as] = prop.type_cast(value)
@@ -18,7 +19,8 @@ module Recliner
         value
       end
       
-      #
+      # Updates the attribute identified by <tt>name</tt> with the specified +value+.
+      # (Alias for the protected write_attribute method).
       def []=(name, value)
         write_attribute(name, value)
       end

@@ -7,7 +7,8 @@ module Recliner
         attribute_method_suffix ""
       end
       
-      # 
+      # Returns the value of the attribute identified by +name+ after it has been typecast (for example,
+      # "2004-12-12" in a date property is cast to a date object, like Date.new(2004, 12, 12)).
       def read_attribute(name)
         if prop = property(name)
           attributes[prop.as]
@@ -16,6 +17,9 @@ module Recliner
         end
       end
       
+      # Returns the value of the attribute identified by <tt>name</tt> after it has been typecast (for example,
+      # "2004-12-12" in a date property is cast to a date object, like Date.new(2004, 12, 12)).
+      # (Alias for read_attribute).
       def [](name)
         read_attribute(name)
       end
