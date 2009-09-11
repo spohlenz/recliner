@@ -36,12 +36,12 @@ module Recliner
       create!
     end
 
-#     def clear!
-#       docs = get("_all_docs")['rows']
-#       post("_bulk_docs", {
-#         :docs => docs.map { |doc| { '_id' => doc['id'], '_rev' => doc['value']['rev'], '_deleted' => true } }
-#       })
-#     end
+    def clear!
+      docs = get("_all_docs")['rows']
+      post("_bulk_docs", {
+        :docs => docs.map { |doc| { '_id' => doc['id'], '_rev' => doc['value']['rev'], '_deleted' => true } }
+      }) unless docs.empty?
+    end
 
     def ==(other)
       other.is_a?(Recliner::Database) && uri == other.uri

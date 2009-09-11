@@ -141,17 +141,54 @@ module Recliner
     end
   
     class << self
+      # Loads one or more documents from the database given their document IDs.
+      # If a document does not exist, nil will be returned.
       #
+      # ==== Examples
+      #
+      #   >> TestDocument.load('some-document-id')
+      #   => #<TestDocument>
+      #
+      #   >> TestDocument.load('missing-document')
+      #   => nil
+      #
+      #   >> TestDocument.load('document-1', 'document-2')
+      #   => [#<TestDocument>, #<TestDocument>]
       def load(*ids)
         load_ids(ids, false)
       end
       
+      # Loads one or more documents from the database given their document IDs.
+      # If a document does not exist, a Recliner::DocumentNotFound exception will be raised.
       #
+      # ==== Examples
+      #
+      #   >> TestDocument.load!('some-document-id')
+      #   => #<TestDocument>
+      #
+      #   >> TestDocument.load!('missing-document')
+      #   Recliner::DocumentNotFound
+      #
+      #   >> TestDocument.load!('document-1', 'document-2')
+      #   => [#<TestDocument>, #<TestDocument>]
       def load!(*ids)
         load_ids(ids, true)
       end
 
+      # Creates an object and saves it to the database, if validations pass.
+      # The resulting object is returned whether the object was saved successfully to the database or not.
       #
+      # The +attributes+ parameter can be either be a Hash or an Array of Hashes.  These Hashes describe the
+      # attributes on the objects that are to be created.
+      #
+      # ==== Examples
+      #   # Create a single new object
+      #   User.create(:first_name => 'Jamie')
+      #
+      #   # Create a single object and pass it into a block to set other attributes.
+      #   User.create(:first_name => 'Jamie') do |u|
+      #     u.is_admin = false
+      #   end
       def create(attributes={})
         returning new(attributes) do |doc|
           yield doc if block_given?
@@ -186,18 +223,18 @@ module Recliner
   #       end
   #     end
 
-      #
+      # Set a new database URI to use for this class and subclasses.
       def use_database!(uri)
         @default_database = nil
         write_inheritable_attribute(:database_uri, uri)
       end
   
-      # Access the Recliner::Database object in use by this class
+      # The Recliner::Database object to use for this class.
       def database
         Thread.current["#{name}_database"] || default_database
       end
       
-      #
+      # The default database to use for this class, based on the URI given to use_database!.
       def default_database
         @default_database ||= Database.new(read_inheritable_attribute(:database_uri))
       end

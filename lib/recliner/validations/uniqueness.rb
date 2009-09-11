@@ -1,6 +1,34 @@
 module Recliner
   module Validations
     module ClassMethods
+      # Validates whether the value of the specified attributes are unique across the system. Useful for making sure that only one user
+      # can be named "davidhh".
+      #
+      #   class Person < Recliner::Document
+      #     validates_uniqueness_of :user_name, :scope => :account_id
+      #   end
+      #
+      # It can also validate whether the value of the specified attributes are unique based on multiple scope parameters.  For example,
+      # making sure that a teacher can only be on the schedule once per semester for a particular class.
+      #
+      #   class TeacherSchedule < Recliner::Document
+      #     validates_uniqueness_of :teacher_id, :scope => [:semester_id, :class_id]
+      #   end
+      #
+      # When the document is created, a check is performed to make sure that no document exists in the database with the given value for the specified
+      # attribute (that maps to a property). When the document is updated, the same check is made but disregarding the document itself.
+      #
+      # Configuration options:
+      # * <tt>:message</tt> - Specifies a custom error message (default is: "has already been taken").
+      # * <tt>:scope</tt> - One or more properties by which to limit the scope of the uniqueness constraint.
+      # * <tt>:allow_nil</tt> - If set to true, skips this validation if the attribute is +nil+ (default is +false+).
+      # * <tt>:allow_blank</tt> - If set to true, skips this validation if the attribute is blank (default is +false+).
+      # * <tt>:if</tt> - Specifies a method, proc or string to call to determine if the validation should
+      #   occur (e.g. <tt>:if => :allow_validation</tt>, or <tt>:if => Proc.new { |user| user.signup_step > 2 }</tt>).  The
+      #   method, proc or string should return or evaluate to a true or false value.
+      # * <tt>:unless</tt> - Specifies a method, proc or string to call to determine if the validation should
+      #   not occur (e.g. <tt>:unless => :skip_validation</tt>, or <tt>:unless => Proc.new { |user| user.signup_step <= 2 }</tt>).  The
+      #   method, proc or string should return or evaluate to a true or false value.
       def validates_uniqueness_of(*attr_names)
         configuration = attr_names.extract_options!
 

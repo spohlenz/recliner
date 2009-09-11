@@ -1,4 +1,7 @@
 module Recliner
+  # Encapsulates a critical error from CouchDB.
+  # Raised by the Recliner base methods when an error response is returned. Use
+  # the +error+ and +reason+ methods to retrieve the specific error.
   class CouchDBError < StandardError
     def initialize(response=nil)
       @error = JSON.parse(response) if response

@@ -75,6 +75,38 @@ module Recliner
       end
     end
     
+    describe "#clear!" do
+      context "database is empty" do
+        before(:each) do
+          @db.stub!(:get).and_return({ 'rows' => [] })
+        end
+        
+        it "should not delete any documents" do
+          @db.should_not_receive(:post)
+          @db.clear!
+        end
+      end
+      
+      context "database contains documents" do
+        before(:each) do
+          @db.stub!(:get).and_return({ 'rows' => [
+            { 'id' => 'doc-1', 'value' => { 'rev' => '1-12345' } },
+            { 'id' => 'doc-2', 'value' => { 'rev' => '1-23456' } },
+            { 'id' => 'doc-3', 'value' => { 'rev' => '1-34567' } },
+          ] })
+        end
+        
+        it "should delete all documents using bulk document API" do
+          @db.should_receive(:post).with('_bulk_docs', :docs => [
+            { '_id' => 'doc-1', '_rev' => '1-12345', '_deleted' => true },
+            { '_id' => 'doc-2', '_rev' => '1-23456', '_deleted' => true },
+            { '_id' => 'doc-3', '_rev' => '1-34567', '_deleted' => true }
+          ])
+          @db.clear!
+        end
+      end
+    end
+    
     describe "#recreate!" do
       context "database doesn't exist" do
         before(:each) do
