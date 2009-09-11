@@ -61,6 +61,12 @@ describe "Core extensions" do
     end
     
     context "Boolean" do
+      context "given nil" do
+        it "should return false" do
+          Boolean.from_couch(nil).should == false
+        end
+      end
+      
       context "given a boolean" do
         it "should return itself" do
           Boolean.from_couch(true).should == true
@@ -69,9 +75,19 @@ describe "Core extensions" do
       end
       
       context "given a string" do
-        it "should convert to booleans" do
+        it "should convert to a boolean" do
           Boolean.from_couch('true').should == true
+          Boolean.from_couch('1').should == true
+          
           Boolean.from_couch('false').should == false
+          Boolean.from_couch('0').should == false
+        end
+      end
+      
+      context "given an integer" do
+        it "should convert to a boolean" do
+          Boolean.from_couch(1).should == true
+          Boolean.from_couch(0).should == false
         end
       end
     end
