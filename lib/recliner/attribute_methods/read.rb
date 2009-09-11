@@ -7,6 +7,7 @@ module Recliner
         attribute_method_suffix ""
       end
       
+      # 
       def read_attribute(name)
         if prop = property(name)
           attributes[prop.as]
@@ -15,9 +16,9 @@ module Recliner
         end
       end
       
-      # def [](name)
-      #   read_attribute(name)
-      # end
+      def [](name)
+        read_attribute(name)
+      end
       
     private
       def attribute(attribute_name)

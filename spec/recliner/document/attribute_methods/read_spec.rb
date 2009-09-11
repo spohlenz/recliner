@@ -44,5 +44,12 @@ module Recliner
         end
       end
     end
+    
+    describe "#[]" do
+      it "should read the given attribute" do
+        subject.should_receive(:read_attribute).with(:foo).and_return('value of foo')
+        subject[:foo].should == 'value of foo'
+      end
+    end
   end
 end

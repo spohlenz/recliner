@@ -76,5 +76,12 @@ module Recliner
         end
       end
     end
+    
+    describe "#[]=" do
+      it "should write the given attribute" do
+        subject.should_receive(:write_attribute).with(:foo, 'value of foo')
+        subject[:foo] = 'value of foo'
+      end
+    end
   end
 end

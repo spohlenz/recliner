@@ -21,13 +21,13 @@ module Recliner
     def ==(other)
       to_s == other.to_s
     end
+  end
+  
+  class ViewFunction::Map < ViewFunction
+    self.definition = 'function(doc)'
+  end
     
-    class Map < self
-      self.definition = 'function(doc)'
-    end
-    
-    class Reduce < self
-      self.definition = 'function(keys, values, rereduce)'
-    end
+  class ViewFunction::Reduce < ViewFunction
+    self.definition = 'function(keys, values, rereduce)'
   end
 end

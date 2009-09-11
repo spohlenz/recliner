@@ -62,7 +62,7 @@ module Recliner
         self.class.define_attribute_methods
         method_name = method_id.to_s
         
-        #guard_private_attribute_method!(method_name, args)
+        guard_private_attribute_method!(method_name, args)
         
         if self.class.generated_attribute_methods.instance_methods.include?(method_name)
           return self.send(method_id, *args, &block)
