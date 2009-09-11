@@ -42,20 +42,67 @@ module Recliner
   autoload :PrettyInspect,       'recliner/pretty_inspect'
   
   class << self
+    # Performs a HTTP GET request on a JSON resource, deserializing the response.
+    #
+    # ==== Parameters
+    #
+    # * +uri+    - the URI of the resource
+    # * +params+ - a hash of parameters to serialize with the URI
+    #
+    # ==== Examples
+    #
+    #   >> Recliner.get('http://localhost:5984/my-database/some-document', :rev => '12-3220752267')
+    #   => { '_id' => 'some-document', '_rev' => '12-3220752267', 'title' => 'Document title' }
     def get(uri, params={})
       request(:get, uri, params)
     end
     
+    # Performs a HTTP POST request on a JSON resource, deserializing the response.
+    #
+    # ==== Parameters
+    #
+    # * +uri+     - the URI of the resource
+    # * +payload+ - a hash of the data to POST
+    # * +params+  - a hash of parameters to serialize with the URI
+    #
+    # ==== Examples
+    #
+    #   >> Recliner.post('http://localhost:5984/my-database', { :title => 'Document title' })
+    #   => { 'id' => '12eec4c198ef0e843cd16761fc565208', 'rev' => '1-1503678650', 'ok' => true }
     def post(uri, payload={}, params={})
       request(:post, uri, params, payload)
     end
     
+    # Performs a HTTP PUT request on a JSON resource, deserializing the response.
+    #
+    # ==== Parameters
+    #
+    # * +uri+    - the URI of the resource
+    # * +payload+ - a hash of the data to PUT
+    # * +params+  - a hash of parameters to serialize with the URI
+    #
+    # ==== Examples
+    #
+    #   >> Recliner.put('http://localhost:5984/my-database/some-document', { :title => 'Document title' })
+    #   => { 'id' => 'some-document', 'rev' => '2-2152886926', 'ok' => true }
     def put(uri, payload={}, params={})
       request(:put, uri, params, payload)
     end
     
-    def delete(uri)
-      request(:delete, uri)
+    # Performs a HTTP DELETE request on a JSON resource, deserializing the response.
+    #
+    # ==== Parameters
+    #
+    # * +uri+    - the URI of the resource
+    # * +params+ - a hash of parameters to serialize with the URI, in particular the revision :rev
+    #
+    # ==== Examples
+    #
+    #   >> Recliner.delete('http://localhost:5984/my-database/some-document', :rev => '2-2152886926')
+    #   => { 'id' => 'some-document', 'rev' => '3-3894620555', 'ok' => true }
+    def delete(uri, params={})
+      uri << "?rev=#{params.delete(:rev)}" if params[:rev]
+      request(:delete, uri, params)
     end
   
   private

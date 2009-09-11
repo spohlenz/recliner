@@ -2,6 +2,11 @@ require 'active_model'
 
 module Recliner
   class Document
+    # The Recliner::Database object used by the current instance
+    attr_reader :database
+    
+    # New objects can be instantiated as either empty (pass no construction parameter) or pre-set with
+    # attributes but not yet saved (pass a hash with key names matching the associated properties).
     def initialize(attributes={})
       self.attributes = attributes
 
@@ -105,10 +110,6 @@ module Recliner
       other.class == self.class && other.id == self.id
     end
   
-    def database
-      @database
-    end
-  
   private
     def create_or_update
       result = new_record? ? create : update
@@ -129,7 +130,7 @@ module Recliner
       result = database.put(id, to_couch)
       
       if id_changed? && !new_record?
-        database.delete("#{id_was}?rev=#{rev}")
+        database.delete(id_was, :rev => rev)
       end
       
       self.rev = result['rev']

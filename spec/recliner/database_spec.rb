@@ -56,8 +56,8 @@ module Recliner
       end
       
       it "should DELETE a document" do
-        Recliner.should_receive(:delete).with('http://localhost:5984/my-database/document-id')
-        @db.delete('document-id')
+        Recliner.should_receive(:delete).with('http://localhost:5984/my-database/document-id', :rev => '1-12345')
+        @db.delete('document-id', :rev => '1-12345')
       end
     end
     

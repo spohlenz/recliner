@@ -1,3 +1,4 @@
+@completed
 Feature: Validation: validates_uniqueness_of
   The validates_uniqueness_of validation specifies that
   a given attribute must only exist once in the database.

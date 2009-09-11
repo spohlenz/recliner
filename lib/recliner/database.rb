@@ -19,8 +19,8 @@ module Recliner
       Recliner.put(uri_for(path), payload, params)
     end
 
-    def delete(path)
-      Recliner.delete("#{uri}/#{path}") if path
+    def delete(path, params={})
+      Recliner.delete("#{uri}/#{path}", params) if path
     end
 
     def delete!

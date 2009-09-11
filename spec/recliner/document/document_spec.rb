@@ -186,7 +186,7 @@ module Recliner
           end
           
           it "should delete the old document" do
-            @database.should_receive(:delete).with('document-id?rev=1-12345').and_return({ 'result' => 'ok' })
+            @database.should_receive(:delete).with('document-id', :rev => '1-12345').and_return({ 'result' => 'ok' })
             subject.save
           end
         end

@@ -27,15 +27,15 @@ module Recliner
     end
   
     def do_delete(rev="12-12345")
-      Recliner.delete("http://127.0.0.1:5984/recliner-spec/some-document?rev=#{rev}")
+      Recliner.delete('http://127.0.0.1:5984/recliner-spec/some-document', :rev => rev)
     end
     
     def do_request(options={})
       case request_type
       when :get
-        send("do_get", options[:params])
+        do_get(options[:params])
       when :delete
-        send("do_delete")
+        do_delete
       else
         send("do_#{request_type}", options[:payload], options[:params])
       end
