@@ -6,7 +6,7 @@ module Recliner
   #   rescue Recliner::DocumentInvalid => invalid
   #     puts invalid.document.errors
   #   end
-  class DocumentInvalid < StandardError
+  class DocumentInvalid < DocumentNotSaved
     attr_reader :document
     
     def initialize(document)

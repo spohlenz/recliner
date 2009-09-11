@@ -1,4 +1,6 @@
 module Recliner
+  # Recliner automatically timestamps create and update operations if the document has properties
+  # named created_at/created_on or updated_at/updated_on.
   module Timestamps
     extend ActiveSupport::Concern
     
@@ -8,6 +10,8 @@ module Recliner
     end
     
     module ClassMethods
+      # Defines timestamp properties created_at and updated_at.
+      # When the document is created or updated, these properties will be respectively updated.
       def timestamps!
         property :created_at, Time
         property :updated_at, Time

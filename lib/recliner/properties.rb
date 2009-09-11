@@ -16,7 +16,7 @@ module Recliner
     end
     
     module ClassMethods
-      #
+      # Defines a property for the document.
       def property(name, *args, &block)
         options = args.extract_options!
         type = args.first
@@ -24,20 +24,20 @@ module Recliner
         if type
           prop = Property.new(name.to_s, type, (options[:as] || name).to_s, options[:default])
           properties[name.to_sym] = prop
-      #   elsif block_given?
-      #     raise 'Not yet supported'
+        # elsif block_given?
+        #   raise 'Not yet supported'
         else
           raise ArgumentError.new('Either a type or block must be provided')
         end
       end
       
-      # Returns all defined properties except for id and rev
+      # Returns a hash of all defined properties except for the internal properties +id+ and +rev+.
       def model_properties
         properties.reject { |name, property| [:id, :rev].include?(name) }
       end
       
     protected
-      # Unique ID generation for new documents
+      # Generates a unique identifier for new documents
       def generate_guid
         UUID.generate
       end

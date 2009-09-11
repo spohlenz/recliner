@@ -1,19 +1,13 @@
-#
-# Example views
-#
-# view :by_title, :order => :title
-# view :published, :conditions => { :published => true }
-# view :custom_map, :map => "emit(null, doc)"          # function is optional
-# view :custom_reduce, :map => "function(doc) { emit(doc.tag, doc); }",
-#                      :reduce => "function(keys, values) { return sum(values); }"
-#
-#
-# Overrides default order for 'all' view
-#
-# default_order :title
-#
-
 module Recliner
+  #
+  # Example views
+  #
+  #   view :by_title, :order => :title
+  #   view :published, :conditions => { :published => true }
+  #   view :custom_map, :map => "emit(null, doc)"          # function is optional
+  #   view :custom_reduce, :map => "function(doc) { emit(doc.tag, doc); }",
+  #                      :reduce => "function(keys, values) { return sum(values); }"
+  #
   module Views
     extend ActiveSupport::Concern
     
@@ -25,12 +19,11 @@ module Recliner
     end
     
     module ClassMethods
+      # Returns hash of all the views that have been defined for this document type and parent document types.
       def views
         read_inheritable_attribute(:views) || write_inheritable_attribute(:views, {})
       end
       
-      #
-      #
       #
       def view(name, options={})
         views[name] = options
@@ -44,7 +37,9 @@ module Recliner
         END_RUBY
       end
 
+      # Sets or gets the default view order for this document type.
       #
+      # When setting, +attribute+ should be the property name.
       def default_order(attribute=nil)
         if attribute
           property = properties[attribute.to_sym]
@@ -56,7 +51,13 @@ module Recliner
         read_inheritable_attribute(:default_order)
       end
       
+      # Sets or gets the default view conditions for this document type.
       #
+      # When setting, +conditions+ may be either a String or a Hash.
+      # Using a Hash is recommended as it will allow subclasses to specify
+      # further conditions by using:
+      #
+      #   default_conditions.merge!({ :override => 'conditions' })
       def default_conditions(conditions=nil)
         if conditions
           write_inheritable_attribute(:default_conditions, conditions)
@@ -66,6 +67,8 @@ module Recliner
         read_inheritable_attribute(:default_conditions)
       end
       
+      # Returns the view design document for this document type.
+      # If it doesn't already exist, a new view document will be created.
       def view_document
         @_view_document ||=
           ViewDocument.with_database(database) do
@@ -73,11 +76,12 @@ module Recliner
           end
       end
       
+      # Returns true if the views for this document type have been initialized; otherwise returns false.
       def views_initialized?
         @_views_initialized
       end
 
-      #
+      # Initializes the views for this document type by synchronizing with the CouchDB view document.
       def initialize_views!
         return if views_initialized?
         

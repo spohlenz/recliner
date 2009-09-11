@@ -29,12 +29,28 @@ module Recliner
       end
     end
     
-    #
+    # Returns a hash of all the attributes with their names as keys and the values of the attributes as values.
     def attributes
       @attributes ||= {}
     end
     
+    # Allows you to set all the attributes at once by passing in a hash with keys
+    # matching the attribute names (which again matches the column names).
     #
+    # Sensitive attributes can be protected from this form of mass-assignment by
+    # using the +attr_protected+ macro. Or you can alternatively specify which
+    # attributes *can* be accessed with the +attr_accessible+ macro. Then all the
+    # attributes not included in that won't be allowed to be mass-assigned.
+    #
+    #   class User < Recliner::Document
+    #     property :is_admin, Boolean
+    #     attr_protected :is_admin
+    #   end
+    #   
+    #   user = User.new
+    #   user.attributes = { :username => 'Sam', :is_admin => true }
+    #   user.username   # => "Sam"
+    #   user.is_admin?  # => false
     def attributes=(attrs)
       attrs.each do |key, value|
         self.send("#{key}=", value)

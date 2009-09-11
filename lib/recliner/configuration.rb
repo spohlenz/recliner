@@ -1,4 +1,8 @@
 module Recliner
+  # Sets the default Recliner::Document database URI.
+  #
+  # Accepts a String (the full database URI) or
+  # a Hash containing the host, port and database as string keys.
   def self.configuration=(config)
     Document.use_database!(
       case config
