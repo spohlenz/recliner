@@ -49,7 +49,7 @@ module Recliner
     # * +uri+    - the URI of the resource
     # * +params+ - a hash of parameters to serialize with the URI
     #
-    # ==== Examples
+    # ==== Example
     #
     #   >> Recliner.get('http://localhost:5984/my-database/some-document', :rev => '12-3220752267')
     #   => { '_id' => 'some-document', '_rev' => '12-3220752267', 'title' => 'Document title' }
@@ -65,7 +65,7 @@ module Recliner
     # * +payload+ - a hash of the data to POST
     # * +params+  - a hash of parameters to serialize with the URI
     #
-    # ==== Examples
+    # ==== Example
     #
     #   >> Recliner.post('http://localhost:5984/my-database', { :title => 'Document title' })
     #   => { 'id' => '12eec4c198ef0e843cd16761fc565208', 'rev' => '1-1503678650', 'ok' => true }
@@ -81,7 +81,7 @@ module Recliner
     # * +payload+ - a hash of the data to PUT
     # * +params+  - a hash of parameters to serialize with the URI
     #
-    # ==== Examples
+    # ==== Example
     #
     #   >> Recliner.put('http://localhost:5984/my-database/some-document', { :title => 'Document title' })
     #   => { 'id' => 'some-document', 'rev' => '2-2152886926', 'ok' => true }
@@ -96,7 +96,7 @@ module Recliner
     # * +uri+    - the URI of the resource
     # * +params+ - a hash of parameters to serialize with the URI, in particular the revision :rev
     #
-    # ==== Examples
+    # ==== Example
     #
     #   >> Recliner.delete('http://localhost:5984/my-database/some-document', :rev => '2-2152886926')
     #   => { 'id' => 'some-document', 'rev' => '3-3894620555', 'ok' => true }

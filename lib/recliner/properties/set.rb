@@ -1,6 +1,6 @@
 module Recliner
   module Properties
-    module Set
+    module Set#:nodoc:
       extend ActiveSupport::Concern
       
       included do
@@ -18,7 +18,7 @@ module Recliner
         end
       end
       
-      module PropertyWithSetDefault
+      module PropertyWithSetDefault#:nodoc:
         extend ActiveSupport::Concern
         
         included do

@@ -110,7 +110,7 @@ module Recliner
         end
       end
       
-      def attributes=(attrs)
+      def attributes=(attrs)#:nodoc:
         super(remove_protected_attributes(attrs))
       end
     

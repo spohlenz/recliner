@@ -1,6 +1,6 @@
 module Recliner
   module Properties
-    module Map
+    module Map#:nodoc:
       extend ActiveSupport::Concern
       
       included do
@@ -22,7 +22,7 @@ module Recliner
         end
       end
       
-      module PropertyWithMapDefault
+      module PropertyWithMapDefault#:nodoc:
         extend ActiveSupport::Concern
         
         included do

@@ -104,8 +104,7 @@ module Recliner
       attributes.frozen?
     end
   
-    # Compares documents for equality.
-    # Two documents are considered equal if they share the same document id and class.
+    # Compares documents for equality. Two documents are considered equal if they share the same document id and class.
     def ==(other)
       other.class == self.class && other.id == self.id
     end
@@ -140,20 +139,15 @@ module Recliner
       true
     end
   
-    class << self
+    module ClassMethods
       # Loads one or more documents from the database given their document IDs.
       # If a document does not exist, nil will be returned.
       #
       # ==== Examples
       #
-      #   >> TestDocument.load('some-document-id')
-      #   => #<TestDocument>
-      #
-      #   >> TestDocument.load('missing-document')
-      #   => nil
-      #
-      #   >> TestDocument.load('document-1', 'document-2')
-      #   => [#<TestDocument>, #<TestDocument>]
+      #   >> TestDocument.load('some-document-id')         # returns the object with id 'some-document-id'
+      #   >> TestDocument.load('missing-document')         # returns nil for missing documents
+      #   >> TestDocument.load('document-1', 'document-2') # returns an array of objects with ids 'document-1', 'document-2'
       def load(*ids)
         load_ids(ids, false)
       end
@@ -163,14 +157,9 @@ module Recliner
       #
       # ==== Examples
       #
-      #   >> TestDocument.load!('some-document-id')
-      #   => #<TestDocument>
-      #
-      #   >> TestDocument.load!('missing-document')
-      #   Recliner::DocumentNotFound
-      #
-      #   >> TestDocument.load!('document-1', 'document-2')
-      #   => [#<TestDocument>, #<TestDocument>]
+      #   >> TestDocument.load!('some-document-id')         # returns the object with id 'some-document-id'
+      #   >> TestDocument.load!('missing-document')         # raises Recliner::DocumentNotFound exception for missing documents
+      #   >> TestDocument.load!('document-1', 'document-2') # returns an array of objects with ids 'document-1', 'document-2'
       def load!(*ids)
         load_ids(ids, true)
       end
@@ -196,7 +185,8 @@ module Recliner
         end
       end
 
-      #
+      # Creates an object just like create but calls save! instead of save
+      # so an exception is raised if the document is invalid.
       def create!(attributes={})
         returning new(attributes) do |doc|
           yield doc if block_given?
@@ -204,24 +194,24 @@ module Recliner
         end
       end
 
-  #     #
-  #     def destroy(id)
-  #       if id.is_a?(Array)
-  #         id.map { |i| destroy(i) }
-  #       else
-  #         load(id).destroy
-  #       end
-  #     end
-  #     
-  #     #
-  #     def delete(id)
-  #       if id.is_a?(Array)
-  #         id.map { |i| delete(i) }
-  #       else
-  #         # We have to instantiate the document to know its revision
-  #         load(id).delete
-  #       end
-  #     end
+      # #
+      # def destroy(id)
+      #   if id.is_a?(Array)
+      #     id.map { |i| destroy(i) }
+      #   else
+      #     load(id).destroy
+      #   end
+      # end
+      # 
+      # #
+      # def delete(id)
+      #   if id.is_a?(Array)
+      #     id.map { |i| delete(i) }
+      #   else
+      #     # We have to instantiate the document to know its revision
+      #     load(id).delete
+      #   end
+      # end
 
       # Set a new database URI to use for this class and subclasses.
       def use_database!(uri)
@@ -239,7 +229,7 @@ module Recliner
         @default_database ||= Database.new(read_inheritable_attribute(:database_uri))
       end
   
-      #
+      # Sets a database for a block, that all objects of this type created inside the block should use.
       def with_database(db)
         Thread.current["#{name}_database"] = db
         
@@ -338,6 +328,8 @@ module Recliner
   end
   
   Document.class_eval do
+    extend Document::ClassMethods
+    
     use_database! 'http://localhost:5984/recliner-default'
 
     include Properties
