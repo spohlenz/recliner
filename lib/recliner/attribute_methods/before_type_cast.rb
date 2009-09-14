@@ -7,7 +7,7 @@ module Recliner
         attribute_method_suffix "_before_type_cast"
       end
       
-      #
+      # Returns an attribute value before typecasting.
       def read_attribute_before_type_cast(name)
         if prop = property(name)
           attributes_before_type_cast[prop.as]

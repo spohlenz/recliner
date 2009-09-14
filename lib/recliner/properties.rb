@@ -1,7 +1,7 @@
 require 'uuid'
 
 module Recliner
-  module Properties
+  module Properties#:nodoc:
     autoload :Map, 'recliner/properties/map'
     autoload :Set, 'recliner/properties/set'
     
@@ -19,11 +19,17 @@ module Recliner
       # Defines a property on the document.
       # Expects a name (a symbol), type (class) and an (optional) options hash.
       #
-      # ==== Parameters
+      # ==== Supported options:
       #
-      # * +name+    - the name of the property
-      # * +type+    - the type of the property
-      # * +options+ - a hash of additional options [optional]
+      # [:default]
+      #   Default value for property, which is set on new instances.
+      #   May be a proc (which takes the instance as its argument).
+      # [:as]
+      #   The internal name to use when saving the property to couch format.
+      # [:protected]
+      #   Sets the property to be protected from mass-assignment. See attr_protected.
+      # [:accessible]
+      #   Sets the property to be accessible to mass-assignment. See attr_accessible.
       #
       # ==== Example
       #

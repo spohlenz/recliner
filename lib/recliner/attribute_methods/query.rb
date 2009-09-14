@@ -7,7 +7,7 @@ module Recliner
         attribute_method_suffix "?"
       end
       
-      #
+      # Returns true if the attribute is not blank (i.e. it has some value). Otherwise returns false.
       def query_attribute(name)
         !read_attribute(name).blank?
       end
