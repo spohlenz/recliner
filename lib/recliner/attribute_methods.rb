@@ -57,6 +57,11 @@ module Recliner
       end
     end
     
+    #
+    def to_couch
+      attributes_with_class.to_couch
+    end
+    
     # def clone_attributes(reader_method = :read_attribute, attributes = {})
     #   self.attribute_names.inject(attributes) do |attrs, name|
     #     attrs[name] = clone_attribute_value(reader_method, name)
@@ -92,17 +97,12 @@ module Recliner
       self.class.define_attribute_methods
       super
     end
-    
-    def to_couch
-      attributes_with_class.to_couch
-    end
   
   protected
     def attribute_method?(attr_name)
       properties.include?(attr_name)
     end
     
-  private
     def attributes_with_class
       attributes.merge(:class => self.class.name)
     end

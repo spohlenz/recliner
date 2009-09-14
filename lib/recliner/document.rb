@@ -171,6 +171,7 @@ module Recliner
       # attributes on the objects that are to be created.
       #
       # ==== Examples
+      #
       #   # Create a single new object
       #   User.create(:first_name => 'Jamie')
       #

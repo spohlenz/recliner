@@ -24,10 +24,13 @@ module Recliner
     end
   end
  
+  # Raised when a document cannot be found in the database.
   class DocumentNotFound < StandardError; end
   
+  # Raised when a document was not saved (e.g. when a callback returns false).
   class DocumentNotSaved < StandardError; end
   
+  # Raised when an incorrect revision is given when updating a document.
   class StaleRevisionError < DocumentNotSaved; end
 
 #   class AssociationTypeMismatch < StandardError; end

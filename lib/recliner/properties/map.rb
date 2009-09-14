@@ -8,6 +8,18 @@ module Recliner
       end
       
       module ClassMethods
+        # Creates a new Map class with the given mapping (a hash with exactly one key/value mapping).
+        # A Map operates like a Hash, but has strict type enforcement. It also automatically
+        # converts its keys and values to the correct type when loading from couch format.
+        #
+        # Map classes are cached so that:
+        #   Map(String => String).object_id == Map(String => String).object_id
+        #
+        # ==== Example
+        #
+        #    >> Map(String => Date)    # creates a map with String keys and Date values
+        #    >> Map(String => Address) # creates a map with String keys and Address values
+        #                              # (Address must be serializable to/from couch format)
         def Map(mapping)
           raise ArgumentError, 'Exactly one type mapping must be given' unless mapping.keys.size == 1
           

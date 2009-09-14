@@ -7,6 +7,7 @@ module Recliner
         attribute_method_suffix "?"
       end
       
+      #
       def query_attribute(name)
         !read_attribute(name).blank?
       end

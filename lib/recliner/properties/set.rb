@@ -8,6 +8,18 @@ module Recliner
       end
       
       module ClassMethods
+        # Creates a new Set class with the given type.
+        # A Set operates like an Array, but has strict type enforcement. It also automatically
+        # converts its elements to the correct type when loading from couch format.
+        #
+        # Set classes are cached so that:
+        #   Set(String).object_id == Set(String).object_id
+        #
+        # ==== Example
+        #
+        #    >> Set(String)  # creates a set which can contain String elements
+        #    >> Set(Address) # creates a set which can contain Address elements
+        #                    # (Address must be serializable to/from couch format)
         def Set(type)
           @set_class_cache ||= {}
           @set_class_cache[type] ||= begin

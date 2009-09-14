@@ -104,7 +104,7 @@ module Recliner
     end
     
     module ClassMethods
-      def validation_method(on)
+      def validation_method(on)#:nodoc:
         case on
         when :create
           :validate_on_create

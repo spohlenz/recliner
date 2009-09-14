@@ -24,7 +24,7 @@ module Recliner
         read_inheritable_attribute(:views) || write_inheritable_attribute(:views, {})
       end
       
-      #
+      # Defines a view.
       def view(name, options={})
         views[name] = options
         reset_views!
@@ -56,7 +56,6 @@ module Recliner
       # When setting, +conditions+ may be either a String or a Hash.
       # Using a Hash is recommended as it will allow subclasses to specify
       # further conditions by using:
-      #
       #   default_conditions.merge!({ :override => 'conditions' })
       def default_conditions(conditions=nil)
         if conditions
@@ -97,17 +96,18 @@ module Recliner
         views_initialized!
       end
       
-      #
+      # Fetch the first object of this type from the database.
       def first
         all(:limit => 1).first
       end
       
-      #
+      # Fetch the last object of this type from the database.
       def last
         all(:limit => 1, :descending => true).first
       end
       
-      #
+      # Fetch the number of objects of this type from the database.
+      # FIXME: Use a more efficient view
       def count
         all.size
       end

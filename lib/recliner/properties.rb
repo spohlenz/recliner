@@ -16,7 +16,23 @@ module Recliner
     end
     
     module ClassMethods
-      # Defines a property for the document.
+      # Defines a property on the document.
+      # Expects a name (a symbol), type (class) and an (optional) options hash.
+      #
+      # ==== Parameters
+      #
+      # * +name+    - the name of the property
+      # * +type+    - the type of the property
+      # * +options+ - a hash of additional options [optional]
+      #
+      # ==== Example
+      #
+      #   property :name, String       # Basic property using standard type
+      #   property :address, Address   # Custom types must implement from_couch/to_couch methods
+      #
+      #   property :language, String, :default => 'English'    # New instances will have default language 'English'
+      #   property :special, Integer, :as => '_internal_name'  # Attribute will be stored internally as '_internal_name'
+      #
       def property(name, *args, &block)
         options = args.extract_options!
         type = args.first
