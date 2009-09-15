@@ -42,7 +42,7 @@ module Recliner
           old = clone_attribute_value(attr)
           changed_attributes[attr] = old unless value == old
         end
-          
+        
         # Carry on.
         super
       end

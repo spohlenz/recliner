@@ -350,8 +350,9 @@ module Recliner
     include Callbacks
 
     include Views
-  #   include Associations
-  
+    
+    include Associations
+    
     include Timestamps
     include PrettyInspect
 

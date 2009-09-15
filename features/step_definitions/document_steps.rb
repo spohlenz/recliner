@@ -22,7 +22,7 @@ Given /^the document at "([^\"]*)" has (\d+) previous revisions?$/ do |uri, coun
   end
 end
 
-Given /^the following document definition:$/ do |code|
+Given /^the following document definitions?:$/ do |code|
   @defined_constants ||= []
   @defined_constants += ActiveSupport::Dependencies.new_constants_in(Object) { eval(code) }
 end
@@ -42,6 +42,14 @@ end
 Given /^I have a saved instance of "([^\"]*)" with:$/ do |klass, table|
   attributes = table.rows_hash
   @instance = klass.constantize.new(attributes)
+  @instance.save!
+  @instance.should_not be_a_new_record
+end
+
+Given /^I have a saved instance of "([^\"]*)" with attributes:$/ do |klass, table|
+  attributes = table.rows_hash
+  @instance = klass.constantize.new
+  attributes.each { |k, v| @instance.write_attribute(k, v) }
   @instance.save!
   @instance.should_not be_a_new_record
 end

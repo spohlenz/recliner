@@ -33,7 +33,7 @@ module Recliner
   autoload :ViewFunction,        'recliner/views/function'
   autoload :ViewGenerator,       'recliner/views/generator'
   
-  # autoload :Associations,        'recliner/associations'
+  autoload :Associations,        'recliner/associations'
   
   autoload :Validations,         'recliner/validations'
   autoload :Callbacks,           'recliner/callbacks'
