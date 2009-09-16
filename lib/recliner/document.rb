@@ -351,7 +351,7 @@ module Recliner
 
     include Views
     
-    include Associations
+    extend Associations::BelongsTo
     
     include Timestamps
     include PrettyInspect

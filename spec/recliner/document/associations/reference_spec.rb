@@ -95,6 +95,22 @@ module Recliner
           subject.target.should == @target
         end
       end
+      
+      describe "#reload" do
+        subject { Reference.new('12345') }
+        
+        before(:each) do
+          @target = mock('new target')
+          Recliner::Document.stub!(:load!).and_return(@target)
+          
+          subject.instance_variable_set("@target", mock('old target'))
+          subject.reload
+        end
+        
+        it "should clear the target" do
+          subject.target.should == @target
+        end
+      end
     end
   end
 end

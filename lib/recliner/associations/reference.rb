@@ -32,6 +32,10 @@ module Recliner
         @target = object
       end
       
+      def reload
+        @target = nil
+      end
+      
       def target
         @target ||= Recliner::Document.load!(id) if id
       end
