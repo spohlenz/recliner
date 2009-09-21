@@ -45,13 +45,12 @@ module Recliner
         end
 
         Recliner::Callbacks::CALLBACKS.each do |callback_method|
-          callback_method_sym = callback_method.to_sym
-          define_callback_method(callback_method_sym)
-          send(callback_method, callback_method_sym)
-          send(callback_method, callback_string(callback_method_sym))
-          send(callback_method, callback_proc(callback_method_sym))
-          send(callback_method, callback_object(callback_method_sym))
-          send(callback_method) { |model| model.history << [callback_method_sym, :block] }
+          next if callback_method.to_s =~ /^around_/
+          define_callback_method(callback_method)
+          send(callback_method, callback_string(callback_method))
+          send(callback_method, callback_proc(callback_method))
+          send(callback_method, callback_object(callback_method))
+          send(callback_method) { |model| model.history << [callback_method, :block] }
         end
         
         def history
@@ -96,26 +95,18 @@ module Recliner
         instance = CallbackTestDocument.new
         instance.valid?
         instance.history.should == [
-          [ :after_initialize,            :string ],
-          [ :after_initialize,            :proc   ],
-          [ :after_initialize,            :object ],
-          [ :after_initialize,            :block  ],
-          [ :before_validation,           :string ],
-          [ :before_validation,           :proc   ],
-          [ :before_validation,           :object ],
-          [ :before_validation,           :block  ],
-          [ :before_validation_on_create, :string ],
-          [ :before_validation_on_create, :proc   ],
-          [ :before_validation_on_create, :object ],
-          [ :before_validation_on_create, :block  ],
-          [ :after_validation,            :string ],
-          [ :after_validation,            :proc   ],
-          [ :after_validation,            :object ],
-          [ :after_validation,            :block  ],
-          [ :after_validation_on_create,  :string ],
-          [ :after_validation_on_create,  :proc   ],
-          [ :after_validation_on_create,  :object ],
-          [ :after_validation_on_create,  :block  ]
+          [ :after_initialize,  :string ],
+          [ :after_initialize,  :proc   ],
+          [ :after_initialize,  :object ],
+          [ :after_initialize,  :block  ],
+          [ :before_validation, :string ],
+          [ :before_validation, :proc   ],
+          [ :before_validation, :object ],
+          [ :before_validation, :block  ],
+          [ :after_validation,  :string ],
+          [ :after_validation,  :proc   ],
+          [ :after_validation,  :object ],
+          [ :after_validation,  :block  ]
         ]
       end
   
@@ -125,72 +116,56 @@ module Recliner
         instance = CallbackTestDocument.load!(doc.id)
         instance.valid?
         instance.history.should == [
-          [ :after_initialize,            :string ],
-          [ :after_initialize,            :proc   ],
-          [ :after_initialize,            :object ],
-          [ :after_initialize,            :block  ],
-          [ :after_load,                  :string ],
-          [ :after_load,                  :proc   ],
-          [ :after_load,                  :object ],
-          [ :after_load,                  :block  ],
-          [ :before_validation,           :string ],
-          [ :before_validation,           :proc   ],
-          [ :before_validation,           :object ],
-          [ :before_validation,           :block  ],
-          [ :before_validation_on_update, :string ],
-          [ :before_validation_on_update, :proc   ],
-          [ :before_validation_on_update, :object ],
-          [ :before_validation_on_update, :block  ],
-          [ :after_validation,            :string ],
-          [ :after_validation,            :proc   ],
-          [ :after_validation,            :object ],
-          [ :after_validation,            :block  ],
-          [ :after_validation_on_update,  :string ],
-          [ :after_validation_on_update,  :proc   ],
-          [ :after_validation_on_update,  :object ],
-          [ :after_validation_on_update,  :block  ]
+          [ :after_initialize,  :string ],
+          [ :after_initialize,  :proc   ],
+          [ :after_initialize,  :object ],
+          [ :after_initialize,  :block  ],
+          [ :after_load,        :string ],
+          [ :after_load,        :proc   ],
+          [ :after_load,        :object ],
+          [ :after_load,        :block  ],
+          [ :before_validation, :string ],
+          [ :before_validation, :proc   ],
+          [ :before_validation, :object ],
+          [ :before_validation, :block  ],
+          [ :after_validation,  :string ],
+          [ :after_validation,  :proc   ],
+          [ :after_validation,  :object ],
+          [ :after_validation,  :block  ]
         ]
       end
   
       it "should run each type of callback when creating a document" do
         instance = CallbackTestDocument.create
         instance.history.should == [
-          [ :after_initialize,            :string ],
-          [ :after_initialize,            :proc   ],
-          [ :after_initialize,            :object ],
-          [ :after_initialize,            :block  ],
-          [ :before_validation,           :string ],
-          [ :before_validation,           :proc   ],
-          [ :before_validation,           :object ],
-          [ :before_validation,           :block  ],
-          [ :before_validation_on_create, :string ],
-          [ :before_validation_on_create, :proc   ],
-          [ :before_validation_on_create, :object ],
-          [ :before_validation_on_create, :block  ],
-          [ :after_validation,            :string ],
-          [ :after_validation,            :proc   ],
-          [ :after_validation,            :object ],
-          [ :after_validation,            :block  ],
-          [ :after_validation_on_create,  :string ],
-          [ :after_validation_on_create,  :proc   ],
-          [ :after_validation_on_create,  :object ],
-          [ :after_validation_on_create,  :block  ],
-          [ :before_save,                 :string ],
-          [ :before_save,                 :proc   ],
-          [ :before_save,                 :object ],
-          [ :before_save,                 :block  ],
-          [ :before_create,               :string ],
-          [ :before_create,               :proc   ],
-          [ :before_create,               :object ],
-          [ :before_create,               :block  ],
-          [ :after_create,                :string ],
-          [ :after_create,                :proc   ],
-          [ :after_create,                :object ],
-          [ :after_create,                :block  ],
-          [ :after_save,                  :string ],
-          [ :after_save,                  :proc   ],
-          [ :after_save,                  :object ],
-          [ :after_save,                  :block  ]
+          [ :after_initialize,  :string ],
+          [ :after_initialize,  :proc   ],
+          [ :after_initialize,  :object ],
+          [ :after_initialize,  :block  ],
+          [ :before_validation, :string ],
+          [ :before_validation, :proc   ],
+          [ :before_validation, :object ],
+          [ :before_validation, :block  ],
+          [ :after_validation,  :string ],
+          [ :after_validation,  :proc   ],
+          [ :after_validation,  :object ],
+          [ :after_validation,  :block  ],
+          [ :before_save,       :string ],
+          [ :before_save,       :proc   ],
+          [ :before_save,       :object ],
+          [ :before_save,       :block  ],
+          [ :before_create,     :string ],
+          [ :before_create,     :proc   ],
+          [ :before_create,     :object ],
+          [ :before_create,     :block  ],
+          [ :after_create,      :string ],
+          [ :after_create,      :proc   ],
+          [ :after_create,      :object ],
+          [ :after_create,      :block  ],
+          [ :after_save,        :string ],
+          [ :after_save,        :proc   ],
+          [ :after_save,        :object ],
+          [ :after_save,        :block  ]
         ]
       end
   
@@ -200,46 +175,38 @@ module Recliner
         instance = CallbackTestDocument.load(doc.id)
         instance.save
         instance.history.should == [
-          [ :after_initialize,            :string ],
-          [ :after_initialize,            :proc   ],
-          [ :after_initialize,            :object ],
-          [ :after_initialize,            :block  ],
-          [ :after_load,                  :string ],
-          [ :after_load,                  :proc   ],
-          [ :after_load,                  :object ],
-          [ :after_load,                  :block  ],
-          [ :before_validation,           :string ],
-          [ :before_validation,           :proc   ],
-          [ :before_validation,           :object ],
-          [ :before_validation,           :block  ],
-          [ :before_validation_on_update, :string ],
-          [ :before_validation_on_update, :proc   ],
-          [ :before_validation_on_update, :object ],
-          [ :before_validation_on_update, :block  ],
-          [ :after_validation,            :string ],
-          [ :after_validation,            :proc   ],
-          [ :after_validation,            :object ],
-          [ :after_validation,            :block  ],
-          [ :after_validation_on_update,  :string ],
-          [ :after_validation_on_update,  :proc   ],
-          [ :after_validation_on_update,  :object ],
-          [ :after_validation_on_update,  :block  ],
-          [ :before_save,                 :string ],
-          [ :before_save,                 :proc   ],
-          [ :before_save,                 :object ],
-          [ :before_save,                 :block  ],
-          [ :before_update,               :string ],
-          [ :before_update,               :proc   ],
-          [ :before_update,               :object ],
-          [ :before_update,               :block  ],
-          [ :after_update,                :string ],
-          [ :after_update,                :proc   ],
-          [ :after_update,                :object ],
-          [ :after_update,                :block  ],
-          [ :after_save,                  :string ],
-          [ :after_save,                  :proc   ],
-          [ :after_save,                  :object ],
-          [ :after_save,                  :block  ]
+          [ :after_initialize,  :string ],
+          [ :after_initialize,  :proc   ],
+          [ :after_initialize,  :object ],
+          [ :after_initialize,  :block  ],
+          [ :after_load,        :string ],
+          [ :after_load,        :proc   ],
+          [ :after_load,        :object ],
+          [ :after_load,        :block  ],
+          [ :before_validation, :string ],
+          [ :before_validation, :proc   ],
+          [ :before_validation, :object ],
+          [ :before_validation, :block  ],
+          [ :after_validation,  :string ],
+          [ :after_validation,  :proc   ],
+          [ :after_validation,  :object ],
+          [ :after_validation,  :block  ],
+          [ :before_save,       :string ],
+          [ :before_save,       :proc   ],
+          [ :before_save,       :object ],
+          [ :before_save,       :block  ],
+          [ :before_update,     :string ],
+          [ :before_update,     :proc   ],
+          [ :before_update,     :object ],
+          [ :before_update,     :block  ],
+          [ :after_update,      :string ],
+          [ :after_update,      :proc   ],
+          [ :after_update,      :object ],
+          [ :after_update,      :block  ],
+          [ :after_save,        :string ],
+          [ :after_save,        :proc   ],
+          [ :after_save,        :object ],
+          [ :after_save,        :block  ]
         ]
       end
   
