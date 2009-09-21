@@ -104,7 +104,7 @@ module Recliner
     end
     
     def attributes_with_class
-      attributes.merge(:class => self.class.name)
+      attributes.merge(:class => self.class.name).reject { |k, v| k == '_rev' && v.nil? }
     end
   end
 end

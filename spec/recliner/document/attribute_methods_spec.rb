@@ -165,6 +165,26 @@ module Recliner
           }
         end
       end
+      
+      context "a model with a revision" do
+        define_recliner_document :TestDocument
+        
+        subject { TestDocument.new(:id => 'abc-123', :rev => '1-12345') }
+        
+        it "should return a hash containing the document class, id and revision" do
+          subject.to_couch.should == { 'class' => 'TestDocument', '_id' => 'abc-123', '_rev' => '1-12345' }
+        end
+      end
+      
+      context "a model with a nil revision" do
+        define_recliner_document :TestDocument
+        
+        subject { TestDocument.new(:id => 'abc-123', :rev => nil) }
+        
+        it "should return a hash containing the document class and id" do
+          subject.to_couch.should == { 'class' => 'TestDocument', '_id' => 'abc-123' }
+        end
+      end
     end
   end
 end

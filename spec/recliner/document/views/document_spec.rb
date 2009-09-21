@@ -62,9 +62,32 @@ module Recliner
     end
     
     describe "#invoke" do
+      class MockView < Recliner::View
+        attr_reader :invoked
+        
+        def initialize(options)
+          @invoked = 0
+        end
+        
+        def invoke(*args)
+          @invoked += 1
+          
+          if @raise_exception
+            @raise_exception = false
+            raise Recliner::DocumentNotFound
+          else
+            'view result'
+          end
+        end
+        
+        def raise_exception_once!
+          @raise_exception = true
+        end
+      end
+      
       before(:each) do
-        @view1 = View.new(:map => 'view 1')
-        @view2 = View.new(:map => 'view 2 (map)', :reduce => 'view 2 (reduce)')
+        @view1 = MockView.new(:map => 'view 1')
+        @view2 = MockView.new(:map => 'view 2 (map)', :reduce => 'view 2 (reduce)')
         subject.views.replace(:view1 => @view1, :view2 => @view2)
         subject.id = '_design/TestDocument'
         save_with_stubbed_database!(subject)
@@ -86,6 +109,23 @@ module Recliner
       it "should return the result of the view invocation" do
         @view1.stub!(:invoke).and_return('view result')
         subject.invoke('view1').should == 'view result'
+      end
+      
+      describe "view document disappears" do
+        before(:each) do
+          subject.stub!(:save!).and_return(true)
+          @view1.raise_exception_once!
+        end
+        
+        it "should resave the view document" do
+          subject.should_receive(:save!)
+          subject.invoke('view1')
+        end
+        
+        it "should invoke the view again" do
+          subject.invoke('view1')
+          @view1.invoked.should == 2
+        end
       end
     end
   end
