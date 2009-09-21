@@ -1,10 +1,10 @@
 module Recliner
   module Associations
-    module BelongsTo
+    module Has
       #
       #
       #
-      def belongs_to(name, options={})
+      def has(name, options={})
         property "#{name}_id", Reference
         
         class_eval <<-EOF

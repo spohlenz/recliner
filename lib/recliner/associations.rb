@@ -1,6 +1,6 @@
 module Recliner
   module Associations
     autoload :Reference, 'recliner/associations/reference'
-    autoload :BelongsTo, 'recliner/associations/belongs_to'
+    autoload :Has,       'recliner/associations/has'
   end
 end

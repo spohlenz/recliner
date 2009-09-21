@@ -1,4 +1,4 @@
-Feature: belongs_to association
+Feature: has association
   
   
   Background:
@@ -10,7 +10,7 @@ Feature: belongs_to association
       end
       
       class Article < Recliner::Document
-        belongs_to :author
+        has :author
       end
       """
   

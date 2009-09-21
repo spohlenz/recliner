@@ -2,10 +2,10 @@ require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 
 module Recliner
   describe Document do
-    describe "belongs_to association" do
+    describe "has association" do
       define_recliner_document :User
       define_recliner_document :Article do
-        belongs_to :user
+        has :user
       end
       
       it "should add a reference property" do
