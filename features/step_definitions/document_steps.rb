@@ -1,3 +1,5 @@
+require 'active_support/dependencies'
+
 Given /^a document exists at "([^\"]*)"$/ do |uri|
   RestClient.put(uri, '{}')
 end
@@ -24,7 +26,7 @@ end
 
 Given /^the following document definitions?:$/ do |code|
   @defined_constants ||= []
-  @defined_constants += ActiveSupport::Dependencies.new_constants_in(Object) { eval(code) }
+  @defined_constants += ActiveSupport::Dependencies.new_constants_in(Object) { Object.module_eval(code) }
 end
 
 Given /^I have an unsaved instance of "([^\"]*)"$/ do |klass|
