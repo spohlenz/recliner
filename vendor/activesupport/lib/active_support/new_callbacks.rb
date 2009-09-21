@@ -295,7 +295,7 @@ module ActiveSupport
           "(#{filter})"
         when Proc
           @klass.send(:define_method, method_name, &filter)
-          return method_name if filter.arity == 0
+          return method_name if filter.arity <= 0
 
           method_name << (filter.arity == 1 ? "(self)" : " self, Proc.new ")
         else

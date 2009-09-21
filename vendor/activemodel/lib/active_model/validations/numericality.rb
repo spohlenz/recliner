@@ -1,3 +1,5 @@
+require 'active_support/core_ext/integer/even_odd'
+
 module ActiveModel
   module Validations
     module ClassMethods
