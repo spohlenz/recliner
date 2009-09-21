@@ -4,7 +4,8 @@ $:.unshift(activesupport_path) if File.directory?(activesupport_path)
 activemodel_path = "#{File.dirname(__FILE__)}/../vendor/activemodel/lib"
 $:.unshift(activemodel_path) if File.directory?(activemodel_path)
 
-require 'active_support/all'
+require 'active_support'
+require 'active_model'
 
 require 'json'
 require 'restclient'

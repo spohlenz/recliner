@@ -1,3 +1,5 @@
+require 'active_support/core_ext/hash/slice'
+
 module Recliner
   class View
     attr_reader :map, :reduce

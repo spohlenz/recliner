@@ -46,7 +46,10 @@ module Recliner
           :foo => Recliner::Property.new(:foo, String, 'foo', nil),
           :bar => Recliner::Property.new(:bar, Integer, 'internal', nil)
         }
-        TestDocument.model_properties.should == TestDocument.properties.slice(:foo, :bar)
+        TestDocument.model_properties.should == {
+          :foo => Recliner::Property.new(:foo, String, 'foo', nil),
+          :bar => Recliner::Property.new(:bar, Integer, 'internal', nil)
+        }
       end
     end
     

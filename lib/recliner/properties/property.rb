@@ -1,10 +1,17 @@
+require 'active_support/core_ext/date_time/conversions'
+require 'active_support/core_ext/time/conversions'
+
 module Recliner
   class Property < Struct.new(:name, :type, :as, :default)
     TRUE_VALUES = [ true, 1, 'true', 't', 'yes', 'y', '1' ]
     FALSE_VALUES = [ false, 0, 'false', 'f', 'no', 'n', '0' ]
   
     def default_value(instance)
-      default.respond_to?(:call) ? default.call(instance) : default
+      if default.respond_to?(:call)
+        default.arity == 1 ? default.call(instance) : default.call
+      else
+        default
+      end
     end
   
     def type_cast(value)
@@ -43,7 +50,12 @@ module Recliner
     end
   
     def convert_to_string(value)
-      value.to_s if value
+      if value.is_a?(Time) && RUBY_VERSION < '1.9'
+        # Use Ruby 1.9 Time format for consistency
+        value.strftime('%Y-%m-%d %T %z')
+      else
+        value.to_s if value
+      end
     end
   
     def convert_to_integer(value)

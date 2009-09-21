@@ -160,7 +160,7 @@ module Recliner
         end
       
         it "should convert a Time to a String" do
-          subject.type_cast(Time.local(2009, 10, 1, 12, 30, 45)).should == 'Thu Oct 01 12:30:45 +0930 2009'
+          subject.type_cast(Time.local(2009, 10, 1, 12, 30, 45)).should == '2009-10-01 12:30:45 +0930'
         end
       
         it "should convert a Date to a String" do

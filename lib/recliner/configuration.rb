@@ -1,3 +1,5 @@
+require 'active_support/core_ext/class/inheritable_attributes'
+
 module Recliner
   # Sets the default Recliner::Document database URI.
   #

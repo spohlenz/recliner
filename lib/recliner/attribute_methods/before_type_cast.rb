@@ -1,3 +1,5 @@
+require 'active_support/core_ext/hash/indifferent_access'
+
 module Recliner
   module AttributeMethods
     module BeforeTypeCast

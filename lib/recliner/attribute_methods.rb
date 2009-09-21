@@ -13,7 +13,7 @@ module Recliner
     include ActiveModel::AttributeMethods
     
     included do
-      undef_method :id
+      undef_method :id if method_defined?(:id)
     end
     
     module ClassMethods
@@ -85,7 +85,7 @@ module Recliner
         
         guard_private_attribute_method!(method_name, args)
         
-        if self.class.generated_attribute_methods.instance_methods.include?(method_name)
+        if self.class.generated_attribute_methods.method_defined?(method_name)
           return self.send(method_id, *args, &block)
         end
       end

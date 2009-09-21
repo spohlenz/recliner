@@ -103,19 +103,6 @@ module Recliner
       define_callbacks :validate_on_create, :validate_on_update
     end
     
-    module ClassMethods
-      def validation_method(on)#:nodoc:
-        case on
-        when :create
-          :validate_on_create
-        when :update
-          :validate_on_update
-        else
-          :validate
-        end
-      end
-    end
-    
     # The validation process on save can be skipped by passing false. The regular Document#save method is
     # replaced with this when the validations module is mixed in, which it is by default.
     def save_with_validation(perform_validation = true)
@@ -139,15 +126,10 @@ module Recliner
     # Runs all the specified validations and returns true if no errors were added otherwise false.
     def valid?
       errors.clear
-  
-      run_callbacks(:validate)
-  
-      if new_record?
-        run_callbacks(:validate_on_create)
-      else
-        run_callbacks(:validate_on_update)
-      end
-  
+      
+      @_on_validate = new_record? ? :create : :update
+      _run_validate_callbacks
+
       errors.empty?
     end
   

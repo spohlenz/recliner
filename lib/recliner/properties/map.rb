@@ -1,3 +1,5 @@
+require 'active_support/core_ext/module/aliasing'
+
 module Recliner
   module Properties
     module Map#:nodoc:

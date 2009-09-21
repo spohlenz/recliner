@@ -1,4 +1,4 @@
-require 'active_model'
+require 'active_support/core_ext/object/returning'
 
 module Recliner
   class Document
@@ -14,8 +14,8 @@ module Recliner
       @new_record = true
 
       yield self if block_given?
-
-      callback(:after_initialize) if respond_to?(:after_initialize)
+      
+      _run_initialize_callbacks
     end
 
     # :call-seq:
@@ -253,8 +253,9 @@ module Recliner
           end
           
           doc.instance_variable_set("@new_record", false)
+          
           doc.send(:changed_attributes).clear
-          doc.send(:callback, :after_load) if doc.respond_to?(:after_load)
+          doc.send(:_run_load_callbacks)
         end
       end
 
