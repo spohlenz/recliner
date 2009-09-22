@@ -24,7 +24,11 @@ module Recliner
       end
       
       def to_s
-        id
+        id.to_s
+      end
+      
+      def blank?
+        id.blank?
       end
       
       def inspect

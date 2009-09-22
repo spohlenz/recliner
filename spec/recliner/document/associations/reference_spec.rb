@@ -36,8 +36,12 @@ module Recliner
           subject.target.should be_nil
         end
         
-        it "should convert to nil on to_s" do
-          subject.to_s.should be_nil
+        it "should convert to blank string" do
+          subject.to_s.should == ''
+        end
+        
+        it "should be blank" do
+          subject.should be_blank
         end
       end
       
@@ -66,6 +70,10 @@ module Recliner
         
         it "should convert to string" do
           subject.to_s.should == '12345'
+        end
+        
+        it "should not be blank" do
+          subject.should_not be_blank
         end
         
         describe "#target" do
