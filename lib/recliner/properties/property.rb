@@ -10,7 +10,7 @@ module Recliner
       if default.respond_to?(:call)
         default.arity == 1 ? default.call(instance) : default.call
       else
-        default
+        default.duplicable? ? default.dup : default
       end
     end
   

@@ -40,6 +40,17 @@ module Recliner
           end
         end
       end
+      
+      context "with a duplicable default object" do
+        before(:each) do
+          @dup = mock('duplicate')
+          subject.default = mock('duplicable object', :dup => @dup)
+        end
+        
+        it "should duplicate and return the object" do
+          subject.default_value(nil).should == @dup
+        end
+      end
     end
   
     describe "#type_cast" do
