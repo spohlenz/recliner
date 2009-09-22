@@ -35,6 +35,10 @@ module Recliner
         it "should have a nil target" do
           subject.target.should be_nil
         end
+        
+        it "should convert to nil on to_s" do
+          subject.to_s.should be_nil
+        end
       end
       
       context "with an id" do
@@ -58,6 +62,10 @@ module Recliner
         
         it "should not be equal to another reference with a different id" do
           subject.should_not == Reference.new('23456')
+        end
+        
+        it "should convert to string" do
+          subject.to_s.should == '12345'
         end
         
         describe "#target" do

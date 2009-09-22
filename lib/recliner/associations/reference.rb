@@ -23,6 +23,10 @@ module Recliner
         id
       end
       
+      def to_s
+        id
+      end
+      
       def inspect
         id.nil? ? 'nil' : id
       end
