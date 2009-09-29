@@ -121,14 +121,14 @@ module Recliner
           convert(Time.parse("2009/07/30 12:16:27 +0930")).should == "2009/07/30 12:16:27 +0930"
         end
         
-        describe "on array" do
+        context "on array" do
           it "should convert each value" do
             convert([Date.parse("2009/07/30"), Time.parse("2009/07/30 12:16:27 +0930")]).should ==
               ["2009/07/30", "2009/07/30 12:16:27 +0930"]
           end
         end
         
-        describe "on hash" do
+        context "on hash" do
           it "should convert keys to strings" do
             convert({
               :abc => 123,
@@ -144,6 +144,87 @@ module Recliner
           it "should convert values" do
             convert({ 'hello' => Date.parse("2009/07/30") }).should ==
               { 'hello' => "2009/07/30" }
+          end
+        end
+      end
+      
+      describe "from couch" do
+        def convert(value, type)
+          Conversions.convert!(value, type, :source => :couch)
+        end
+        
+        specify "hash should return itself" do
+          hash = {
+            'abc' => 123,
+            '45' => 99,
+            'Object' => 'the object'
+          }
+          
+          convert(hash, Hash).should == hash
+        end
+        
+        specify "array should return itself" do
+          array = ['1', '2', 3, 4.0]
+          convert(array, Array).should == array
+        end
+        
+        specify "integers remain integers" do
+          convert(0, Integer).should == 0
+          convert(36, Integer).should == 36
+          convert(999, Integer).should == 999
+        end
+        
+        specify "floats remain floats" do
+          convert(0.5, Float).should == 0.5
+          convert(123.456, Float).should == 123.456
+        end
+        
+        specify "strings remaing strings" do
+          convert('hello', String).should == 'hello'
+          convert('goodbye', String).should == 'goodbye'
+        end
+        
+        context "to Time" do
+          specify "time strings should be converted to Time objects" do
+            convert("2009/07/30 12:16:27 +0930", Time).should == Time.parse("2009/07/30 12:16:27 +0930")
+          end
+        
+          specify "nil should remain nil" do
+            convert(nil, Time).should be_nil
+          end
+        end
+        
+        context "to Date" do
+          specify "date strings should be converted to Time objects" do
+            convert("2009/07/30", Date).should == Date.parse("2009/07/30")
+          end
+
+          specify "nil should remain nil" do
+            convert(nil, Date).should be_nil
+          end
+        end
+        
+        context "to Boolean" do
+          specify "nil remains nil" do
+            convert(nil, Boolean).should be_nil
+          end
+
+          specify "booleans remain booleans" do
+            convert(true, Boolean).should == true
+            convert(false, Boolean).should == false
+          end
+
+          specify "strings are converted to booleans" do
+            convert('true', Boolean).should == true
+            convert('1', Boolean).should == true
+
+            convert('false', Boolean).should == false
+            convert('0', Boolean).should == false
+          end
+
+          specify "integers are converted to booleans" do
+            convert(1, Boolean).should == true
+            convert(0, Boolean).should == false
           end
         end
       end

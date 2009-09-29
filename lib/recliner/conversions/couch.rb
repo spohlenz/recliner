@@ -20,19 +20,27 @@ end
 
 # From couch format
 
-# Recliner::Conversions.register(:couch, Boolean) do
-#   case self
-#   when true, 'true', '1', 1
-#     true
-#   else
-#     false
-#   end
-# end
-# 
-# Recliner::Conversions.register(:couch, Date) do
-#   Date.parse(self)
-# end
-# 
-# Recliner::Conversions.register(:couch, Time) do
-#   Time.parse(self)
-# end
+Recliner::Conversions.register(:couch, Hash) { self }
+Recliner::Conversions.register(:couch, Array) { self }
+Recliner::Conversions.register(:couch, String) { self }
+Recliner::Conversions.register(:couch, Integer) { self }
+Recliner::Conversions.register(:couch, Float) { self }
+
+Recliner::Conversions.register(:couch, Boolean) do
+  case self
+  when true, 'true', '1', 1
+    true
+  when false, 'false', '0', 0
+    false
+  else
+    nil
+  end
+end
+
+Recliner::Conversions.register(:couch, Date) do
+  Date.parse(self)
+end
+
+Recliner::Conversions.register(:couch, Time) do
+  Time.parse(self)
+end

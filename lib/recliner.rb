@@ -11,7 +11,7 @@ require 'json'
 require 'restclient'
 require 'uri'
 
-require 'recliner/core_ext'
+require 'recliner/core_extensions'
 require 'recliner/exceptions'
 require 'recliner/configuration'
 

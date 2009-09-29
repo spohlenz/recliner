@@ -9,41 +9,45 @@ module Recliner
       conversions.clear
     end
     
-    def convert(from, to)
+    def convert(from, to, options={})
       return nil if from.nil?
       return from if to.is_a?(Class) && from.kind_of?(to)
       
-      if block = conversion(from.class, to)
+      source = options[:source] || from.class
+      
+      if block = conversion(source, to)
         from.instance_eval(&block) rescue nil
       else
-        raise ConversionError, "No registered conversion from #{from.class} to #{to.inspect}"
+        raise ConversionError, "No registered conversion from #{source} to #{to.inspect}"
       end
     end
     
-    def convert!(from, to)
+    def convert!(from, to, options={})
       return nil if from.nil?
       return from if to.is_a?(Class) && from.kind_of?(to)
       
-      if block = conversion(from.class, to)
+      source = options[:source] || from.class
+      
+      if block = conversion(source, to)
         begin
           from.instance_eval(&block)
         rescue => e
           raise ConversionError, "Conversion block raised exception"
         end
       else
-        raise ConversionError, "No registered conversion from #{from.class} to #{to.inspect}"
+        raise ConversionError, "No registered conversion from #{source} to #{to.inspect}"
       end
     end
     
     def register(from, to, &block)
       conversions[from][to] = block
     end
-  
+    
   private
     def conversion(from, to)
       while from
         return conversions[from][to] if conversions[from] && conversions[from][to]
-        from = from.superclass
+        from = from.is_a?(Class) ? from.superclass : nil
       end
       nil
     end
