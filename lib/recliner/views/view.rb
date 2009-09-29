@@ -12,13 +12,6 @@ module Recliner
         @map, @reduce = Recliner::ViewGenerator.new(options).generate
       end
     end
-
-    def to_couch
-      returning({}) do |result|
-        result[:map] = map
-        result[:reduce] = reduce if reduce
-      end.to_couch
-    end
     
     def self.from_couch(hash)
       new(:map => hash['map'], :reduce => hash['reduce'])
@@ -70,4 +63,11 @@ module Recliner
       [ options, options.slice!(*INTERNAL_OPTIONS) ]
     end
   end
+end
+
+Recliner::Conversions.register(Recliner::View, :couch) do
+  returning({}) do |result|
+    result[:map] = map
+    result[:reduce] = reduce if reduce
+  end.to_couch
 end

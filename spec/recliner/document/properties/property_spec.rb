@@ -65,12 +65,7 @@ module Recliner
           subject.type_cast(Time.utc(2010, 5, 15, 1, 2, 3, 4)).should == Date.new(2010, 5, 15)
           subject.type_cast(Time.now).should == Date.today
         end
-      
-        it "should convert a DateTime to a Date" do
-          subject.type_cast(DateTime.civil(2010, 5, 15, 1, 2, 3, 4)).should == Date.new(2010, 5, 15)
-          subject.type_cast(DateTime.now).should == Date.today
-        end
-      
+        
         it "should convert a valid date string to a Date" do
           subject.type_cast("2009-10-1").should == Date.new(2009, 10, 1)
           subject.type_cast("2008/4/23").should == Date.new(2008, 4, 23)
@@ -133,6 +128,7 @@ module Recliner
           subject.type_cast('Y').should be_true
           subject.type_cast('1').should be_true
           subject.type_cast(1).should be_true
+          subject.type_cast(124).should be_true
         end
       
         it "should convert 'false' values to false" do
@@ -145,10 +141,10 @@ module Recliner
           subject.type_cast('N').should be_false
           subject.type_cast('0').should be_false
           subject.type_cast(0).should be_false
+          subject.type_cast(-10).should be_false
         end
       
         it "should convert other values to nil" do
-          subject.type_cast(124).should be_nil
           subject.type_cast('trueish').should be_nil
           subject.type_cast('falsish').should be_nil
           subject.type_cast('yes and no').should be_nil
@@ -249,12 +245,12 @@ module Recliner
           def initialize(name="John")
             @name = name
           end
-        
-          def self.parse(str)
-            new(str)
-          end
         end
-      
+        
+        before(:each) do
+          Recliner::Conversions.register(String, CustomType) { |str| CustomType.new(str) }
+        end
+        
         subject { Property.new(:custom, CustomType, :custom, nil) }
       
         it "should not alter instances of custom type" do

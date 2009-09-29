@@ -10,9 +10,4 @@ class Time
       val
     end
   end
-  
-  # Converts the Time object to a consistent string format (YYYY/MM/DD HH:MM:SS ZONE) for JSON serialization.
-  def to_couch
-    strftime('%Y/%m/%d %T %z')
-  end
 end

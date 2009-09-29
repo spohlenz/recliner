@@ -121,19 +121,7 @@ module Recliner
     end
     
     def self.convert_value(value)
-      return nil if value.nil?
-      
-      if type == String
-        value.to_s
-      elsif type == Integer
-        value.to_i
-      elsif type == Float
-        value.to_f
-      elsif value.kind_of?(type)
-        value
-      else
-        raise TypeError, "expected #{type} but got #{value.class}"
-      end
+      Conversions.convert(value, type)
     end
   end
 end

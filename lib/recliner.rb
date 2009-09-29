@@ -18,6 +18,8 @@ require 'recliner/configuration'
 module Recliner
   VERSION = '0.0.1'
   
+  autoload :Conversions,         'recliner/conversions'
+  
   autoload :Document,            'recliner/document'
   autoload :Database,            'recliner/database'
   

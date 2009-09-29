@@ -186,7 +186,7 @@ module Recliner
       
       it "should raise a TypeError if an assigned value is not a custom class" do
         set = subject.new
-        lambda { set << 'wrong type' }.should raise_error(TypeError, 'expected CustomClass but got String')
+        lambda { set << 'wrong type' }.should raise_error(TypeError)
       end
     end
   end

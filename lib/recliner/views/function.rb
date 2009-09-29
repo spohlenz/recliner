@@ -14,10 +14,6 @@ module Recliner
       @body
     end
     
-    def to_couch
-      @body
-    end
-    
     def ==(other)
       to_s == other.to_s
     end
@@ -31,3 +27,5 @@ module Recliner
     self.definition = 'function(keys, values, rereduce)'
   end
 end
+
+Recliner::Conversions.register(Recliner::ViewFunction, :couch) { |func| func.to_s }

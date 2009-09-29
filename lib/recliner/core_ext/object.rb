@@ -2,9 +2,10 @@
 class Object
   def self.from_couch(val)
     val
+    # Recliner::Conversions.convert(val, self.class, :from => :couch)
   end
   
   def to_couch
-    self
+    Recliner::Conversions.convert(self, :couch)
   end
 end

@@ -19,10 +19,6 @@ module Recliner
         new(id)
       end
       
-      def to_couch
-        id
-      end
-      
       def to_s
         id.to_s
       end
@@ -49,4 +45,7 @@ module Recliner
       end
     end
   end
+  
+  Conversions.register(Associations::Reference, :couch) { |ref| ref.id }
+  Conversions.register(String, Associations::Reference) { |str| Associations::Reference.new(str) }
 end

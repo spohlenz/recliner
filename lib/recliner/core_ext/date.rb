@@ -8,9 +8,4 @@ class Date
       val
     end
   end
-
-  # Converts the Date object to a consistent string format (YYYY/MM/DD) for JSON serialization.
-  def to_couch
-    strftime('%Y/%m/%d')
-  end
 end

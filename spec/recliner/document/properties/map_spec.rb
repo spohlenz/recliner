@@ -186,7 +186,7 @@ module Recliner
       
       it "should raise a TypeError if an assigned key is not a custom class" do
         map = subject.new
-        lambda { map['foo'] = 'wrong type' }.should raise_error(TypeError, 'expected CustomKeyClass but got String')
+        lambda { map['foo'] = 'wrong type' }.should raise_error(TypeError)
       end
     end
     
@@ -313,7 +313,7 @@ module Recliner
       
       it "should raise a TypeError if an assigned value is not a custom class" do
         map = subject.new
-        lambda { map['foo'] = 'wrong type' }.should raise_error(TypeError, 'expected CustomValueClass but got String')
+        lambda { map['foo'] = 'wrong type' }.should raise_error(TypeError)
       end
     end
   end
