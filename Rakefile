@@ -42,3 +42,22 @@ task :stats do
   CodeStatistics::TEST_TYPES.replace ['Specs']
   CodeStatistics.new(['Recliner Library', 'lib'], ['Specs', 'spec']).to_s
 end
+
+begin
+  require 'jeweler'
+  
+  Jeweler::Tasks.new do |gem|
+    gem.name = "recliner"
+    gem.summary = "CouchDB ORM for Ruby/Rails"
+    gem.description = "Recliner is a CouchDB ORM for Ruby/Rails similar to ActiveRecord and DataMapper."
+    gem.email = "sam@sampohlenz.com"
+    gem.homepage = "http://github.com/spohlenz/recliner"
+    gem.authors = ["Sam Pohlenz"]
+    
+    gem.add_dependency('rest-client', '>= 1.0.3')
+    gem.add_dependency('json', '>= 1.1.9')
+    gem.add_dependency('uuid', '>= 2.0.2')
+  end
+rescue LoadError
+  puts "Jeweler not available. Install it with: sudo gem install technicalpickles-jeweler -s http://gems.github.com"
+end
