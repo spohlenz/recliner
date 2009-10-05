@@ -226,3 +226,38 @@ describe Recliner, ' RESTful API' do
     end
   end
 end
+
+describe Recliner, ' logging' do
+  before(:all) do
+    @logger = mock('logger')
+    Recliner.logger = @logger
+  end
+  
+  after(:all) do
+    Recliner.logger = nil
+  end
+  
+  it "should log GET requests" do
+    @logger.should_receive(:debug).with('  [GET] http://127.0.0.1:5984/recliner-spec/some-document?param=123')
+    RestClient.stub!(:get).and_return('{"result":"ok"}')
+    Recliner.get('http://127.0.0.1:5984/recliner-spec/some-document', :param => 123)
+  end
+  
+  it "should log PUT requests" do
+    @logger.should_receive(:debug).with('  [PUT] http://127.0.0.1:5984/recliner-spec/some-document?param=123')
+    RestClient.stub!(:put).and_return('{"result":"ok"}')
+    Recliner.put('http://127.0.0.1:5984/recliner-spec/some-document', { :payload => 456 }, { :param => 123 })
+  end
+  
+  it "should log POST requests" do
+    @logger.should_receive(:debug).with('  [POST] http://127.0.0.1:5984/recliner-spec/some-document?param=123')
+    RestClient.stub!(:post).and_return('{"result":"ok"}')
+    Recliner.post('http://127.0.0.1:5984/recliner-spec/some-document', { :payload => 456 }, { :param => 123 })
+  end
+  
+  it "should log DELETE requests" do
+    @logger.should_receive(:debug).with('  [DELETE] http://127.0.0.1:5984/recliner-spec/some-document?rev=1-12345')
+    RestClient.stub!(:delete).and_return('{"result":"ok"}')
+    Recliner.delete('http://127.0.0.1:5984/recliner-spec/some-document', :rev => '1-12345')
+  end
+end

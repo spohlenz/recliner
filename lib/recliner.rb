@@ -7,6 +7,9 @@ $:.unshift(activemodel_path) if File.directory?(activemodel_path)
 require 'active_support'
 require 'active_model'
 
+require 'active_support/core_ext/object/blank'
+require 'active_support/core_ext/module/attribute_accessors'
+
 require 'json'
 require 'restclient'
 require 'uri'
@@ -43,6 +46,9 @@ module Recliner
   
   autoload :Timestamps,          'recliner/timestamps'
   autoload :PrettyInspect,       'recliner/pretty_inspect'
+  
+  # Accepts a logger conforming to the interface of Log4r or the default Ruby 1.8+ Logger class.
+  mattr_accessor :logger, :instance_writer => false
   
   class << self
     # Performs a HTTP GET request on a JSON resource, deserializing the response.
@@ -111,6 +117,7 @@ module Recliner
   private
     def request(type, uri, params={}, payload=nil)
       args = [type, "#{uri}#{to_query_string(params)}"]
+      log(*args)
       args << payload.to_json if payload
       
       JSON.parse(RestClient.send(*args))
@@ -118,6 +125,12 @@ module Recliner
       raise DocumentNotFound, "Could not find document at #{uri}"
     rescue RestClient::RequestFailed => e
       rescue_from_failed_request(e)
+    end
+    
+    def log(type, uri)
+      if logger
+        logger.debug("  [#{type.to_s.upcase}] #{uri}")
+      end
     end
   
     def rescue_from_failed_request(e)
