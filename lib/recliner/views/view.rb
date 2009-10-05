@@ -64,10 +64,3 @@ module Recliner
     end
   end
 end
-
-Recliner::Conversions.register(Recliner::View, :couch) do
-  returning({}) do |result|
-    result[:map] = map
-    result[:reduce] = reduce if reduce
-  end.to_couch
-end

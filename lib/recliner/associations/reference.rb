@@ -11,14 +11,6 @@ module Recliner
         other.is_a?(Reference) && id == other.id
       end
 
-      def self.from_couch(id)
-        new(id)
-      end
-      
-      def self.parse(id)
-        new(id)
-      end
-      
       def to_s
         id.to_s
       end
@@ -45,7 +37,4 @@ module Recliner
       end
     end
   end
-  
-  Conversions.register(Associations::Reference, :couch) { |ref| ref.id }
-  Conversions.register(String, Associations::Reference) { |str| Associations::Reference.new(str) }
 end

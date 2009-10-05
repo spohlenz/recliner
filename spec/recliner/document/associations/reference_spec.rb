@@ -8,11 +8,6 @@ module Recliner
         r.id.should == 'abc-123'
       end
       
-      it "should parse from id" do
-        r = Reference.parse('abc-123')
-        r.id.should == 'abc-123'
-      end
-      
       context "without an id" do
         subject { Reference.new }
         
